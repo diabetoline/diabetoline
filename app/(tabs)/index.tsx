@@ -34,7 +34,7 @@ export default function ScanScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }} edges={["top"]}>
       <View style={st.wrap}>
-        <Text style={[st.brand, { color: t.ink }]}>Diabetoline <Text style={{ color: t.accent, fontWeight: "500" }}>Scan</Text></Text>
+        <Text style={[st.brand, { color: t.ink }]}>Diabetoline</Text>
         <Card>
           <View style={[st.cam, { backgroundColor: t.accentSoft }]}>
             {perm?.granted ? (

@@ -1,4 +1,4 @@
-# Diabetoline Scan
+# Diabetoline (aplicația)
 
 Scanner de produse pentru diabetici: verdict verde / galben / roșu, indice și încărcătură glicemică estimate, zahăr ascuns, alternative.
 

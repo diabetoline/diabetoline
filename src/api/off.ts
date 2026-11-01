@@ -19,7 +19,7 @@ export interface OffPayload {
 
 export async function fetchProduct(barcode: string, lang = "en"): Promise<Product> {
   const res = await fetch(`${BASE}${encodeURIComponent(barcode)}.json?fields=${FIELDS}&lc=${lang}`, {
-    headers: { "User-Agent": "DiabetolineScan/1.0 (contact@diabetoline.com)" },
+    headers: { "User-Agent": "Diabetoline/1.0 (contact@diabetoline.com)" },
   });
   if (res.status === 404) throw new NotFound(barcode);
   if (!res.ok) throw new Error(`OFF ${res.status}`);

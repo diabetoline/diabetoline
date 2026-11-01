@@ -1,19 +1,19 @@
 {
   "expo": {
-    "name": "Diabetoline Scan",
-    "slug": "diabetoline-scan",
+    "name": "Diabetoline",
+    "slug": "diabetoline",
     "version": "1.0.0",
-    "scheme": "diabetolinescan",
+    "scheme": "diabetoline",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "ios": { "supportsTablet": false, "bundleIdentifier": "com.curalife.diabetolinescan",
+    "ios": { "supportsTablet": false, "bundleIdentifier": "com.curalife.diabetoline",
       "infoPlist": { "NSCameraUsageDescription": "Camera is used to scan product barcodes.", "ITSAppUsesNonExemptEncryption": false } },
-    "android": { "package": "com.curalife.diabetolinescan", "permissions": ["CAMERA"],
+    "android": { "package": "com.curalife.diabetoline", "permissions": ["CAMERA"],
       "adaptiveIcon": { "backgroundColor": "#1F4F8F", "foregroundImage": "./assets/android-icon-foreground.png", "backgroundImage": "./assets/android-icon-background.png", "monochromeImage": "./assets/android-icon-monochrome.png" },
       "predictiveBackGestureEnabled": false },
     "web": { "favicon": "./assets/favicon.png", "bundler": "metro" },
-    "plugins": ["expo-router", ["expo-camera", { "cameraPermission": "Diabetoline Scan uses the camera to read product barcodes." }], "expo-localization"],
+    "plugins": ["expo-router", ["expo-camera", { "cameraPermission": "Diabetoline uses the camera to read product barcodes." }], "expo-localization"],
     "experiments": { "typedRoutes": true }
   }
 }
