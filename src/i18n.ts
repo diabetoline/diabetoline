@@ -1,0 +1,101 @@
+import { getLocales } from "expo-localization";
+
+export type Lang = "ro" | "en" | "de";
+
+const STR = {
+  ro: {
+    tab_scan: "Scanare", tab_meals: "Mese", tab_glu: "Glicemie", tab_family: "Familie", tab_more: "Mai mult",
+    scan_hint: "Îndreaptă camera spre codul de bare", scan_manual: "sau tastează codul", check: "Verifică", cam_denied: "Aplicația are nevoie de cameră ca să citească codurile de bare.", cam_allow: "Permite camera",
+    loading: "Caut produsul…", not_found: "Produsul nu e încă în baza de date.", not_found_help: "Poți scana alt produs sau poți adăuga acest produs tu, cu o poză la etichetă.", network: "Nu am putut ajunge la baza de date. Verifică internetul.",
+    good: "Potrivit", mod: "Cu măsură", avoid: "Evită", serving: "porție", serving_assumed: "porție estimată, eticheta nu o declară",
+    why: "De ce", impact: "Impact asupra glicemiei", gi: "Indice glicemic", gl: "Încărcătură / porție", low: "scăzut", mid: "mediu", high: "ridicat", low_f: "scăzută", mid_f: "medie", high_f: "ridicată",
+    gi_note: "Indice estimat după alimente de referință similare. Încărcătura = indice × carbohidrați pe porție ÷ 100.",
+    hidden: "Zahăr ascuns în ingrediente", walk: "Doza de mișcare", walk_text: (m: number) => `O plimbare de ${m} minute după ce îl mănânci reduce vârful glicemic.`,
+    nut: "Valori nutriționale", per100: "100", carbs: "Carbohidrați", sugars: "din care zaharuri", fiber: "Fibre",
+    disclaimer: "Informații generale despre produs, nu sfat medical. Pentru alimentația ta, urmează recomandările medicului.",
+    to_cart: "Adaugă în coș", in_cart: "E în coș", log_after: "Notează glicemia după",
+    trap: (claim: string) => `Atenție la etichetă. Scrie „${claim}”, dar conține ingrediente care cresc glicemia.`,
+    reason: {
+      carbs_low: (v: Verd) => `${v.carbs} g carbohidrați pe porție, un nivel redus.`,
+      carbs_mid: (v: Verd) => `${v.carbs} g carbohidrați pe porție: ține cont de ei la masa respectivă.`,
+      carbs_high: (v: Verd) => `${v.carbs} g carbohidrați pe porție: mult pentru o singură porție.`,
+      sugars_mid: (v: Verd) => `${v.sugars} g zahăr pe porție, cam ${Math.max(1, Math.round(v.sugars / 4))} lingurițe.`,
+      sugars_high: (v: Verd) => `${v.sugars} g zahăr pe porție, cât ${Math.round(v.sugars / 4)} lingurițe.`,
+      fiber_good: (v: Verd) => `${v.fiber} g fibre pe porție încetinesc creșterea glicemiei.`,
+      gi_high: () => "Indice glicemic ridicat: crește glicemia rapid.",
+      gl_high: (v: Verd) => `Încărcătură glicemică ridicată pe porție (${v.gl}).`,
+      sugar_dense: () => "Produsul e în cea mai mare parte zahăr, oricât de mică ar fi porția.",
+      hidden_sugar: () => "Conține ingrediente care cresc glicemia, deși nu apar ca „zahăr”.",
+      label_trap: () => "Eticheta promite puțin zahăr, dar conținutul spune altceva.",
+    } as Record<string, (v: Verd) => string>,
+    hid: { maltodextrin: "maltodextrină", glucose_fructose_syrup: "sirop de glucoză-fructoză", glucose_syrup: "sirop de glucoză", dextrose: "dextroză", fructose: "fructoză", maltitol: "maltitol", honey: "miere", invert_sugar: "zahăr invertit", other_syrup: "siropuri (orez, agave, porumb, caramel)", molasses: "melasă", juice_concentrate: "suc concentrat", maltose: "maltoză" } as Record<string, string>,
+    claim: { no_added_sugar: "fără zahăr adăugat", sugar_free: "fără zahăr", for_diabetics: "pentru diabetici", light: "light" } as Record<string, string>,
+    history: "Istoric", empty_history: "Produsele scanate apar aici.", soon: "În lucru. Vine în versiunea următoare.",
+  },
+  en: {
+    tab_scan: "Scan", tab_meals: "Meals", tab_glu: "Glucose", tab_family: "Family", tab_more: "More",
+    scan_hint: "Point the camera at the barcode", scan_manual: "or type the code", check: "Check", cam_denied: "The app needs the camera to read barcodes.", cam_allow: "Allow camera",
+    loading: "Looking up the product…", not_found: "This product isn't in the database yet.", not_found_help: "Scan another product, or add this one yourself with a photo of the label.", network: "Couldn't reach the database. Check your connection.",
+    good: "Good choice", mod: "In moderation", avoid: "Avoid", serving: "serving", serving_assumed: "estimated serving, the label doesn't declare one",
+    why: "Why", impact: "Impact on blood sugar", gi: "Glycemic index", gl: "Glycemic load / serving", low: "low", mid: "medium", high: "high", low_f: "low", mid_f: "medium", high_f: "high",
+    gi_note: "Index estimated from similar reference foods. Load = index × carbs per serving ÷ 100.",
+    hidden: "Hidden sugar in ingredients", walk: "Movement dose", walk_text: (m: number) => `A ${m}-minute walk after eating it lowers the glucose peak.`,
+    nut: "Nutrition facts", per100: "100", carbs: "Carbohydrates", sugars: "of which sugars", fiber: "Fiber",
+    disclaimer: "General product information, not medical advice. Follow your doctor's guidance for your diet.",
+    to_cart: "Add to cart", in_cart: "In cart", log_after: "Log glucose after",
+    trap: (claim: string) => `Watch the label. It says "${claim}", but it contains ingredients that raise blood sugar.`,
+    reason: {
+      carbs_low: (v: Verd) => `${v.carbs} g carbs per serving, a low amount.`,
+      carbs_mid: (v: Verd) => `${v.carbs} g carbs per serving: count them in that meal.`,
+      carbs_high: (v: Verd) => `${v.carbs} g carbs per serving: a lot for one serving.`,
+      sugars_mid: (v: Verd) => `${v.sugars} g sugar per serving, about ${Math.max(1, Math.round(v.sugars / 4))} teaspoons.`,
+      sugars_high: (v: Verd) => `${v.sugars} g sugar per serving, ${Math.round(v.sugars / 4)} teaspoons.`,
+      fiber_good: (v: Verd) => `${v.fiber} g fiber per serving slows the glucose rise.`,
+      gi_high: () => "High glycemic index: raises blood sugar fast.",
+      gl_high: (v: Verd) => `High glycemic load per serving (${v.gl}).`,
+      sugar_dense: () => "The product is mostly sugar, however small the serving.",
+      hidden_sugar: () => "Contains ingredients that raise blood sugar without being called \"sugar\".",
+      label_trap: () => "The label promises little sugar; the contents say otherwise.",
+    } as Record<string, (v: Verd) => string>,
+    hid: { maltodextrin: "maltodextrin", glucose_fructose_syrup: "glucose-fructose syrup", glucose_syrup: "glucose syrup", dextrose: "dextrose", fructose: "fructose", maltitol: "maltitol", honey: "honey", invert_sugar: "invert sugar", other_syrup: "syrups (rice, agave, corn, caramel)", molasses: "molasses", juice_concentrate: "juice concentrate", maltose: "maltose" } as Record<string, string>,
+    claim: { no_added_sugar: "no added sugar", sugar_free: "sugar-free", for_diabetics: "for diabetics", light: "light" } as Record<string, string>,
+    history: "History", empty_history: "Scanned products show up here.", soon: "In progress. Coming in the next version.",
+  },
+  de: {
+    tab_scan: "Scannen", tab_meals: "Essen", tab_glu: "Zucker", tab_family: "Familie", tab_more: "Mehr",
+    scan_hint: "Kamera auf den Barcode richten", scan_manual: "oder Code eingeben", check: "Prüfen", cam_denied: "Die App braucht die Kamera, um Barcodes zu lesen.", cam_allow: "Kamera erlauben",
+    loading: "Produkt wird gesucht…", not_found: "Dieses Produkt ist noch nicht in der Datenbank.", not_found_help: "Scanne ein anderes Produkt oder füge dieses mit einem Foto des Etiketts hinzu.", network: "Datenbank nicht erreichbar. Prüfe deine Verbindung.",
+    good: "Geeignet", mod: "In Maßen", avoid: "Vermeiden", serving: "Portion", serving_assumed: "geschätzte Portion, das Etikett nennt keine",
+    why: "Warum", impact: "Wirkung auf den Blutzucker", gi: "Glykämischer Index", gl: "Glykämische Last / Portion", low: "niedrig", mid: "mittel", high: "hoch", low_f: "niedrig", mid_f: "mittel", high_f: "hoch",
+    gi_note: "Index geschätzt anhand ähnlicher Referenzlebensmittel. Last = Index × Kohlenhydrate pro Portion ÷ 100.",
+    hidden: "Versteckter Zucker in den Zutaten", walk: "Bewegungsdosis", walk_text: (m: number) => `Ein ${m}-minütiger Spaziergang danach senkt die Blutzuckerspitze.`,
+    nut: "Nährwerte", per100: "100", carbs: "Kohlenhydrate", sugars: "davon Zucker", fiber: "Ballaststoffe",
+    disclaimer: "Allgemeine Produktinformation, keine medizinische Beratung. Folge bei deiner Ernährung den Empfehlungen deines Arztes.",
+    to_cart: "In den Einkauf", in_cart: "Im Einkauf", log_after: "Blutzucker danach eintragen",
+    trap: (claim: string) => `Achtung Etikett. Es steht „${claim}“, aber es enthält Zutaten, die den Blutzucker erhöhen.`,
+    reason: {
+      carbs_low: (v: Verd) => `${v.carbs} g Kohlenhydrate pro Portion, wenig.`,
+      carbs_mid: (v: Verd) => `${v.carbs} g Kohlenhydrate pro Portion: bei der Mahlzeit mitrechnen.`,
+      carbs_high: (v: Verd) => `${v.carbs} g Kohlenhydrate pro Portion: viel für eine Portion.`,
+      sugars_mid: (v: Verd) => `${v.sugars} g Zucker pro Portion, etwa ${Math.max(1, Math.round(v.sugars / 4))} Teelöffel.`,
+      sugars_high: (v: Verd) => `${v.sugars} g Zucker pro Portion, ${Math.round(v.sugars / 4)} Teelöffel.`,
+      fiber_good: (v: Verd) => `${v.fiber} g Ballaststoffe pro Portion bremsen den Anstieg.`,
+      gi_high: () => "Hoher glykämischer Index: lässt den Blutzucker schnell steigen.",
+      gl_high: (v: Verd) => `Hohe glykämische Last pro Portion (${v.gl}).`,
+      sugar_dense: () => "Das Produkt besteht größtenteils aus Zucker, egal wie klein die Portion.",
+      hidden_sugar: () => "Enthält Zutaten, die den Blutzucker erhöhen, ohne „Zucker“ zu heißen.",
+      label_trap: () => "Das Etikett verspricht wenig Zucker, der Inhalt sagt etwas anderes.",
+    } as Record<string, (v: Verd) => string>,
+    hid: { maltodextrin: "Maltodextrin", glucose_fructose_syrup: "Glukose-Fruktose-Sirup", glucose_syrup: "Glukosesirup", dextrose: "Dextrose", fructose: "Fruktose", maltitol: "Maltit", honey: "Honig", invert_sugar: "Invertzucker", other_syrup: "Sirupe (Reis, Agave, Mais, Karamell)", molasses: "Melasse", juice_concentrate: "Saftkonzentrat", maltose: "Maltose" } as Record<string, string>,
+    claim: { no_added_sugar: "ohne Zuckerzusatz", sugar_free: "zuckerfrei", for_diabetics: "für Diabetiker", light: "light" } as Record<string, string>,
+    history: "Verlauf", empty_history: "Gescannte Produkte erscheinen hier.", soon: "In Arbeit. Kommt in der nächsten Version.",
+  },
+};
+type Verd = { carbs: number; sugars: number; fiber: number; gl: number | null };
+export type Strings = typeof STR.ro;
+
+export function deviceLang(): Lang {
+  const code = getLocales()[0]?.languageCode ?? "en";
+  return code === "ro" || code === "de" ? code : "en";
+}
+export function strings(lang: Lang): Strings { return STR[lang] as Strings; }
