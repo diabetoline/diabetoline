@@ -7,6 +7,7 @@ import { levelColor, useTheme, type Theme } from "../../src/theme";
 import { Icon, type IconName } from "../../src/ui/Icon";
 import { Button, Card, Hint, Label, useScale } from "../../src/ui/Primitives";
 import { Quip } from "../../src/ui/Quip";
+import { MoveCheckin, WeightCheckin } from "../../src/ui/Checkins";
 
 /**
  * Prima pagină: patru butoane mari, un cuvânt fiecare, fără explicații.
@@ -55,6 +56,9 @@ export default function Home() {
             {justTook && <Quip k="med_taken" seed={justTook} style={{ textAlign: "left" }} />}
           </Card>
         )}
+
+        {!fresh && <MoveCheckin />}
+        {!fresh && <WeightCheckin />}
 
         {hasDay && (
           <Card>

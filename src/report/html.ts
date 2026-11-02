@@ -54,7 +54,8 @@ export function reportHtml(r: ReportData, s: Strings, opts: { name: string; unit
     <div class="grid">
       <div class="box"><b>${r.meals.count}</b><span>${esc(s.rep_meals)}: ${esc(s.rep_meals_v(r.meals.green, r.meals.yellow, r.meals.red))}</span></div>
       <div class="box"><b>${r.meals.avgCarbs != null ? `${r.meals.avgCarbs} g` : "—"}</b><span>${esc(s.rep_avgcarbs)}</span></div>
-      <div class="box"><b>${r.walks.minutes} min</b><span>${esc(s.rep_walks_v(r.walks.count, r.walks.minutes))}${r.walkDaysPct != null ? ` · ${esc(s.rep_walkdays(r.walkDaysPct))}` : ""}</span></div>
+      <div class="box"><b>${r.walks.minutes} min</b><span>${esc(s.rep_movedays(r.walks.days, r.days))} · ${esc(s.rep_walks_v(r.walks.count, r.walks.minutes))}${r.walkDaysPct != null ? ` · ${esc(s.rep_walkdays(r.walkDaysPct))}` : ""}</span></div>
+      ${r.weight ? `<div class="box"><b>${r.weight.last} kg</b><span>${esc(s.rep_weight)}: ${esc(s.rep_weight_v(r.weight.first, r.weight.last))} (${esc(s.wt_change(r.weight.change))})</span></div>` : ""}
       <div class="box"><b>${r.goodDays} / ${r.goodDays + r.lessDays}</b><span>${esc(s.rep_days_v(r.goodDays, r.lessDays))}</span></div>
     </div>
 

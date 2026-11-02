@@ -11,6 +11,7 @@ export interface GluEntry { id: string; v: number; ctx: GluCtx; note: string; t:
 export interface MealEntry { id: string; t: number; photoUri?: string; code?: string; name?: string; level?: Level; slot: "breakfast" | "lunch" | "dinner" | "snack"; analysis?: PlateAnalysis; carbs?: number; gl?: number }
 export interface Med { id: string; name: string; times: string[]; notifIds?: string[] }
 export interface Walk { id: string; t: number; min: number }
+export interface Weight { id: string; t: number; kg: number }
 /** Contul de familie: rolul pe acest telefon și legăturile. */
 export interface Family {
   role: "parent" | "child" | null;
@@ -26,10 +27,12 @@ export interface MedLog { id: string; medId: string; time: string; day: string; 
 
 export interface State {
   lang: Lang; langManual?: boolean; humor: boolean; welcomed?: boolean; unit: "mg" | "mmol"; name: string; bigText: boolean;
-  history: HistItem[]; glucose: GluEntry[]; meals: MealEntry[]; meds: Med[]; medLog: MedLog[]; walks: Walk[]; family: Family;
+  history: HistItem[]; glucose: GluEntry[]; meals: MealEntry[]; meds: Med[]; medLog: MedLog[]; walks: Walk[]; weights: Weight[]; family: Family;
+  /** ziua (YYYY-MM-DD) în care a răspuns „nu încă” la întrebarea de seară, ca să nu-l mai întrebăm azi */
+  moveAskedDay?: string; moveNotifId?: string;
   cache: Record<string, Product>;
 }
-const initial: State = { lang: deviceLang(), humor: true, unit: "mg", name: "", bigText: false, history: [], glucose: [], meals: [], meds: [], medLog: [], walks: [], family: { role: null, consent: false, children: [] }, cache: {} };
+const initial: State = { lang: deviceLang(), humor: true, unit: "mg", name: "", bigText: false, history: [], glucose: [], meals: [], meds: [], medLog: [], walks: [], weights: [], family: { role: null, consent: false, children: [] }, cache: {} };
 const KEY = "dscan.state.v2";
 
 interface Ctx {
@@ -41,6 +44,7 @@ interface Ctx {
   addMeal: (m: Omit<MealEntry, "id" | "t"> & { t?: number }) => string;
   markMed: (medId: string, time: string) => void;
   addWalk: (min: number) => void;
+  addWeight: (kg: number) => void;
 }
 const C = createContext<Ctx | null>(null);
 export const dayKey = (t: number) => new Date(t).toISOString().slice(0, 10);
@@ -59,7 +63,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     if (!ready || s.family.role !== "parent" || !s.family.consent) return;
     const h = setTimeout(() => { pushEntries(s).then(() => setS((p) => ({ ...p, family: { ...p.family, lastSync: Date.now() } }))).catch(() => {}); }, 4000);
     return () => clearTimeout(h);
-  }, [ready, s.glucose, s.meals, s.medLog, s.walks, s.history, s.family.role, s.family.consent]);
+  }, [ready, s.glucose, s.meals, s.medLog, s.walks, s.weights, s.history, s.family.role, s.family.consent]);
 
   const api = useMemo<Ctx>(() => ({
     s, t: strings(s.lang),
@@ -71,6 +75,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     addUserProduct: (p) => setS((prev) => ({ ...prev, cache: { ...prev.cache, [p.code]: p } })),
     addGlucose: (e) => setS((prev) => ({ ...prev, glucose: [...prev.glucose, { ...e, id: String(Date.now()), t: e.t ?? Date.now() }] })),
     addMeal: (m) => { const id = String(Date.now()); setS((prev) => ({ ...prev, meals: [...prev.meals, { ...m, id, t: m.t ?? Date.now() }] })); return id; },
+    addWeight: (kg) => setS((prev) => ({ ...prev, weights: [...(prev.weights ?? []), { id: String(Date.now()), t: Date.now(), kg }] })),
     addWalk: (min) => setS((prev) => ({ ...prev, walks: [...(prev.walks ?? []), { id: String(Date.now()), t: Date.now(), min }] })),
     markMed: (medId, time) => setS((prev) => {
       const day = dayKey(Date.now());

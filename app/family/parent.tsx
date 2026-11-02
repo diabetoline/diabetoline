@@ -62,6 +62,7 @@ export default function ParentJournal() {
             if (r.kind === "meal") { const lv = r.data.level as "green" | "yellow" | "red" | null; return (
               <Row key={r.client_id} left={<Text style={{ fontSize: 22 }}>🍽️</Text>} text={String(r.data.name ?? s.meal)} sub={lv ? (lv === "green" ? s.meal_green : lv === "yellow" ? s.meal_yellow : s.meal_red) : s[`meal_${r.data.slot}` as "meal_lunch"]} dot={lv ? levelColor(t, lv).fg : undefined} time={time} />); }
             if (r.kind === "med") return <Row key={r.client_id} left={<Text style={{ fontSize: 22 }}>💊</Text>} text={`${r.data.name} · ${s.med_taken}`} time={time} />;
+            if (r.kind === "weight") return <Row key={r.client_id} left={<Text style={{ fontSize: 22 }}>⚖️</Text>} text={s.wt_entry(Number(r.data.kg))} time={time} />;
             if (r.kind === "walk") return <Row key={r.client_id} left={<Text style={{ fontSize: 22 }}>🚶</Text>} text={s.walk_entry(Number(r.data.min))} time={time} />;
             return <Row key={r.client_id} left={<Text style={{ fontSize: 22 }}>🛒</Text>} text={String(r.data.name)} dot={r.data.level ? levelColor(t, r.data.level as "green").fg : undefined} time={time} />;
           })}

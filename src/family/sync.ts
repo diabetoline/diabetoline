@@ -5,7 +5,7 @@ import type { State } from "../store";
  * Urcă jurnalul părintelui pe server, ca să-l vadă copilul. Doar când legătura e activă și părintele a acceptat.
  * Pozele nu se urcă; la mese se trimit numele, verdictul și carbohidrații.
  */
-export type Entry = { client_id: string; kind: "glucose" | "meal" | "med" | "walk" | "scan"; t: string; data: Record<string, unknown> };
+export type Entry = { client_id: string; kind: "glucose" | "meal" | "med" | "walk" | "scan" | "weight"; t: string; data: Record<string, unknown> };
 
 export function entriesFrom(s: State): Entry[] {
   const iso = (t: number) => new Date(t).toISOString();
@@ -14,6 +14,7 @@ export function entriesFrom(s: State): Entry[] {
   for (const m of s.meals) out.push({ client_id: `m${m.id}`, kind: "meal", t: iso(m.t), data: { name: m.name ?? null, level: m.level ?? null, slot: m.slot, carbs: m.carbs ?? null, gl: m.gl ?? null, summary: m.analysis?.summary ?? null } });
   for (const l of s.medLog) { const med = s.meds.find((x) => x.id === l.medId); out.push({ client_id: `d${l.id}`, kind: "med", t: iso(l.t), data: { name: med?.name ?? "", time: l.time } }); }
   for (const w of s.walks ?? []) out.push({ client_id: `w${w.id}`, kind: "walk", t: iso(w.t), data: { min: w.min } });
+  for (const w of s.weights ?? []) out.push({ client_id: `k${w.id}`, kind: "weight", t: iso(w.t), data: { kg: w.kg } });
   for (const h of s.history.slice(0, 50)) out.push({ client_id: `s${h.code}`, kind: "scan", t: iso(h.t), data: { name: h.name, level: h.level, code: h.code } });
   return out;
 }

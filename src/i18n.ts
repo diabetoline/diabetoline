@@ -5,6 +5,10 @@ type Verd = { carbs: number; sugars: number; fiber: number; gl: number | null };
 type Dict = Record<string, any>;
 
 const ro = {
+  wt_ask: "Cât cântărești săptămâna asta?", wt_hint: "O dată pe săptămână e de ajuns. Medicul tău vrea să vadă tendința, nu fiecare zi.", wt_kg: "kg", wt_save: "Notează greutatea", wt_saved: "Greutatea a fost notată.", wt_later: "Mai târziu", wt_last: (kg: number, d: string) => `Ultima: ${kg} kg, ${d}`, wt_title: "Greutate", wt_change: (d: number) => (d > 0 ? `+${d} kg` : `${d} kg`), wt_entry: (kg: number) => `Greutate: ${kg} kg`,
+  mv_ask: "Ai făcut mișcare azi?", mv_hint: "O plimbare, grădina, treburile prin casă: toate contează.", mv_yes: (m: number) => `Da, ${m} min`, mv_no: "Nu încă", mv_more: "Mai mult", mv_thanks: "Notat. Bravo!", mv_no_thanks: "Nicio problemă. Poate o plimbare scurtă după cină?",
+  notif_mv_title: "Ai făcut mișcare azi?", notif_mv_body: "Deschide Diabetoline și apasă Da sau Nu. Durează o secundă.",
+  rep_weight: "Greutate", rep_weight_v: (a: number, b: number) => `${a} kg → ${b} kg`, rep_movedays: (n: number, d: number) => `${n} din ${d} zile cu mișcare`,
   w1_title: "Bun venit!", w1_text: "Diabetoline te ajută să mănânci bine și să ai grijă de glicemie, în fiecare zi. Simplu, fără cont, fără cursuri.",
   w2_title: "La cumpărături", w2_text: "Scanezi codul de bare al unui produs și afli pe loc dacă e bun pentru tine.", w2_g: "Potrivit", w2_y: "Cu măsură", w2_r: "Evită",
   w3_title: "La masă", w3_text: "Faci o poză la farfurie, acasă sau la restaurant. Îți spunem cât îți crește glicemia și ce să faci după.",
@@ -111,6 +115,10 @@ const ro = {
 };
 
 const en: typeof ro = {
+  wt_ask: "What's your weight this week?", wt_hint: "Once a week is enough. Your doctor wants the trend, not every day.", wt_kg: "kg", wt_save: "Log weight", wt_saved: "Weight logged.", wt_later: "Later", wt_last: (kg: number, d: string) => `Last: ${kg} kg, ${d}`, wt_title: "Weight", wt_change: (d: number) => (d > 0 ? `+${d} kg` : `${d} kg`), wt_entry: (kg: number) => `Weight: ${kg} kg`,
+  mv_ask: "Did you move today?", mv_hint: "A walk, the garden, housework: it all counts.", mv_yes: (m: number) => `Yes, ${m} min`, mv_no: "Not yet", mv_more: "More", mv_thanks: "Logged. Well done!", mv_no_thanks: "No problem. Maybe a short walk after dinner?",
+  notif_mv_title: "Did you move today?", notif_mv_body: "Open Diabetoline and tap Yes or No. Takes a second.",
+  rep_weight: "Weight", rep_weight_v: (a: number, b: number) => `${a} kg → ${b} kg`, rep_movedays: (n: number, d: number) => `${n} of ${d} days with activity`,
   w1_title: "Welcome!", w1_text: "Diabetoline helps you eat well and look after your blood sugar, every day. Simple, no account, no lessons.",
   w2_title: "When shopping", w2_text: "Scan a product's barcode and find out right away whether it's good for you.", w2_g: "Good", w2_y: "In moderation", w2_r: "Avoid",
   w3_title: "At the table", w3_text: "Take a photo of your plate, at home or in a restaurant. We tell you how much it raises your blood sugar and what to do after.",
@@ -207,6 +215,10 @@ const en: typeof ro = {
 };
 
 const de: typeof ro = {
+  wt_ask: "Wie viel wiegst du diese Woche?", wt_hint: "Einmal pro Woche reicht. Dein Arzt will den Verlauf sehen, nicht jeden Tag.", wt_kg: "kg", wt_save: "Gewicht eintragen", wt_saved: "Gewicht eingetragen.", wt_later: "Später", wt_last: (kg: number, d: string) => `Zuletzt: ${kg} kg, ${d}`, wt_title: "Gewicht", wt_change: (d: number) => (d > 0 ? `+${d} kg` : `${d} kg`), wt_entry: (kg: number) => `Gewicht: ${kg} kg`,
+  mv_ask: "Hast du dich heute bewegt?", mv_hint: "Ein Spaziergang, der Garten, Hausarbeit: alles zählt.", mv_yes: (m: number) => `Ja, ${m} Min.`, mv_no: "Noch nicht", mv_more: "Mehr", mv_thanks: "Eingetragen. Super!", mv_no_thanks: "Kein Problem. Vielleicht ein kurzer Spaziergang nach dem Abendessen?",
+  notif_mv_title: "Hast du dich heute bewegt?", notif_mv_body: "Öffne Diabetoline und tippe Ja oder Nein. Dauert eine Sekunde.",
+  rep_weight: "Gewicht", rep_weight_v: (a: number, b: number) => `${a} kg → ${b} kg`, rep_movedays: (n: number, d: number) => `${n} von ${d} Tagen mit Bewegung`,
   w1_title: "Willkommen!", w1_text: "Diabetoline hilft dir, jeden Tag gut zu essen und auf deinen Blutzucker zu achten. Einfach, ohne Konto, ohne Anleitung.",
   w2_title: "Beim Einkaufen", w2_text: "Scanne den Barcode eines Produkts und erfahre sofort, ob es gut für dich ist.", w2_g: "Geeignet", w2_y: "In Maßen", w2_r: "Vermeiden",
   w3_title: "Beim Essen", w3_text: "Fotografiere deinen Teller, zu Hause oder im Restaurant. Wir sagen dir, wie stark der Blutzucker steigt und was danach hilft.",

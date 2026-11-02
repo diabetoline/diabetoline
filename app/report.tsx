@@ -17,7 +17,7 @@ export default function Report() {
   const { t: s, s: state } = useStore();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
-  const r = buildReport({ glucose: state.glucose, meals: state.meals, walks: state.walks ?? [], meds: state.meds, medLog: state.medLog });
+  const r = buildReport({ glucose: state.glucose, meals: state.meals, walks: state.walks ?? [], meds: state.meds, medLog: state.medLog, weights: state.weights ?? [] });
   const empty = r.glucose.count === 0 && r.meals.count === 0;
 
   const make = async () => {

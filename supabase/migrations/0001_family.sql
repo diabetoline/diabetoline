@@ -32,7 +32,7 @@ create table if not exists public.entries (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
   client_id text not null,
-  kind text not null check (kind in ('glucose','meal','med','walk','scan')),
+  kind text not null check (kind in ('glucose','meal','med','walk','scan','weight')),
   t timestamptz not null,
   data jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),

@@ -50,3 +50,12 @@ export async function scheduleGlucoseCheck(t: Strings, minutes = 120): Promise<s
   });
   return at.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
+
+/** Întrebarea de seară „Ai făcut mișcare azi?”, zilnic la 19:00. Întoarce id-ul notificării. */
+export async function scheduleMoveQuestion(t: Strings, hour = 19): Promise<string | null> {
+  if (!(await ensurePermission())) return null;
+  return Notifications.scheduleNotificationAsync({
+    content: { title: t.notif_mv_title, body: t.notif_mv_body, data: { kind: "move" } },
+    trigger: { type: Notifications.SchedulableTriggerInputTypes.DAILY, hour, minute: 0 },
+  });
+}
