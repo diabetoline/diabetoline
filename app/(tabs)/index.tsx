@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useRouter, type Href } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { dayKey, useStore } from "../../src/store";
 import { levelColor, useTheme, type Theme } from "../../src/theme";
 import { Button, Card, Hint, Label, useScale } from "../../src/ui/Primitives";
+import { Quip } from "../../src/ui/Quip";
 
 /**
  * Prima pagină: aplicația explicată prin situațiile din zi.
@@ -16,6 +18,7 @@ export default function Home() {
   const today = dayKey(Date.now());
   const todayMeals = state.meals.filter((m) => dayKey(m.t) === today);
   const todayGlu = state.glucose.filter((g) => dayKey(g.t) === today);
+  const [justTook, setJustTook] = useState<string | null>(null);
   const nowHM = new Date().toTimeString().slice(0, 5);
   const dueMeds = state.meds.flatMap((m) => m.times.map((time) => ({ m, time, done: state.medLog.some((l) => l.medId === m.id && l.time === time && l.day === today) })))
     .filter((x) => !x.done).sort((a, b) => a.time.localeCompare(b.time));
@@ -48,16 +51,17 @@ export default function Home() {
               <View key={m.id + time} style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
                 <Text style={{ fontSize: 24 }}>💊</Text>
                 <Text style={{ flex: 1, color: t.ink, fontSize: 18 * k, fontWeight: "700" }}>{m.name} <Text style={{ color: t.muted, fontWeight: "400" }}>{time}</Text></Text>
-                <Button title={s.med_take} size="sm" onPress={() => markMed(m.id, time)} />
+                <Button title={s.med_take} size="sm" onPress={() => { markMed(m.id, time); setJustTook(m.id + time); }} />
               </View>
             ))}
             {dueNow.length === 0 && next && <Hint>{s.med_next(next.m.name, next.time)}</Hint>}
+            {justTook && <Quip k="med_taken" seed={justTook} style={{ textAlign: "left" }} />}
           </Card>
         )}
 
         <Card>
           <Label>{s.your_day}</Label>
-          {todayMeals.length === 0 && todayGlu.length === 0 ? <Hint>{s.nothing_today}</Hint> : (
+          {todayMeals.length === 0 && todayGlu.length === 0 ? <View style={{ gap: 6 }}><Hint>{s.nothing_today}</Hint><Quip k="empty" seed={today} style={{ textAlign: "left" }} /></View> : (
             <View style={{ gap: 8 }}>
               {todayGlu.slice(-3).map((g) => <Row key={g.id} t={t} k={k} left="🩸" text={`${state.unit === "mg" ? Math.round(g.v) : (g.v / 18).toFixed(1)} ${state.unit === "mg" ? "mg/dL" : "mmol/L"} · ${s.ctx[g.ctx]}`} time={g.t} />)}
               {todayMeals.slice(-3).map((m) => <Row key={m.id} t={t} k={k} left={m.photoUri ? "🍽️" : "🛒"} text={m.name ?? s[`meal_${m.slot}` as `meal_${typeof m.slot}`]} time={m.t} level={m.level} />)}

@@ -4,6 +4,8 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { ctxForHour, useStore, type GluCtx } from "../../src/store";
 import { useTheme } from "../../src/theme";
 import { Button, Card, Hint, Label, Title, useScale } from "../../src/ui/Primitives";
+import { Quip } from "../../src/ui/Quip";
+import { gluClass } from "../../src/engine/days";
 
 const CTX: GluCtx[] = ["fasting", "pre", "post2h", "evening", "other"];
 
@@ -12,6 +14,7 @@ export default function NewGlucose() {
   const t = useTheme(); const k = useScale(); const router = useRouter();
   const { t: s, s: state, addGlucose } = useStore();
   const [val, setVal] = useState("");
+  const [saved, setSaved] = useState<{ v: number; ctx: GluCtx } | null>(null);
   const [ctx, setCtx] = useState<GluCtx>(after ? "post2h" : ctxForHour(new Date().getHours()));
   const unitLbl = state.unit === "mg" ? "mg/dL" : "mmol/L";
   const parsed = parseFloat(val.replace(",", "."));
@@ -21,8 +24,24 @@ export default function NewGlucose() {
   const save = () => {
     if (!valid) return;
     addGlucose({ v: Math.round(mg), ctx, note: after ? `după ${after}` : "" });
-    router.back();
+    setSaved({ v: Math.round(mg), ctx });
   };
+  if (saved) {
+    const c = gluClass(saved.v, saved.ctx);
+    const col = c === "ok" ? t.ok : c === "low" ? t.bad : t.warn;
+    return (
+      <ScrollView contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 40 }}>
+        <Stack.Screen options={{ title: s.glu_add }} />
+        <Card style={{ alignItems: "center", gap: 10, borderColor: col, borderWidth: 2 }}>
+          <Text style={{ color: col, fontSize: 48 * k, fontWeight: "800", fontVariant: ["tabular-nums"] }}>{state.unit === "mg" ? saved.v : (saved.v / 18).toFixed(1)}</Text>
+          <Text style={{ color: col, fontSize: 20 * k, fontWeight: "700" }}>{c === "ok" ? s.g_ok : c === "low" ? s.g_low : s.g_high} · {s.ctx[saved.ctx]}</Text>
+          <Text style={{ color: t.ink, fontSize: 17 * k }}>{s.glu_saved}</Text>
+          <Quip k={c === "ok" ? "glu_ok" : c === "low" ? "glu_low" : "glu_high"} seed={saved.v} />
+        </Card>
+        <Button title={s.care_done} size="xl" onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))} />
+      </ScrollView>
+    );
+  }
   return (
     <ScrollView contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
       <Stack.Screen options={{ title: s.glu_add }} />

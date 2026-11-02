@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -5,6 +6,7 @@ import { dayKey, useStore } from "../../src/store";
 import { levelColor, useTheme } from "../../src/theme";
 import { Button, Card, Hint, Label, Title, useScale } from "../../src/ui/Primitives";
 import { DaysCalendar } from "../../src/ui/DaysCalendar";
+import { Quip } from "../../src/ui/Quip";
 
 import type { GluEntry, MealEntry, MedLog, Walk } from "../../src/store";
 type Item = { t: number; kind: "glu"; data: GluEntry } | { t: number; kind: "meal"; data: MealEntry } | { t: number; kind: "med"; data: MedLog } | { t: number; kind: "walk"; data: Walk };
@@ -12,6 +14,7 @@ type Item = { t: number; kind: "glu"; data: GluEntry } | { t: number; kind: "mea
 export default function Journal() {
   const t = useTheme(); const k = useScale(); const router = useRouter();
   const { t: s, s: state, set, markMed } = useStore();
+  const [justTook, setJustTook] = useState<string | null>(null);
   const toU = (v: number) => (state.unit === "mg" ? String(Math.round(v)) : (v / 18).toFixed(1));
   const unitLbl = state.unit === "mg" ? "mg/dL" : "mmol/L";
   const cls = (v: number, ctx: string) => (v < 70 ? "low" : (ctx === "fasting" && v > 130) || v > 180 ? "high" : "ok");
@@ -56,13 +59,14 @@ export default function Journal() {
               <View key={m.id + time} style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
                 <Text style={{ flex: 1, color: t.ink, fontSize: 18 * k }}>{m.name} <Text style={{ color: t.muted }}>{time}</Text></Text>
                 {done ? <Text style={{ color: t.ok, fontWeight: "700", fontSize: 16 * k }}>✓ {s.med_taken}</Text>
-                  : <Button title={s.med_take} size="sm" onPress={() => markMed(m.id, time)} />}
+                  : <Button title={s.med_take} size="sm" onPress={() => { markMed(m.id, time); setJustTook(m.id + time); }} />}
               </View>
             ))}
+            {justTook && <Quip k="med_taken" seed={justTook} style={{ textAlign: "left" }} />}
           </Card>
         )}
 
-        {days.size === 0 && <Hint>{s.no_entries}</Hint>}
+        {days.size === 0 && <View style={{ gap: 6 }}><Hint>{s.no_entries}</Hint><Quip k="empty" style={{ textAlign: "left" }} /></View>}
         {[...days.entries()].map(([d, list]) => (
           <Card key={d}>
             <Label>{d === today ? s.today : new Date(list[0].t).toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" })}</Label>

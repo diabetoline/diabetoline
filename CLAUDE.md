@@ -9,6 +9,7 @@ Aplicație mobilă (Expo / React Native, TypeScript) pentru diabetici, publicat�
 - Rolul aplicației: ajută și ghidează diabeticul în toate situațiile din zi.
 - Doar 3 secțiuni: Acasă · Jurnal · Mai mult. Prima pagină e organizată pe situații („Unde ești acum?”): La cumpărături (scanare) · La masă, acasă sau la restaurant (poză la farfurie) · Glicemia · Medicamentele.
 - Limbi: ro, en, de. Preț: 99 lei/an în RO, 19,99 €/an în rest; pachet de familie.
+- Glumițe (`src/quips.ts`, componenta `Quip`): scurte, calde, pe seama prăjiturilor, niciodată pe seama persoanei sau a bolii; o singură replică pe ecran; se pot opri din Setări.
 - Fără sfaturi medicale, fără doze, fără diagnostic (evităm încadrarea ca dispozitiv medical). Reamintirile de medicație sunt doar reamintiri.
 
 ## Scope V1 (decis 1 nov 2026)

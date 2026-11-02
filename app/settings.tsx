@@ -33,6 +33,10 @@ export default function Settings() {
         <TextInput value={state.name} onChangeText={(v) => set({ name: v })} placeholder="—" placeholderTextColor={t.muted} accessibilityLabel={s.your_name}
           style={{ borderWidth: 1, borderColor: t.line, borderRadius: 12, padding: 14, fontSize: 18 * k, color: t.ink, backgroundColor: t.bg }} />
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+          <Text style={{ color: t.ink, fontSize: 18 * k }}>{s.humor}</Text>
+          <Switch value={state.humor} onValueChange={(v) => set({ humor: v })} trackColor={{ true: t.ok }} />
+        </View>
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
           <Text style={{ color: t.ink, fontSize: 18 * k }}>{s.big_text}</Text>
           <Switch value={state.bigText} onValueChange={(v) => set({ bigText: v })} trackColor={{ true: t.ok }} />
         </View>

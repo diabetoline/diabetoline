@@ -10,6 +10,7 @@ import { speechLocale } from "../../src/i18n";
 import { levelColor, useTheme } from "../../src/theme";
 import { Button, Card, Hint, Label, useScale } from "../../src/ui/Primitives";
 import { AfterMeal } from "../../src/ui/AfterMeal";
+import { Quip } from "../../src/ui/Quip";
 
 const n = (x: number) => x.toLocaleString(undefined, { maximumFractionDigits: 1 });
 
@@ -53,7 +54,7 @@ export default function ProductScreen() {
         <Button title={s.back} onPress={() => router.back()} kind="ghost" /></Card>
     </View>
   );
-  if (!p || !v) return <View style={{ flex: 1, alignItems: "center", justifyContent: "center", gap: 10 }}><ActivityIndicator color={t.accent} size="large" /><Hint>{s.loading}</Hint></View>;
+  if (!p || !v) return <View style={{ flex: 1, alignItems: "center", justifyContent: "center", gap: 10 }}><ActivityIndicator color={t.accent} size="large" /><Hint>{s.loading}</Hint><Quip k="loading" seed={code} /></View>;
 
   const c = levelColor(t, v.level);
   const label = v.level === "green" ? s.good : v.level === "yellow" ? s.mod : s.avoid;
@@ -71,6 +72,7 @@ export default function ProductScreen() {
         <Text style={{ color: c.fg, fontWeight: "800", fontSize: 34 * k, textAlign: "center" }}>{label}</Text>
         <Text style={{ color: t.ink, fontWeight: "600", fontSize: 19 * k, textAlign: "center" }}>{p.name}</Text>
         <Text style={{ color: t.ink, fontSize: 18 * k, textAlign: "center", lineHeight: 26 * k }}>{summary}</Text>
+        <Quip k={v.level} seed={p.code} />
         <Pressable onPress={speak} style={[st.speak, { backgroundColor: t.surface, borderColor: c.fg }]} accessibilityRole="button" accessibilityLabel={s.speak}>
           <Text style={{ fontSize: 22 }}>🔊</Text><Text style={{ color: t.ink, fontWeight: "700", fontSize: 16 * k }}>{s.speak}</Text>
         </Pressable>

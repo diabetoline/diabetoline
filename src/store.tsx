@@ -13,11 +13,11 @@ export interface Walk { id: string; t: number; min: number }
 export interface MedLog { id: string; medId: string; time: string; day: string; t: number }
 
 export interface State {
-  lang: Lang; langManual?: boolean; unit: "mg" | "mmol"; name: string; bigText: boolean;
+  lang: Lang; langManual?: boolean; humor: boolean; unit: "mg" | "mmol"; name: string; bigText: boolean;
   history: HistItem[]; glucose: GluEntry[]; meals: MealEntry[]; meds: Med[]; medLog: MedLog[]; walks: Walk[];
   cache: Record<string, Product>;
 }
-const initial: State = { lang: deviceLang(), unit: "mg", name: "", bigText: false, history: [], glucose: [], meals: [], meds: [], medLog: [], walks: [], cache: {} };
+const initial: State = { lang: deviceLang(), humor: true, unit: "mg", name: "", bigText: false, history: [], glucose: [], meals: [], meds: [], medLog: [], walks: [], cache: {} };
 const KEY = "dscan.state.v2";
 
 interface Ctx {

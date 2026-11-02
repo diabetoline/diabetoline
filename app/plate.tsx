@@ -10,6 +10,7 @@ import { Button, Hint } from "../src/ui/Primitives";
 import type { Level } from "../src/engine/types";
 import { analyzePlate } from "../src/api/plate";
 import { mealVerdict } from "../src/engine/plate";
+import { quip } from "../src/quips";
 
 export default function PlateScreen() {
   const t = useTheme(); const router = useRouter();
@@ -78,7 +79,7 @@ export default function PlateScreen() {
           </View>
           <View style={st.bottom}>
             {analyzing ? (
-              <View style={{ alignItems: "center", gap: 10, paddingVertical: 8 }}><ActivityIndicator color="#fff" size="large" /><Text style={st.how}>{s.plate_analyzing}</Text></View>
+              <View style={{ alignItems: "center", gap: 10, paddingVertical: 8 }}><ActivityIndicator color="#fff" size="large" /><Text style={st.how}>{s.plate_analyzing}</Text>{state.humor && <Text style={st.hint}>{quip(state.lang, "plate_wait", shot ?? "")}</Text>}</View>
             ) : shot ? (
               <>
                 {unrecognized && <Text style={st.hint}>{s.plate_fail}</Text>}

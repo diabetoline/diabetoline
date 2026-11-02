@@ -5,6 +5,7 @@ type Verd = { carbs: number; sugars: number; fiber: number; gl: number | null };
 type Dict = Record<string, any>;
 
 const ro = {
+  humor: "Glumițe pentru bună dispoziție",
   rep_byday: "Pe zile", rep_nowalk: "fără mișcare", rep_walkdays: (p: number) => `după ${p}% din mesele grele a urmat o plimbare`, rep_legend: "Mese: ● verde = potrivită, ● portocaliu = cu măsură, ● roșu = grea (verdictul aplicației, nu al pacientului).",
   med_next: (n: string, h: string) => `Următorul: ${n}, la ${h}.`,
   rep_title: "Raport pentru medic", rep_sub: "Ultimele 30 de zile: glicemii, mese, mișcare, medicamente. Îl trimiți medicului sau îl printezi.", rep_make: "Pregătește raportul", rep_making: "Pregătesc raportul…", rep_share: "Trimite raportul", rep_empty: "Încă nu sunt date de pus în raport. Notează glicemii și mese câteva zile.",
@@ -92,6 +93,7 @@ const ro = {
 };
 
 const en: typeof ro = {
+  humor: "Little jokes for a better mood",
   rep_byday: "Day by day", rep_nowalk: "no activity", rep_walkdays: (p: number) => `a walk followed ${p}% of heavy meals`, rep_legend: "Meals: ● green = good, ● orange = moderate, ● red = heavy (app verdict).",
   med_next: (n: string, h: string) => `Next: ${n}, at ${h}.`,
   rep_title: "Doctor report", rep_sub: "Last 30 days: glucose, meals, activity, medication. Send it to your doctor or print it.", rep_make: "Prepare the report", rep_making: "Preparing the report…", rep_share: "Send the report", rep_empty: "No data for a report yet. Log glucose and meals for a few days.",
@@ -169,6 +171,7 @@ const en: typeof ro = {
 };
 
 const de: typeof ro = {
+  humor: "Kleine Witze für gute Laune",
   rep_byday: "Tag für Tag", rep_nowalk: "keine Bewegung", rep_walkdays: (p: number) => `nach ${p}% der schweren Mahlzeiten folgte ein Spaziergang`, rep_legend: "Mahlzeiten: ● grün = geeignet, ● orange = in Maßen, ● rot = schwer (Bewertung der App).",
   med_next: (n: string, h: string) => `Als Nächstes: ${n}, um ${h}.`,
   rep_title: "Arztbericht", rep_sub: "Letzte 30 Tage: Blutzucker, Mahlzeiten, Bewegung, Medikamente. Zum Senden an den Arzt oder Ausdrucken.", rep_make: "Bericht erstellen", rep_making: "Bericht wird erstellt…", rep_share: "Bericht senden", rep_empty: "Noch keine Daten für einen Bericht. Trag ein paar Tage Werte und Mahlzeiten ein.",

@@ -8,6 +8,7 @@ import { useStore } from "../../src/store";
 import { levelColor, useTheme } from "../../src/theme";
 import { AfterMeal } from "../../src/ui/AfterMeal";
 import { Button, Card, Hint, Label, useScale } from "../../src/ui/Primitives";
+import { Quip } from "../../src/ui/Quip";
 
 /** Rezultatul pozei de la masă: verdictul mesei, ce s-a văzut în farfurie, IG, recomandări și ce ajută acum. */
 export default function MealResult() {
@@ -39,6 +40,7 @@ export default function MealResult() {
         <View style={[st.dot, { backgroundColor: c.fg }]}><Text style={{ color: t.surface, fontWeight: "800", fontSize: 40 }}>{glyph}</Text></View>
         <Text style={{ color: c.fg, fontWeight: "800", fontSize: 30 * k, textAlign: "center" }}>{title}</Text>
         {a?.summary ? <Text style={{ color: t.ink, fontSize: 18 * k, textAlign: "center", lineHeight: 26 * k }}>{a.summary}</Text> : null}
+        <Quip k={level} seed={m.id} />
         {a && (
           <Pressable onPress={speak} style={[st.speak, { backgroundColor: t.surface, borderColor: c.fg }]} accessibilityRole="button" accessibilityLabel={s.speak}>
             <Text style={{ fontSize: 22 }}>🔊</Text><Text style={{ color: t.ink, fontWeight: "700", fontSize: 16 * k }}>{s.speak}</Text>

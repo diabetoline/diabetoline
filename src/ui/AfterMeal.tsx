@@ -5,6 +5,7 @@ import { scheduleGlucoseCheck } from "../notifications";
 import { useStore } from "../store";
 import { levelColor, useTheme } from "../theme";
 import { Button, useScale } from "./Primitives";
+import { Quip } from "./Quip";
 
 /**
  * După o masă „cu măsură” sau „mai grea”: nu certăm, ghidăm.
@@ -33,7 +34,7 @@ export function AfterMeal({ level, walkMinutes }: { level: Exclude<Level, "green
       <Text style={{ color: t.ink, fontSize: 20 * k, fontWeight: "800" }}>{level === "red" ? s.care_title_red : s.care_title_yellow}</Text>
 
       <Step icon="🚶" text={s.care_walk(min)}>
-        {walked ? <Text style={{ color: t.ok, fontWeight: "700", fontSize: 17 * k }}>✓ {s.care_walk_done}</Text>
+        {walked ? <View style={{ gap: 4 }}><Text style={{ color: t.ok, fontWeight: "700", fontSize: 17 * k }}>✓ {s.care_walk_done}</Text><Quip k="walk_done" style={{ textAlign: "left" }} /></View>
           : <Button title={s.care_walk_btn} kind="soft" onPress={() => { addWalk(min); setWalked(true); }} />}
       </Step>
 

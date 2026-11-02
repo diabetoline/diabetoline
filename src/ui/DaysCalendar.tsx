@@ -4,6 +4,7 @@ import { dayKeyLocal, dayStatuses } from "../engine/days";
 import { useStore } from "../store";
 import { useTheme } from "../theme";
 import { Card, Hint, Label, useScale } from "./Primitives";
+import { Quip } from "./Quip";
 
 /** Calendarul lunii: verde = zi bună, portocaliu = zi mai puțin bună, gol = nimic notat. */
 export function DaysCalendar() {
@@ -66,6 +67,7 @@ export function DaysCalendar() {
         <Legend color={t.ok} text={`${s.cal_good}: ${good}`} />
         <Legend color={t.warn} text={`${s.cal_less}: ${less}`} />
       </View>
+      {statuses.get(todayK) && offset === 0 && <Quip k={statuses.get(todayK) === "good" ? "good_day" : "less_day"} seed={todayK} />}
       <Hint>{s.cal_hint}</Hint>
     </Card>
   );
