@@ -22,6 +22,9 @@ export interface Product {
   /** glycemic index, estimated (0–100); null when unknown or not applicable */
   gi: number | null;
   giSource: "measured" | "estimated" | "none";
+  /** nutrition table missing on the source: verdict cannot be trusted */
+  incomplete?: boolean;
+  source?: "off" | "user" | "usda";
 }
 
 export interface Verdict {

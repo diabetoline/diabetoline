@@ -30,6 +30,8 @@ const STR = {
     } as Record<string, (v: Verd) => string>,
     hid: { maltodextrin: "maltodextrină", glucose_fructose_syrup: "sirop de glucoză-fructoză", glucose_syrup: "sirop de glucoză", dextrose: "dextroză", fructose: "fructoză", maltitol: "maltitol", honey: "miere", invert_sugar: "zahăr invertit", other_syrup: "siropuri (orez, agave, porumb, caramel)", molasses: "melasă", juice_concentrate: "suc concentrat", maltose: "maltoză" } as Record<string, string>,
     claim: { no_added_sugar: "fără zahăr adăugat", sugar_free: "fără zahăr", for_diabetics: "pentru diabetici", light: "light" } as Record<string, string>,
+    add_product: "Adaugă produsul manual", add_title: "Adaugă produs", add_hint: "Copiază de pe eticheta produsului valorile la 100 g sau 100 ml.", f_name: "Numele produsului", f_brand: "Brand (opțional)", f_carbs: "Carbohidrați la 100", f_sugars: "din care zaharuri", f_fiber: "Fibre", f_serving: "Porție (g sau ml)", f_unit_g: "grame", f_unit_ml: "mililitri", save: "Salvează și verifică", added_by_you: "adăugat de tine",
+    incomplete: "Eticheta nu are tabel nutrițional în baza de date.", incomplete_help: "Verdictul nu poate fi calculat. Poți adăuga tu valorile de pe etichetă.", scan_distance: "Ține telefonul la 15–20 cm de cod, cu tot codul în cadru.", back: "Înapoi",
     history: "Istoric", empty_history: "Produsele scanate apar aici.", soon: "În lucru. Vine în versiunea următoare.",
   },
   en: {
@@ -59,6 +61,8 @@ const STR = {
     } as Record<string, (v: Verd) => string>,
     hid: { maltodextrin: "maltodextrin", glucose_fructose_syrup: "glucose-fructose syrup", glucose_syrup: "glucose syrup", dextrose: "dextrose", fructose: "fructose", maltitol: "maltitol", honey: "honey", invert_sugar: "invert sugar", other_syrup: "syrups (rice, agave, corn, caramel)", molasses: "molasses", juice_concentrate: "juice concentrate", maltose: "maltose" } as Record<string, string>,
     claim: { no_added_sugar: "no added sugar", sugar_free: "sugar-free", for_diabetics: "for diabetics", light: "light" } as Record<string, string>,
+    add_product: "Add product manually", add_title: "Add product", add_hint: "Copy the values per 100 g or 100 ml from the product label.", f_name: "Product name", f_brand: "Brand (optional)", f_carbs: "Carbohydrates per 100", f_sugars: "of which sugars", f_fiber: "Fiber", f_serving: "Serving (g or ml)", f_unit_g: "grams", f_unit_ml: "millilitres", save: "Save and check", added_by_you: "added by you",
+    incomplete: "The database has no nutrition table for this label.", incomplete_help: "The verdict can't be calculated. You can add the label values yourself.", scan_distance: "Hold the phone 15–20 cm from the code, with the whole code in frame.", back: "Back",
     history: "History", empty_history: "Scanned products show up here.", soon: "In progress. Coming in the next version.",
   },
   de: {
@@ -88,6 +92,8 @@ const STR = {
     } as Record<string, (v: Verd) => string>,
     hid: { maltodextrin: "Maltodextrin", glucose_fructose_syrup: "Glukose-Fruktose-Sirup", glucose_syrup: "Glukosesirup", dextrose: "Dextrose", fructose: "Fruktose", maltitol: "Maltit", honey: "Honig", invert_sugar: "Invertzucker", other_syrup: "Sirupe (Reis, Agave, Mais, Karamell)", molasses: "Melasse", juice_concentrate: "Saftkonzentrat", maltose: "Maltose" } as Record<string, string>,
     claim: { no_added_sugar: "ohne Zuckerzusatz", sugar_free: "zuckerfrei", for_diabetics: "für Diabetiker", light: "light" } as Record<string, string>,
+    add_product: "Produkt manuell hinzufügen", add_title: "Produkt hinzufügen", add_hint: "Übernimm die Werte pro 100 g oder 100 ml vom Etikett.", f_name: "Produktname", f_brand: "Marke (optional)", f_carbs: "Kohlenhydrate pro 100", f_sugars: "davon Zucker", f_fiber: "Ballaststoffe", f_serving: "Portion (g oder ml)", f_unit_g: "Gramm", f_unit_ml: "Milliliter", save: "Speichern und prüfen", added_by_you: "von dir hinzugefügt",
+    incomplete: "Für dieses Etikett gibt es keine Nährwerttabelle in der Datenbank.", incomplete_help: "Die Bewertung kann nicht berechnet werden. Du kannst die Werte vom Etikett selbst eintragen.", scan_distance: "Halte das Handy 15–20 cm vom Code entfernt, mit dem ganzen Code im Bild.", back: "Zurück",
     history: "Verlauf", empty_history: "Gescannte Produkte erscheinen hier.", soon: "In Arbeit. Kommt in der nächsten Version.",
   },
 };

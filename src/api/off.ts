@@ -32,7 +32,13 @@ export async function fetchProduct(barcode: string, lang = "en"): Promise<Produc
 export function normalize(o: Record<string, any>, lang = "en"): Product {
   const n = o.nutriments ?? {};
   const num = (k: string) => { const v = Number(n[k]); return Number.isFinite(v) ? v : 0; };
-  const unit: "g" | "ml" = /\bml\b|\bl\b|\bcl\b/i.test(String(o.quantity ?? "")) || (o.categories_tags ?? []).some((c: string) => /beverages|drinks|juices|waters|milks/.test(c)) ? "ml" : "g";
+  const cats0: string[] = o.categories_tags ?? [];
+  const qty = String(o.quantity ?? "").toLowerCase();
+  const liquidQty = /\d\s*(ml|cl|l)\b/.test(qty) && !/\d\s*(g|kg)\b/.test(qty);
+  // "en:plant-based-foods-and-beverages" is a generic parent tag; only specific drink tags count
+  const liquidCat = cats0.some((c) => /^[a-z]{2}:(beverages|drinks|juices|fruit-juices|waters|mineral-waters|sodas|carbonated-drinks|milks|dairy-drinks|plant-based-milks|teas|coffees|energy-drinks|iced-teas|lemonades|nectars)$/.test(c)
+    || /-(juices|drinks|waters|sodas|milks|nectars|beverages)$/.test(c) && !/foods-and-beverages/.test(c));
+  const unit: "g" | "ml" = liquidQty || (liquidCat && !/\d\s*(g|kg)\b/.test(qty)) ? "ml" : "g";
   const servingRaw = Number(o.serving_quantity);
   const serving = Number.isFinite(servingRaw) && servingRaw > 0 ? servingRaw : undefined;
 
@@ -46,12 +52,14 @@ export function normalize(o: Record<string, any>, lang = "en"): Product {
   const claims = findClaims(labelText);
   const name = o[`product_name_${lang}`] || o.product_name_en || o.product_name || "Produs fără nume";
 
+  const has = (k: string) => n[k] !== undefined && n[k] !== null && n[k] !== "";
+  const incomplete = !has("carbohydrates_100g") && !has("sugars_100g");
   const carbs100 = num("carbohydrates_100g"), sugars100 = num("sugars_100g"), fiber100 = num("fiber_100g");
   const gi = estimateGi({ categories, carbs100, fiber100, sugars100, name });
 
   return {
     code: String(o.code), name, brand: o.brands || undefined, imageUrl: o.image_front_small_url || undefined,
     carbs100, sugars100, fiber100, protein100: num("proteins_100g"),
-    serving, unit, ingredients, categories, claims, gi: gi.gi, giSource: gi.source,
+    serving, unit, ingredients, categories, claims, gi: gi.gi, giSource: gi.source, incomplete, source: "off",
   };
 }

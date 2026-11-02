@@ -21,6 +21,7 @@ export default function ProductScreen() {
 
   useEffect(() => {
     let alive = true;
+    if (p?.source === "user") { recordScan(p, analyze(p)); return; }
     (async () => {
       try {
         const prod = await fetchProduct(code, state.lang);
@@ -36,12 +37,14 @@ export default function ProductScreen() {
     return () => { alive = false; };
   }, [code]);
 
-  if (err) return (
+  if (err || (p && p.incomplete)) return (
     <View style={{ flex: 1, padding: 16, gap: 12 }}>
       <Stack.Screen options={{ title: code }} />
-      <Card><Text style={{ color: t.ink, fontWeight: "700", fontSize: 17 }}>{err === "notfound" ? s.not_found : s.network}</Text>
-        {err === "notfound" && <Hint>{s.not_found_help}</Hint>}
-        <Button title={s.tab_scan} onPress={() => router.back()} kind="soft" /></Card>
+      <Card><Text style={{ color: t.ink, fontWeight: "700", fontSize: 17 }}>{err === "network" ? s.network : err === "notfound" ? s.not_found : s.incomplete}</Text>
+        {p?.incomplete && <Text style={{ color: t.ink }}>{p.name}</Text>}
+        <Hint>{err === "network" ? "" : err === "notfound" ? s.not_found_help : s.incomplete_help}</Hint>
+        {err !== "network" && <Button title={s.add_product} onPress={() => router.replace({ pathname: "/product/add", params: { code, name: p?.name ?? "", brand: p?.brand ?? "" } })} />}
+        <Button title={s.back} onPress={() => router.back()} kind="ghost" /></Card>
     </View>
   );
   if (!p || !v) return <View style={{ flex: 1, alignItems: "center", justifyContent: "center", gap: 10 }}><ActivityIndicator color={t.accent} /><Hint>{s.loading}</Hint></View>;
@@ -61,7 +64,7 @@ export default function ProductScreen() {
           <View style={{ flex: 1 }}>
             <Text style={{ color: c.fg, fontWeight: "800", fontSize: 22 }}>{label}</Text>
             <Text style={{ color: t.ink, fontWeight: "600" }}>{p.name}</Text>
-            <Text style={{ color: t.muted, fontSize: 12 }}>{p.code} · {s.serving} {v.serving} {p.unit}{v.servingAssumed ? ` (${s.serving_assumed})` : ""}</Text>
+            <Text style={{ color: t.muted, fontSize: 12 }}>{p.code} · {s.serving} {v.serving} {p.unit}{v.servingAssumed ? ` (${s.serving_assumed})` : ""}{p.source === "user" ? ` · ${s.added_by_you}` : ""}</Text>
           </View>
           {p.imageUrl && <Image source={{ uri: p.imageUrl }} style={{ width: 56, height: 56, borderRadius: 8 }} />}
         </View>

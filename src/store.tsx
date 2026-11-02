@@ -20,6 +20,7 @@ interface Ctx {
   set: (patch: Partial<State> | ((s: State) => Partial<State>)) => void;
   recordScan: (p: Product, v: Verdict) => void;
   addToCart: (item: Omit<CartItem, "id" | "done">) => void;
+  addUserProduct: (p: Product) => void;
 }
 const C = createContext<Ctx | null>(null);
 
@@ -40,6 +41,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       history: [{ code: p.code, name: p.name, level: v.level, t: Date.now() }, ...prev.history.filter((h) => h.code !== p.code)].slice(0, 200),
     })),
     addToCart: (item) => setS((prev) => ({ ...prev, cart: [{ ...item, id: String(Date.now()), done: false }, ...prev.cart] })),
+    addUserProduct: (p) => setS((prev) => ({ ...prev, cache: { ...prev.cache, [p.code]: p } })),
   }), [s]);
   if (!ready) return null;
   return <C.Provider value={api}>{children}</C.Provider>;

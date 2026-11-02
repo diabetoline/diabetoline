@@ -38,7 +38,7 @@ export default function ScanScreen() {
         <Card>
           <View style={[st.cam, { backgroundColor: t.accentSoft }]}>
             {perm?.granted ? (
-              active && <CameraView style={StyleSheet.absoluteFill} facing="back"
+              active && <CameraView style={StyleSheet.absoluteFill} facing="back" autofocus="on"
                 barcodeScannerSettings={{ barcodeTypes: ["ean13", "ean8", "upc_a", "upc_e", "code128"] }}
                 onBarcodeScanned={onScan} />
             ) : (
@@ -50,7 +50,7 @@ export default function ScanScreen() {
             <View pointerEvents="none" style={[st.corner, st.c1, { borderColor: t.accent }]} /><View pointerEvents="none" style={[st.corner, st.c2, { borderColor: t.accent }]} />
             <View pointerEvents="none" style={[st.corner, st.c3, { borderColor: t.accent }]} /><View pointerEvents="none" style={[st.corner, st.c4, { borderColor: t.accent }]} />
           </View>
-          <Hint style={{ textAlign: "center" }}>{s.scan_hint}</Hint>
+          <Hint style={{ textAlign: "center" }}>{s.scan_hint}. {s.scan_distance}</Hint>
           <View style={{ flexDirection: "row", gap: 8 }}>
             <TextInput value={code} onChangeText={setCode} onSubmitEditing={() => open(code)} placeholder={s.scan_manual} placeholderTextColor={t.muted}
               keyboardType="number-pad" returnKeyType="search" accessibilityLabel={s.scan_manual}

@@ -10,6 +10,8 @@ export function assumedServing(p: Product): number {
   if (/yogurts|dairy-desserts/.test(cats)) return 150;
   if (/chocolates|biscuits|cookies|candies|bars/.test(cats)) return 25;
   if (/sauces|ketchup|spreads|jams|honey/.test(cats)) return 15;
+  if (/seeds|nuts|chia|flax|sesame|almonds|walnuts|peanut/.test(cats)) return 30;
+  if (/bran|oat-bran|wheat-bran|psyllium|fibre-mix|fiber/.test(cats)) return 30;
   if (/pastas|rices|grains|legumes/.test(cats)) return 75; // dry weight
   if (/pizzas|ready-meals|lasagne/.test(cats)) return 300;
   return 100;

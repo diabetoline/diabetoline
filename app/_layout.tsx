@@ -12,7 +12,8 @@ export default function Root() {
         <StatusBar style="auto" />
         <Stack screenOptions={{ headerStyle: { backgroundColor: t.surface }, headerTintColor: t.ink, headerTitleStyle: { fontWeight: "700" }, contentStyle: { backgroundColor: t.bg } }}>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="product/[code]" options={{ title: "" , headerBackTitle: " " }} />
+          <Stack.Screen name="product/[code]" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
+          <Stack.Screen name="product/add" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
         </Stack>
       </StoreProvider>
     </SafeAreaProvider>
