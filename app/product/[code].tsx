@@ -11,6 +11,7 @@ import { levelColor, useTheme } from "../../src/theme";
 import { Button, Card, Hint, Label, useScale } from "../../src/ui/Primitives";
 import { AfterMeal } from "../../src/ui/AfterMeal";
 import { Quip } from "../../src/ui/Quip";
+import { VerdictBadge } from "../../src/ui/VerdictBadge";
 
 const n = (x: number) => x.toLocaleString(undefined, { maximumFractionDigits: 1 });
 
@@ -68,7 +69,7 @@ export default function ProductScreen() {
     <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
       <Stack.Screen options={{ title: p.brand ?? "" }} />
       <View style={[st.hero, { backgroundColor: c.bg }]}>
-        <View style={[st.dot, { backgroundColor: c.fg }]}><Text style={{ color: t.surface, fontWeight: "800", fontSize: 54 }}>{glyph}</Text></View>
+        <VerdictBadge level={v.level} />
         <Text style={{ color: c.fg, fontWeight: "800", fontSize: 34 * k, textAlign: "center" }}>{label}</Text>
         <Text style={{ color: t.ink, fontWeight: "600", fontSize: 19 * k, textAlign: "center" }}>{p.name}</Text>
         <Text style={{ color: t.ink, fontSize: 18 * k, textAlign: "center", lineHeight: 26 * k }}>{summary}</Text>

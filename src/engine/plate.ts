@@ -1,7 +1,7 @@
 import type { Level } from "./types";
 
 /** Un aliment recunoscut în poza farfuriei (estimări). */
-export interface PlateFood { name: string; grams: number; carbs: number; gi: number | null }
+export interface PlateFood { name: string; grams: number; carbs: number; gi: number | null; x?: number | null; y?: number | null }
 export interface PlateAnalysis { foods: PlateFood[]; summary: string; tips: string[] }
 export interface MealVerdict { level: Level; carbs: number; gl: number }
 
