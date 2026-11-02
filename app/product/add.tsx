@@ -40,8 +40,8 @@ export default function AddProduct() {
         {field(s.f_name, name, setName, false)}
         {field(s.f_brand, brand, setBrand, false)}
         <View style={{ flexDirection: "row", gap: 8 }}>
-          <View style={{ flex: 1 }}><Button title={`${s.f_unit_g}`} kind={unit === "g" ? "primary" : "ghost"} small onPress={() => setUnit("g")} /></View>
-          <View style={{ flex: 1 }}><Button title={`${s.f_unit_ml}`} kind={unit === "ml" ? "primary" : "ghost"} small onPress={() => setUnit("ml")} /></View>
+          <View style={{ flex: 1 }}><Button title={`${s.f_unit_g}`} kind={unit === "g" ? "primary" : "ghost"} size="sm" onPress={() => setUnit("g")} /></View>
+          <View style={{ flex: 1 }}><Button title={`${s.f_unit_ml}`} kind={unit === "ml" ? "primary" : "ghost"} size="sm" onPress={() => setUnit("ml")} /></View>
         </View>
         {field(`${s.f_carbs} ${unit}`, carbs, setCarbs, true, "0")}
         {field(s.f_sugars, sugars, setSugars, true, "0")}

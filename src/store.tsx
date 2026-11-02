@@ -4,25 +4,33 @@ import type { Product, Verdict, Level } from "./engine/types";
 import { deviceLang, strings, type Lang, type Strings } from "./i18n";
 
 export interface HistItem { code: string; name: string; level: Level; t: number }
-export interface CartItem { id: string; code?: string; name: string; level?: Level; done: boolean }
-export interface GluEntry { id: string; v: number; ctx: "fasting" | "pre" | "post2h" | "evening" | "other"; note: string; t: number }
+export type GluCtx = "fasting" | "pre" | "post2h" | "evening" | "other";
+export interface GluEntry { id: string; v: number; ctx: GluCtx; note: string; t: number }
+export interface MealEntry { id: string; t: number; photoUri?: string; code?: string; name?: string; level?: Level; slot: "breakfast" | "lunch" | "dinner" | "snack" }
+export interface Med { id: string; name: string; times: string[]; notifIds?: string[] }
+export interface MedLog { id: string; medId: string; time: string; day: string; t: number }
 
-interface State {
-  lang: Lang; unit: "mg" | "mmol"; name: string;
-  history: HistItem[]; cart: CartItem[]; glucose: GluEntry[];
+export interface State {
+  lang: Lang; unit: "mg" | "mmol"; name: string; bigText: boolean;
+  history: HistItem[]; glucose: GluEntry[]; meals: MealEntry[]; meds: Med[]; medLog: MedLog[];
   cache: Record<string, Product>;
 }
-const initial: State = { lang: deviceLang(), unit: "mg", name: "", history: [], cart: [], glucose: [], cache: {} };
-const KEY = "dscan.state.v1";
+const initial: State = { lang: deviceLang(), unit: "mg", name: "", bigText: false, history: [], glucose: [], meals: [], meds: [], medLog: [], cache: {} };
+const KEY = "dscan.state.v2";
 
 interface Ctx {
   s: State; t: Strings;
   set: (patch: Partial<State> | ((s: State) => Partial<State>)) => void;
   recordScan: (p: Product, v: Verdict) => void;
-  addToCart: (item: Omit<CartItem, "id" | "done">) => void;
   addUserProduct: (p: Product) => void;
+  addGlucose: (e: Omit<GluEntry, "id" | "t"> & { t?: number }) => void;
+  addMeal: (m: Omit<MealEntry, "id" | "t"> & { t?: number }) => void;
+  markMed: (medId: string, time: string) => void;
 }
 const C = createContext<Ctx | null>(null);
+export const dayKey = (t: number) => new Date(t).toISOString().slice(0, 10);
+export const slotForHour = (h: number): MealEntry["slot"] => (h < 10 ? "breakfast" : h < 15 ? "lunch" : h < 18 ? "snack" : "dinner");
+export const ctxForHour = (h: number): GluCtx => (h < 9 ? "fasting" : h >= 20 ? "evening" : "post2h");
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [s, setS] = useState<State>(initial);
@@ -36,12 +44,17 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     s, t: strings(s.lang),
     set: (patch) => setS((prev) => ({ ...prev, ...(typeof patch === "function" ? patch(prev) : patch) })),
     recordScan: (p, v) => setS((prev) => ({
-      ...prev,
-      cache: { ...prev.cache, [p.code]: p },
+      ...prev, cache: { ...prev.cache, [p.code]: p },
       history: [{ code: p.code, name: p.name, level: v.level, t: Date.now() }, ...prev.history.filter((h) => h.code !== p.code)].slice(0, 200),
     })),
-    addToCart: (item) => setS((prev) => ({ ...prev, cart: [{ ...item, id: String(Date.now()), done: false }, ...prev.cart] })),
     addUserProduct: (p) => setS((prev) => ({ ...prev, cache: { ...prev.cache, [p.code]: p } })),
+    addGlucose: (e) => setS((prev) => ({ ...prev, glucose: [...prev.glucose, { ...e, id: String(Date.now()), t: e.t ?? Date.now() }] })),
+    addMeal: (m) => setS((prev) => ({ ...prev, meals: [...prev.meals, { ...m, id: String(Date.now()), t: m.t ?? Date.now() }] })),
+    markMed: (medId, time) => setS((prev) => {
+      const day = dayKey(Date.now());
+      if (prev.medLog.some((l) => l.medId === medId && l.time === time && l.day === day)) return prev;
+      return { ...prev, medLog: [...prev.medLog, { id: String(Date.now()), medId, time, day, t: Date.now() }] };
+    }),
   }), [s]);
   if (!ready) return null;
   return <C.Provider value={api}>{children}</C.Provider>;
