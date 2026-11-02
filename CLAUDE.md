@@ -21,9 +21,10 @@ Aplicație mobilă (Expo / React Native, TypeScript) pentru diabetici, publicat�
 6. Raport pentru medic (PDF, 30 de zile, trimis de obicei de copil)
 7. Îndrumare după masă (2 nov 2026): la un produs roșu/galben mâncat sau la o farfurie notată „cu măsură”/„mai grea” nu certăm, ghidăm: plimbare, reamintire de măsurat glicemia la 2 ore, apă, masa următoare ușoară (`src/ui/AfterMeal.tsx`). Calendarul zilelor bune / mai puțin bune în Jurnal (`src/engine/days.ts`).
 9. Întrebări periodice (`src/ui/Checkins.tsx`): greutatea o dată pe săptămână (card pe prima pagină), „Ai făcut mișcare azi?” după ora 17 în aplicație și notificare zilnică la 19:00; ambele intră în Jurnal, în raportul pentru medic și în contul de familie.
+10. „Ce mănânc azi?” (`app/ideas.tsx`, `app/api/ideas+api.ts`): 3 idei de mese/gustări pentru momentul zilei, din produsele scanate verzi, fără cele roșii, fără a repeta mesele recente; pași puțini, carbohidrați estimați; „Am mâncat asta” intră în jurnal.
 8. Produs negăsit → poză la tabelul nutrițional, citit de AI pe server (`app/api/label+api.ts`), omul doar confirmă. Niciodată introducere manuală de la zero.
 
-După lansare: rețete, coș, plan de mese, senzor (Libre/Dexcom), meniu de restaurant, scanare raft.
+După lansare: coș, plan de mese pe săptămână, senzor (Libre/Dexcom), meniu de restaurant, scanare raft.
 
 ## Tehnic
 - `npm run typecheck`, `npm test` (motorul de verdict, Node test runner, build în `.test-build`)

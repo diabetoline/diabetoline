@@ -8,6 +8,7 @@ import { Icon, type IconName } from "../../src/ui/Icon";
 import { Button, Card, Hint, Label, useScale } from "../../src/ui/Primitives";
 import { Quip } from "../../src/ui/Quip";
 import { MoveCheckin, WeightCheckin } from "../../src/ui/Checkins";
+import { slotForHour } from "../../src/store";
 
 /**
  * Prima pagină: patru butoane mari, un cuvânt fiecare, fără explicații.
@@ -57,6 +58,16 @@ export default function Home() {
           </Card>
         )}
 
+        {!fresh && (
+          <Pressable onPress={() => router.push("/ideas")} accessibilityRole="button" style={({ pressed }) => [st.ideas, { backgroundColor: t.surface, borderColor: t.line, opacity: pressed ? 0.85 : 1 }]}>
+            <Text style={{ fontSize: 30 }}>🍲</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={{ color: t.ink, fontSize: 19 * k, fontWeight: "800" }}>{s.ideas_title}</Text>
+              <Text style={{ color: t.muted, fontSize: 15 * k }}>{s.ideas_btn} {s.ideas_slot[slotForHour(new Date().getHours())]}</Text>
+            </View>
+            <Text style={{ color: t.muted, fontSize: 26 }}>›</Text>
+          </Pressable>
+        )}
         {!fresh && <MoveCheckin />}
         {!fresh && <WeightCheckin />}
 
@@ -127,4 +138,5 @@ const st = StyleSheet.create({
   iconWrap: { width: 56, height: 56, borderRadius: 16, alignItems: "center", justifyContent: "center" },
   badge: { position: "absolute", top: 12, right: 12, minWidth: 26, height: 26, borderRadius: 13, paddingHorizontal: 7, alignItems: "center", justifyContent: "center" },
   row: { flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 6 },
+  ideas: { flexDirection: "row", alignItems: "center", gap: 14, borderWidth: 1, borderRadius: 20, padding: 16 },
 });

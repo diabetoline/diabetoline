@@ -5,6 +5,8 @@ type Verd = { carbs: number; sugars: number; fiber: number; gl: number | null };
 type Dict = Record<string, any>;
 
 const ro = {
+  ideas_title: "Ce mănânc azi?", ideas_sub: "Idei simple, din ce ai scanat. Fără produsele de evitat.", ideas_btn: "Idei pentru", ideas_loading: "Mă gândesc la ceva bun…", ideas_more: "Alte idei", ideas_err: "Nu am putut aduce ideile. Verifică internetul.", ideas_off: "Ideile de mese pornesc în curând.",
+  ideas_carbs: (g: number) => `~${g} g carbohidrați`, ideas_min: (m: number) => `${m} min`, ideas_uses: "Din ce ai scanat:", ideas_ingredients: "Ce îți trebuie", ideas_steps: "Cum faci", ideas_ate: "Am mâncat asta", ideas_slot: { breakfast: "mic dejun", lunch: "prânz", snack: "gustare", dinner: "cină" } as Record<string, string>,
   wt_ask: "Cât cântărești săptămâna asta?", wt_hint: "O dată pe săptămână e de ajuns. Medicul tău vrea să vadă tendința, nu fiecare zi.", wt_kg: "kg", wt_save: "Notează greutatea", wt_saved: "Greutatea a fost notată.", wt_later: "Mai târziu", wt_last: (kg: number, d: string) => `Ultima: ${kg} kg, ${d}`, wt_title: "Greutate", wt_change: (d: number) => (d > 0 ? `+${d} kg` : `${d} kg`), wt_entry: (kg: number) => `Greutate: ${kg} kg`,
   mv_ask: "Ai făcut mișcare azi?", mv_hint: "O plimbare, grădina, treburile prin casă: toate contează.", mv_yes: (m: number) => `Da, ${m} min`, mv_no: "Nu încă", mv_more: "Mai mult", mv_thanks: "Notat. Bravo!", mv_no_thanks: "Nicio problemă. Poate o plimbare scurtă după cină?",
   notif_mv_title: "Ai făcut mișcare azi?", notif_mv_body: "Deschide Diabetoline și apasă Da sau Nu. Durează o secundă.",
@@ -115,6 +117,8 @@ const ro = {
 };
 
 const en: typeof ro = {
+  ideas_title: "What shall I eat today?", ideas_sub: "Simple ideas from what you scanned. Without the products to avoid.", ideas_btn: "Ideas for", ideas_loading: "Thinking of something good…", ideas_more: "More ideas", ideas_err: "Couldn't load ideas. Check your connection.", ideas_off: "Meal ideas are coming soon.",
+  ideas_carbs: (g: number) => `~${g} g carbs`, ideas_min: (m: number) => `${m} min`, ideas_uses: "From what you scanned:", ideas_ingredients: "You need", ideas_steps: "How to make it", ideas_ate: "I ate this", ideas_slot: { breakfast: "breakfast", lunch: "lunch", snack: "snack", dinner: "dinner" },
   wt_ask: "What's your weight this week?", wt_hint: "Once a week is enough. Your doctor wants the trend, not every day.", wt_kg: "kg", wt_save: "Log weight", wt_saved: "Weight logged.", wt_later: "Later", wt_last: (kg: number, d: string) => `Last: ${kg} kg, ${d}`, wt_title: "Weight", wt_change: (d: number) => (d > 0 ? `+${d} kg` : `${d} kg`), wt_entry: (kg: number) => `Weight: ${kg} kg`,
   mv_ask: "Did you move today?", mv_hint: "A walk, the garden, housework: it all counts.", mv_yes: (m: number) => `Yes, ${m} min`, mv_no: "Not yet", mv_more: "More", mv_thanks: "Logged. Well done!", mv_no_thanks: "No problem. Maybe a short walk after dinner?",
   notif_mv_title: "Did you move today?", notif_mv_body: "Open Diabetoline and tap Yes or No. Takes a second.",
@@ -215,6 +219,8 @@ const en: typeof ro = {
 };
 
 const de: typeof ro = {
+  ideas_title: "Was esse ich heute?", ideas_sub: "Einfache Ideen aus dem, was du gescannt hast. Ohne die zu vermeidenden Produkte.", ideas_btn: "Ideen für", ideas_loading: "Ich überlege mir etwas Gutes…", ideas_more: "Weitere Ideen", ideas_err: "Ideen konnten nicht geladen werden. Prüfe die Verbindung.", ideas_off: "Essensideen kommen bald.",
+  ideas_carbs: (g: number) => `~${g} g Kohlenhydrate`, ideas_min: (m: number) => `${m} Min.`, ideas_uses: "Aus deinen Scans:", ideas_ingredients: "Du brauchst", ideas_steps: "So geht's", ideas_ate: "Das habe ich gegessen", ideas_slot: { breakfast: "Frühstück", lunch: "Mittagessen", snack: "Snack", dinner: "Abendessen" },
   wt_ask: "Wie viel wiegst du diese Woche?", wt_hint: "Einmal pro Woche reicht. Dein Arzt will den Verlauf sehen, nicht jeden Tag.", wt_kg: "kg", wt_save: "Gewicht eintragen", wt_saved: "Gewicht eingetragen.", wt_later: "Später", wt_last: (kg: number, d: string) => `Zuletzt: ${kg} kg, ${d}`, wt_title: "Gewicht", wt_change: (d: number) => (d > 0 ? `+${d} kg` : `${d} kg`), wt_entry: (kg: number) => `Gewicht: ${kg} kg`,
   mv_ask: "Hast du dich heute bewegt?", mv_hint: "Ein Spaziergang, der Garten, Hausarbeit: alles zählt.", mv_yes: (m: number) => `Ja, ${m} Min.`, mv_no: "Noch nicht", mv_more: "Mehr", mv_thanks: "Eingetragen. Super!", mv_no_thanks: "Kein Problem. Vielleicht ein kurzer Spaziergang nach dem Abendessen?",
   notif_mv_title: "Hast du dich heute bewegt?", notif_mv_body: "Öffne Diabetoline und tippe Ja oder Nein. Dauert eine Sekunde.",
