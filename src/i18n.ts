@@ -5,6 +5,10 @@ type Verd = { carbs: number; sugars: number; fiber: number; gl: number | null };
 type Dict = Record<string, any>;
 
 const ro = {
+  label_title: "Fă o poză la tabelul cu valori nutriționale", label_hint: "Tabelul de pe ambalaj, drept, cu lumină bună și tot în cadru.",
+  label_reading: "Citesc eticheta…", label_check: "Am citit eticheta", label_check_hint: "Uită-te dacă cifrele se potrivesc cu eticheta. Poți corecta una dacă e greșită.",
+  label_fail: "Nu am putut citi tabelul. Fă o poză mai de aproape, cu lumină bună.", label_off: "Citirea etichetelor din poză pornește în curând. Scanează alt produs până atunci.",
+  privacy: "Confidențialitate", privacy_sub: "Ce date folosim și cum le protejăm",
   // home (situații)
   tab_home: "Acasă", hello: "Bună", hello_name: (n: string) => `Bună, ${n}`,
   home_promise: "Te ajutăm cu diabetul în fiecare zi: la cumpărături, la masă, cu glicemia și cu medicamentele.", home_ask: "Unde ești acum?",
@@ -25,7 +29,7 @@ const ro = {
   plate_title: "Poză la farfurie", plate_hint: "Încadrează toată farfuria și apasă butonul.", plate_saved: "Masa a fost notată în jurnal.", take_photo: "Fă poza", retake: "Altă poză", use_photo: "Notează masa",
   meal_breakfast: "Mic dejun", meal_lunch: "Prânz", meal_dinner: "Cină", meal_snack: "Gustare",
   // product
-  loading: "Caut produsul…", not_found: "Produsul nu e încă în baza de date.", not_found_help: "Poți scana alt produs sau poți adăuga acest produs tu, cu valorile de pe etichetă.", network: "Nu am putut ajunge la baza de date. Verifică internetul.",
+  loading: "Caut produsul…", not_found: "Produsul nu e încă în baza de date.", not_found_help: "Fă o poză la tabelul cu valori nutriționale și citim noi valorile. Produsul rămâne apoi în aplicație pentru toată lumea.", network: "Nu am putut ajunge la baza de date. Verifică internetul.",
   good: "Potrivit", mod: "Cu măsură", avoid: "Evită", serving: "porție", serving_assumed: "porție estimată, eticheta nu o declară",
   why: "De ce?", less: "Mai puțin", impact: "Impact asupra glicemiei", gi: "Indice glicemic", gl: "Încărcătură / porție", low: "scăzut", mid: "mediu", high: "ridicat", low_f: "scăzută", mid_f: "medie", high_f: "ridicată",
   gi_note: "Indice estimat după alimente de referință similare. Încărcătura = indice × carbohidrați pe porție ÷ 100.",
@@ -51,8 +55,8 @@ const ro = {
   hid: { maltodextrin: "maltodextrină", glucose_fructose_syrup: "sirop de glucoză-fructoză", glucose_syrup: "sirop de glucoză", dextrose: "dextroză", fructose: "fructoză", maltitol: "maltitol", honey: "miere", invert_sugar: "zahăr invertit", other_syrup: "siropuri (orez, agave, porumb, caramel)", molasses: "melasă", juice_concentrate: "suc concentrat", maltose: "maltoză" } as Record<string, string>,
   claim: { no_added_sugar: "fără zahăr adăugat", sugar_free: "fără zahăr", for_diabetics: "pentru diabetici", light: "light" } as Record<string, string>,
   // add product
-  add_product: "Adaugă produsul", add_title: "Adaugă produs", add_hint: "Copiază de pe etichetă valorile la 100 g sau 100 ml.", f_name: "Numele produsului", f_brand: "Brand (opțional)", f_carbs: "Carbohidrați la 100", f_sugars: "din care zaharuri", f_fiber: "Fibre", f_serving: "Porție (g sau ml)", f_unit_g: "grame", f_unit_ml: "mililitri", save: "Salvează și verifică", added_by_you: "adăugat de tine",
-  incomplete: "Eticheta nu are tabel nutrițional în baza de date.", incomplete_help: "Verdictul nu poate fi calculat. Poți adăuga tu valorile de pe etichetă.", back: "Înapoi",
+  add_product: "📷 Fă o poză la etichetă", add_title: "Adaugă produs", add_hint: "Copiază de pe etichetă valorile la 100 g sau 100 ml.", f_name: "Numele produsului", f_brand: "Brand (opțional)", f_carbs: "Carbohidrați la 100", f_sugars: "din care zaharuri", f_fiber: "Fibre", f_serving: "Porție (g sau ml)", f_unit_g: "grame", f_unit_ml: "mililitri", save: "Salvează și verifică", added_by_you: "adăugat de tine",
+  incomplete: "Eticheta nu are tabel nutrițional în baza de date.", incomplete_help: "Verdictul nu poate fi calculat. Fă o poză la tabelul de pe etichetă și citim noi valorile.", back: "Înapoi",
   // journal
   journal_title: "Jurnal", glu_add: "Notează glicemia", glu_value: "Glicemia", glu_when: "Când ai măsurat?", glu_saved: "Glicemia a fost notată.",
   ctx: { fasting: "Pe nemâncate", pre: "Înainte de masă", post2h: "La 2 ore după masă", evening: "Seara", other: "Altă situație" } as Record<string, string>,
@@ -69,6 +73,10 @@ const ro = {
 };
 
 const en: typeof ro = {
+  label_title: "Take a photo of the nutrition table", label_hint: "The table on the pack, straight, well lit and fully in frame.",
+  label_reading: "Reading the label…", label_check: "Label read", label_check_hint: "Check the numbers match the label. You can fix one if it's wrong.",
+  label_fail: "Couldn't read the table. Take a closer photo in good light.", label_off: "Reading labels from a photo is coming soon. Scan another product meanwhile.",
+  privacy: "Privacy", privacy_sub: "What data we use and how we protect it",
   tab_home: "Home", hello: "Hello", hello_name: (n: string) => `Hello, ${n}`,
   home_promise: "We help you with diabetes every day: when shopping, at meals, with your blood sugar and your medication.", home_ask: "Where are you right now?",
   sit_meds: "Medication", sit_meds_sub: "We remind you at the right time and you tick \"Taken\".",
@@ -83,7 +91,7 @@ const en: typeof ro = {
   cam_denied: "The app needs the camera to read barcodes.", cam_allow: "Allow camera", close: "Close", torch: "Torch",
   plate_title: "Photo of my plate", plate_hint: "Frame the whole plate and press the button.", plate_saved: "Meal saved to your journal.", take_photo: "Take photo", retake: "Retake", use_photo: "Save meal",
   meal_breakfast: "Breakfast", meal_lunch: "Lunch", meal_dinner: "Dinner", meal_snack: "Snack",
-  loading: "Looking up the product…", not_found: "This product isn't in the database yet.", not_found_help: "Scan another product, or add this one yourself with the label values.", network: "Couldn't reach the database. Check your connection.",
+  loading: "Looking up the product…", not_found: "This product isn't in the database yet.", not_found_help: "Take a photo of the nutrition table and we read the values for you.", network: "Couldn't reach the database. Check your connection.",
   good: "Good choice", mod: "In moderation", avoid: "Avoid", serving: "serving", serving_assumed: "estimated serving, the label doesn't declare one",
   why: "Why?", less: "Less", impact: "Impact on blood sugar", gi: "Glycemic index", gl: "Glycemic load / serving", low: "low", mid: "medium", high: "high", low_f: "low", mid_f: "medium", high_f: "high",
   gi_note: "Index estimated from similar reference foods. Load = index × carbs per serving ÷ 100.",
@@ -108,8 +116,8 @@ const en: typeof ro = {
   },
   hid: { maltodextrin: "maltodextrin", glucose_fructose_syrup: "glucose-fructose syrup", glucose_syrup: "glucose syrup", dextrose: "dextrose", fructose: "fructose", maltitol: "maltitol", honey: "honey", invert_sugar: "invert sugar", other_syrup: "syrups (rice, agave, corn, caramel)", molasses: "molasses", juice_concentrate: "juice concentrate", maltose: "maltose" },
   claim: { no_added_sugar: "no added sugar", sugar_free: "sugar-free", for_diabetics: "for diabetics", light: "light" },
-  add_product: "Add this product", add_title: "Add product", add_hint: "Copy the values per 100 g or 100 ml from the label.", f_name: "Product name", f_brand: "Brand (optional)", f_carbs: "Carbohydrates per 100", f_sugars: "of which sugars", f_fiber: "Fiber", f_serving: "Serving (g or ml)", f_unit_g: "grams", f_unit_ml: "millilitres", save: "Save and check", added_by_you: "added by you",
-  incomplete: "The database has no nutrition table for this label.", incomplete_help: "The verdict can't be calculated. You can add the label values yourself.", back: "Back",
+  add_product: "📷 Photo of the label", add_title: "Add product", add_hint: "Copy the values per 100 g or 100 ml from the label.", f_name: "Product name", f_brand: "Brand (optional)", f_carbs: "Carbohydrates per 100", f_sugars: "of which sugars", f_fiber: "Fiber", f_serving: "Serving (g or ml)", f_unit_g: "grams", f_unit_ml: "millilitres", save: "Save and check", added_by_you: "added by you",
+  incomplete: "The database has no nutrition table for this label.", incomplete_help: "The verdict can't be calculated. Take a photo of the nutrition table and we read it for you.", back: "Back",
   journal_title: "Journal", glu_add: "Log glucose", glu_value: "Blood glucose", glu_when: "When did you measure?", glu_saved: "Glucose saved.",
   ctx: { fasting: "Fasting", pre: "Before a meal", post2h: "2 hours after a meal", evening: "Evening", other: "Other" },
   g_low: "Low", g_ok: "In range", g_high: "High", avg7: "7-day average", inrange: "in range", last: "latest",
@@ -123,6 +131,10 @@ const en: typeof ro = {
 };
 
 const de: typeof ro = {
+  label_title: "Foto der Nährwerttabelle machen", label_hint: "Die Tabelle auf der Packung, gerade, hell und ganz im Bild.",
+  label_reading: "Etikett wird gelesen…", label_check: "Etikett gelesen", label_check_hint: "Prüfe, ob die Zahlen zum Etikett passen. Du kannst eine korrigieren.",
+  label_fail: "Tabelle nicht lesbar. Mach ein näheres Foto bei gutem Licht.", label_off: "Etiketten per Foto lesen kommt bald. Scanne inzwischen ein anderes Produkt.",
+  privacy: "Datenschutz", privacy_sub: "Welche Daten wir nutzen und wie wir sie schützen",
   tab_home: "Start", hello: "Hallo", hello_name: (n: string) => `Hallo, ${n}`,
   home_promise: "Wir helfen dir jeden Tag mit Diabetes: beim Einkaufen, beim Essen, beim Blutzucker und bei den Medikamenten.", home_ask: "Wo bist du gerade?",
   sit_meds: "Medikamente", sit_meds_sub: "Wir erinnern dich zur richtigen Zeit, du hakst \"Genommen\" ab.",
@@ -137,7 +149,7 @@ const de: typeof ro = {
   cam_denied: "Die App braucht die Kamera, um Barcodes zu lesen.", cam_allow: "Kamera erlauben", close: "Schließen", torch: "Licht",
   plate_title: "Foto vom Teller", plate_hint: "Den ganzen Teller ins Bild nehmen und auf den Knopf drücken.", plate_saved: "Mahlzeit im Tagebuch gespeichert.", take_photo: "Foto machen", retake: "Neues Foto", use_photo: "Mahlzeit speichern",
   meal_breakfast: "Frühstück", meal_lunch: "Mittagessen", meal_dinner: "Abendessen", meal_snack: "Snack",
-  loading: "Produkt wird gesucht…", not_found: "Dieses Produkt ist noch nicht in der Datenbank.", not_found_help: "Scanne ein anderes Produkt oder füge dieses mit den Werten vom Etikett hinzu.", network: "Datenbank nicht erreichbar. Prüfe deine Verbindung.",
+  loading: "Produkt wird gesucht…", not_found: "Dieses Produkt ist noch nicht in der Datenbank.", not_found_help: "Fotografiere die Nährwerttabelle, wir lesen die Werte für dich.", network: "Datenbank nicht erreichbar. Prüfe deine Verbindung.",
   good: "Geeignet", mod: "In Maßen", avoid: "Vermeiden", serving: "Portion", serving_assumed: "geschätzte Portion, das Etikett nennt keine",
   why: "Warum?", less: "Weniger", impact: "Wirkung auf den Blutzucker", gi: "Glykämischer Index", gl: "Glykämische Last / Portion", low: "niedrig", mid: "mittel", high: "hoch", low_f: "niedrig", mid_f: "mittel", high_f: "hoch",
   gi_note: "Index geschätzt anhand ähnlicher Referenzlebensmittel. Last = Index × Kohlenhydrate pro Portion ÷ 100.",
@@ -162,8 +174,8 @@ const de: typeof ro = {
   },
   hid: { maltodextrin: "Maltodextrin", glucose_fructose_syrup: "Glukose-Fruktose-Sirup", glucose_syrup: "Glukosesirup", dextrose: "Dextrose", fructose: "Fruktose", maltitol: "Maltit", honey: "Honig", invert_sugar: "Invertzucker", other_syrup: "Sirupe (Reis, Agave, Mais, Karamell)", molasses: "Melasse", juice_concentrate: "Saftkonzentrat", maltose: "Maltose" },
   claim: { no_added_sugar: "ohne Zuckerzusatz", sugar_free: "zuckerfrei", for_diabetics: "für Diabetiker", light: "light" },
-  add_product: "Produkt hinzufügen", add_title: "Produkt hinzufügen", add_hint: "Übernimm die Werte pro 100 g oder 100 ml vom Etikett.", f_name: "Produktname", f_brand: "Marke (optional)", f_carbs: "Kohlenhydrate pro 100", f_sugars: "davon Zucker", f_fiber: "Ballaststoffe", f_serving: "Portion (g oder ml)", f_unit_g: "Gramm", f_unit_ml: "Milliliter", save: "Speichern und prüfen", added_by_you: "von dir hinzugefügt",
-  incomplete: "Für dieses Etikett gibt es keine Nährwerttabelle in der Datenbank.", incomplete_help: "Die Bewertung kann nicht berechnet werden. Du kannst die Werte vom Etikett selbst eintragen.", back: "Zurück",
+  add_product: "📷 Foto vom Etikett", add_title: "Produkt hinzufügen", add_hint: "Übernimm die Werte pro 100 g oder 100 ml vom Etikett.", f_name: "Produktname", f_brand: "Marke (optional)", f_carbs: "Kohlenhydrate pro 100", f_sugars: "davon Zucker", f_fiber: "Ballaststoffe", f_serving: "Portion (g oder ml)", f_unit_g: "Gramm", f_unit_ml: "Milliliter", save: "Speichern und prüfen", added_by_you: "von dir hinzugefügt",
+  incomplete: "Für dieses Etikett gibt es keine Nährwerttabelle in der Datenbank.", incomplete_help: "Die Bewertung kann nicht berechnet werden. Fotografiere die Nährwerttabelle, wir lesen sie für dich.", back: "Zurück",
   journal_title: "Tagebuch", glu_add: "Blutzucker eintragen", glu_value: "Blutzucker", glu_when: "Wann gemessen?", glu_saved: "Blutzucker gespeichert.",
   ctx: { fasting: "Nüchtern", pre: "Vor dem Essen", post2h: "2 Stunden nach dem Essen", evening: "Abends", other: "Sonstiges" },
   g_low: "Niedrig", g_ok: "Im Zielbereich", g_high: "Hoch", avg7: "Durchschnitt, 7 Tage", inrange: "im Zielbereich", last: "zuletzt",
@@ -192,5 +204,11 @@ export function deviceLang(): Lang {
   return "en";
 }
 export function strings(lang: Lang): Strings { return STR[lang] ?? ro; }
+/** Politica de confidențialitate, publicată pe diabetoline.com (o versiune pe limbă) */
+export const privacyUrl: Record<Lang, string> = {
+  ro: "https://diabetoline.com/pages/confidentialitate-aplicatie",
+  en: "https://diabetoline.com/pages/app-privacy",
+  de: "https://diabetoline.com/pages/app-datenschutz",
+};
 /** BCP-47 tag for text-to-speech */
 export const speechLocale: Record<Lang, string> = { ro: "ro-RO", en: "en-US", de: "de-DE" };
