@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Diabetoline",
-    "slug": "diabetoline",
+    "slug": "curalife",
     "version": "1.0.0",
     "scheme": "diabetoline",
     "orientation": "portrait",
@@ -45,7 +45,7 @@
     "experiments": {
       "typedRoutes": true
     },
-    "owner": "curalife",
+    "owner": "curalife-development-srl",
     "extra": {
       "eas": {
         "projectId": "c16b0d89-5978-4d04-8189-6bd45744d1dc"
