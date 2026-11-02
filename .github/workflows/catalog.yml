@@ -1,14 +1,15 @@
 name: Catalog diabetoline.com
 on: { workflow_dispatch: {} }
+permissions: { contents: write }
 jobs:
   fetch:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - run: |
-          mkdir -p out
-          for p in 1 2 3; do curl -sS "https://diabetoline.com/products.json?limit=250&page=$p" -o out/products-$p.json; done
-          curl -sS "https://diabetoline.com/collections.json?limit=250" -o out/collections.json
-          for c in alimente-indice-glicemic-scazut ingrijire-pentru-pielea; do curl -sS "https://diabetoline.com/collections/$c/products.json?limit=250" -o out/col-$c.json || true; done
-          ls -la out; head -c 400 out/products-1.json; echo
-      - uses: actions/upload-artifact@v4
-        with: { name: catalog, path: out }
+          mkdir -p data/catalog
+          for p in 1 2 3; do curl -sS "https://diabetoline.com/products.json?limit=250&page=$p" -o data/catalog/products-$p.json; done
+          curl -sS "https://diabetoline.com/collections.json?limit=250" -o data/catalog/collections.json
+          git config user.name "catalog-bot"; git config user.email "noreply@diabetoline.com"
+          git add data/catalog && git commit -m "Catalog diabetoline.com ($(date -u +%F))" || echo "nimic nou"
+          git push
