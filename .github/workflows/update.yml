@@ -1,10 +1,13 @@
-name: Publică actualizare (Expo Go)
+name: Publică (server + Expo Go)
 on:
   push:
     branches: [main]
   workflow_dispatch:
+env:
+  # adresa serverului (EAS Hosting); aplicația o citește prin EXPO_PUBLIC_API_URL
+  EXPO_PUBLIC_API_URL: https://diabetoline.expo.app
 jobs:
-  update:
+  publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,5 +19,10 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
       - run: npm ci
       - run: npm run typecheck
-      - name: Publică pe ramura preview (Expo Go)
+      - run: npm test
+      - name: Server → EAS Hosting (rutele /api)
+        run: |
+          npx expo export --platform web
+          eas deploy --prod --alias diabetoline --environment production --non-interactive
+      - name: Aplicația → Expo Go (ramura preview)
         run: eas update --branch preview --platform all --non-interactive --message "${{ github.sha }}"
