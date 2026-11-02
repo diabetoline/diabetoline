@@ -7,15 +7,15 @@
 import { askVision, LANG_NAME, readImageBody } from "../../src/server/claude";
 
 const prompt = (lang: string) => `You help an older person with diabetes understand a meal from a photo of their plate.
-Identify each food on the plate. For each, estimate the portion in grams, the carbohydrates in grams for that portion, its glycemic index (GI, 0-100; null if the food has almost no carbohydrates, e.g. meat, fish, eggs, cheese, oil), and the position of its centre in the photo as percentages: "x" from the left (0-100) and "y" from the top (0-100).
+Identify each food or drink in the photo (a plate, a bowl, a glass of wine or beer, a juice, a coffee with milk, a snack in hand: all count). For each, estimate the portion in grams (for drinks use millilitres as grams), the carbohydrates in grams for that portion, its glycemic index (GI, 0-100; null if the food has almost no carbohydrates, e.g. meat, fish, eggs, cheese, oil), and the position of its centre in the photo as percentages: "x" from the left (0-100) and "y" from the top (0-100).
 Then write, in ${LANG_NAME[lang]}:
 - "summary": one short, kind sentence (max 20 words) about the meal's likely effect on blood sugar (no blame).
-- "tips": up to 3 short practical tips (max 12 words each) for THIS plate, e.g. eat the vegetables and protein first, leave part of the bread or potatoes, add a salad, take a walk after eating.
+- "tips": up to 3 short practical tips (max 12 words each) for THIS photo; for alcohol: drink it with food, not on an empty stomach, and keep it to one glass; e.g. eat the vegetables and protein first, leave part of the bread or potatoes, add a salad, take a walk after eating.
 Never mention insulin, doses, medication changes, diagnoses or medical treatment.
 Food names also in ${LANG_NAME[lang]}, short and everyday.
 Reply with ONLY JSON:
 {"ok":true,"foods":[{"name":string,"grams":number,"carbs":number,"gi":number|null,"x":number,"y":number}],"summary":string,"tips":[string]}
-If the photo shows no food, reply {"ok":false,"reason":"no_food"}.`;
+Only if the photo shows no food and no drink at all, reply {"ok":false,"reason":"no_food"}.`;
 
 const n = (x: unknown, max: number) => (typeof x === "number" && Number.isFinite(x) && x >= 0 && x <= max ? Math.round(x) : null);
 
