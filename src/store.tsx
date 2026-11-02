@@ -8,14 +8,15 @@ export type GluCtx = "fasting" | "pre" | "post2h" | "evening" | "other";
 export interface GluEntry { id: string; v: number; ctx: GluCtx; note: string; t: number }
 export interface MealEntry { id: string; t: number; photoUri?: string; code?: string; name?: string; level?: Level; slot: "breakfast" | "lunch" | "dinner" | "snack" }
 export interface Med { id: string; name: string; times: string[]; notifIds?: string[] }
+export interface Walk { id: string; t: number; min: number }
 export interface MedLog { id: string; medId: string; time: string; day: string; t: number }
 
 export interface State {
   lang: Lang; langManual?: boolean; unit: "mg" | "mmol"; name: string; bigText: boolean;
-  history: HistItem[]; glucose: GluEntry[]; meals: MealEntry[]; meds: Med[]; medLog: MedLog[];
+  history: HistItem[]; glucose: GluEntry[]; meals: MealEntry[]; meds: Med[]; medLog: MedLog[]; walks: Walk[];
   cache: Record<string, Product>;
 }
-const initial: State = { lang: deviceLang(), unit: "mg", name: "", bigText: false, history: [], glucose: [], meals: [], meds: [], medLog: [], cache: {} };
+const initial: State = { lang: deviceLang(), unit: "mg", name: "", bigText: false, history: [], glucose: [], meals: [], meds: [], medLog: [], walks: [], cache: {} };
 const KEY = "dscan.state.v2";
 
 interface Ctx {
@@ -26,6 +27,7 @@ interface Ctx {
   addGlucose: (e: Omit<GluEntry, "id" | "t"> & { t?: number }) => void;
   addMeal: (m: Omit<MealEntry, "id" | "t"> & { t?: number }) => void;
   markMed: (medId: string, time: string) => void;
+  addWalk: (min: number) => void;
 }
 const C = createContext<Ctx | null>(null);
 export const dayKey = (t: number) => new Date(t).toISOString().slice(0, 10);
@@ -50,6 +52,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     addUserProduct: (p) => setS((prev) => ({ ...prev, cache: { ...prev.cache, [p.code]: p } })),
     addGlucose: (e) => setS((prev) => ({ ...prev, glucose: [...prev.glucose, { ...e, id: String(Date.now()), t: e.t ?? Date.now() }] })),
     addMeal: (m) => setS((prev) => ({ ...prev, meals: [...prev.meals, { ...m, id: String(Date.now()), t: m.t ?? Date.now() }] })),
+    addWalk: (min) => setS((prev) => ({ ...prev, walks: [...(prev.walks ?? []), { id: String(Date.now()), t: Date.now(), min }] })),
     markMed: (medId, time) => setS((prev) => {
       const day = dayKey(Date.now());
       if (prev.medLog.some((l) => l.medId === medId && l.time === time && l.day === day)) return prev;

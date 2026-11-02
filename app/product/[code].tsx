@@ -9,6 +9,7 @@ import { slotForHour, useStore } from "../../src/store";
 import { speechLocale } from "../../src/i18n";
 import { levelColor, useTheme } from "../../src/theme";
 import { Button, Card, Hint, Label, useScale } from "../../src/ui/Primitives";
+import { AfterMeal } from "../../src/ui/AfterMeal";
 
 const n = (x: number) => x.toLocaleString(undefined, { maximumFractionDigits: 1 });
 
@@ -77,6 +78,7 @@ export default function ProductScreen() {
 
       <View style={{ padding: 16, gap: 12 }}>
         <Button title={ate ? "✓ " + s.ate_this : s.ate_this} kind="soft" size="xl" disabled={ate} onPress={() => { addMeal({ code: p.code, name: p.name, level: v.level, slot: slotForHour(new Date().getHours()) }); setAte(true); }} />
+        {ate && v.level !== "green" && <AfterMeal level={v.level} walkMinutes={v.walkMinutes} />}
         <View style={{ flexDirection: "row", gap: 10 }}>
           <View style={{ flex: 1 }}><Button title={s.log_after} kind="ghost" onPress={() => router.push({ pathname: "/glucose/new", params: { after: p.name } })} /></View>
           <View style={{ flex: 1 }}><Button title={s.scan_again} kind="ghost" onPress={() => router.replace("/scan")} /></View>

@@ -18,11 +18,15 @@ Aplicație mobilă (Expo / React Native, TypeScript) pentru diabetici, publicat�
 4. Medicamente cu reamintire și buton „Am luat”
 5. Cont de familie: copilul vede scanările, pozele, glicemiile, medicația; alerte; părintele acceptă și poate rupe legătura oricând
 6. Raport pentru medic (PDF, 30 de zile, trimis de obicei de copil)
+7. Îndrumare după masă (2 nov 2026): la un produs roșu/galben mâncat sau la o farfurie notată „cu măsură”/„mai grea” nu certăm, ghidăm: plimbare, reamintire de măsurat glicemia la 2 ore, apă, masa următoare ușoară (`src/ui/AfterMeal.tsx`). Calendarul zilelor bune / mai puțin bune în Jurnal (`src/engine/days.ts`).
+8. Produs negăsit → poză la tabelul nutrițional, citit de AI pe server (`app/api/label+api.ts`), omul doar confirmă. Niciodată introducere manuală de la zero.
 
 După lansare: rețete, coș, plan de mese, senzor (Libre/Dexcom), meniu de restaurant, scanare raft, AI pe poza farfuriei.
 
 ## Tehnic
 - `npm run typecheck`, `npm test` (motorul de verdict, Node test runner, build în `.test-build`)
 - Open Food Facts nu e accesibil din mediul de dezvoltare Claude; testele pe produse reale se fac pe telefon.
+- Server: rute API Expo Router (`app/api/*+api.ts`, `web.output: "server"`), găzduite pe EAS Hosting. Secret: `ANTHROPIC_API_KEY` (variabilă secretă EAS). Aplicația găsește serverul prin `EXPO_PUBLIC_API_URL`.
+- Politica de confidențialitate: diabetoline.com/pages/confidentialitate-aplicatie (link în Mai mult).
 - Backend planificat: Supabase în UE (conturi, familie, poze criptate). Abonamente: RevenueCat.
 - Pragurile de verdict (`src/engine/verdict.ts`, obiectul `T`) sunt punct de pornire; de validat cu un diabetolog înainte de lansare.

@@ -4,9 +4,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { dayKey, useStore } from "../../src/store";
 import { levelColor, useTheme } from "../../src/theme";
 import { Button, Card, Hint, Label, Title, useScale } from "../../src/ui/Primitives";
+import { DaysCalendar } from "../../src/ui/DaysCalendar";
 
-import type { GluEntry, MealEntry, MedLog } from "../../src/store";
-type Item = { t: number; kind: "glu"; data: GluEntry } | { t: number; kind: "meal"; data: MealEntry } | { t: number; kind: "med"; data: MedLog };
+import type { GluEntry, MealEntry, MedLog, Walk } from "../../src/store";
+type Item = { t: number; kind: "glu"; data: GluEntry } | { t: number; kind: "meal"; data: MealEntry } | { t: number; kind: "med"; data: MedLog } | { t: number; kind: "walk"; data: Walk };
 
 export default function Journal() {
   const t = useTheme(); const k = useScale(); const router = useRouter();
@@ -25,6 +26,7 @@ export default function Journal() {
     ...state.glucose.map((g) => ({ t: g.t, kind: "glu" as const, data: g })),
     ...state.meals.map((m) => ({ t: m.t, kind: "meal" as const, data: m })),
     ...state.medLog.map((l) => ({ t: l.t, kind: "med" as const, data: l })),
+    ...(state.walks ?? []).map((w) => ({ t: w.t, kind: "walk" as const, data: w })),
   ].sort((a, b) => b.t - a.t).slice(0, 100);
   const days = new Map<string, Item[]>();
   items.forEach((it) => { const d = dayKey(it.t); if (!days.has(d)) days.set(d, []); days.get(d)!.push(it); });
@@ -44,6 +46,8 @@ export default function Journal() {
             <Stat v={lastG ? toU(lastG.v) : "–"} l={s.last} color={lastG ? col[cls(lastG.v, lastG.ctx)] : undefined} />
           </View>
         )}
+
+        {(state.glucose.length > 0 || state.meals.length > 0) && <DaysCalendar />}
 
         {dueMeds.length > 0 && (
           <Card>
@@ -75,6 +79,12 @@ export default function Journal() {
                   {m.photoUri ? <Image source={{ uri: m.photoUri }} style={{ width: 56, height: 56, borderRadius: 10 }} /> : <View style={{ width: 56, height: 56, borderRadius: 10, backgroundColor: t.accentSoft, alignItems: "center", justifyContent: "center" }}><Text style={{ fontSize: 24 }}>▥</Text></View>}
                   <View style={{ flex: 1 }}><Text style={{ color: t.ink, fontSize: 16 * k }} numberOfLines={2}>{m.name ?? s.meal}</Text><Text style={{ color: t.muted, fontSize: 14 * k }}>{s[`meal_${m.slot}` as `meal_${MealEntry["slot"]}`]}</Text></View>
                   {m.level && <View style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: levelColor(t, m.level).fg }} />}
+                  <Text style={{ color: t.muted, fontSize: 14 * k }}>{time}</Text>
+                </View>); }
+              if (it.kind === "walk") { const w = it.data; return (
+                <View key={w.id} style={{ flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 6 }}>
+                  <Text style={{ fontSize: 22 }}>🚶</Text>
+                  <Text style={{ flex: 1, color: t.ink, fontSize: 16 * k }}>{s.walk_entry(w.min)}</Text>
                   <Text style={{ color: t.muted, fontSize: 14 * k }}>{time}</Text>
                 </View>); }
               const l = it.data; const med = state.meds.find((m) => m.id === l.medId);

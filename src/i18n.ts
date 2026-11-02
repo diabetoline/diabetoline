@@ -5,6 +5,14 @@ type Verd = { carbs: number; sugars: number; fiber: number; gl: number | null };
 type Dict = Record<string, any>;
 
 const ro = {
+  care_title_red: "S-a întâmplat. Uite ce te ajută acum:", care_title_yellow: "Ca să-ți fie bine după masă:",
+  care_walk: (m: number) => `Mergi pe jos ${m} minute, cât mai curând după masă.`, care_walk_btn: "Am făcut plimbarea", care_walk_done: "Plimbare notată. Bravo!",
+  care_check: "Măsoară glicemia la 2 ore după masă.", care_check_btn: "Amintește-mi peste 2 ore", care_check_set: (h: string) => `Te anunț la ora ${h}.`,
+  care_water: "Bea un pahar mare de apă.", care_next: "La masa următoare alege ceva ușor: legume, ouă, carne slabă, lactate neîndulcite.",
+  care_meds: "Medicamentele le iei exact cum ți-a spus medicul.", care_done: "Gata",
+  notif_glu_title: "E timpul să măsori glicemia", notif_glu_body: "Au trecut 2 ore de la masă. Notează valoarea în Diabetoline.",
+  plate_how: "Cum a fost masa?", plate_light: "Ușoară", plate_mid: "Cu măsură", plate_heavy: "Mai grea",
+  cal_title: "Zilele tale", cal_good: "Zi bună", cal_less: "Zi mai puțin bună", cal_hint: "O zi e bună când glicemiile sunt în interval și, după o masă grea, ai făcut plimbarea.", walk_entry: (m: number) => `Plimbare, ${m} minute`,
   label_title: "Fă o poză la tabelul cu valori nutriționale", label_hint: "Tabelul de pe ambalaj, drept, cu lumină bună și tot în cadru.",
   label_reading: "Citesc eticheta…", label_check: "Am citit eticheta", label_check_hint: "Uită-te dacă cifrele se potrivesc cu eticheta. Poți corecta una dacă e greșită.",
   label_fail: "Nu am putut citi tabelul. Fă o poză mai de aproape, cu lumină bună.", label_off: "Citirea etichetelor din poză pornește în curând. Scanează alt produs până atunci.",
@@ -73,6 +81,14 @@ const ro = {
 };
 
 const en: typeof ro = {
+  care_title_red: "It happens. Here's what helps now:", care_title_yellow: "To feel good after this meal:",
+  care_walk: (m: number) => `Walk for ${m} minutes, as soon as you can after eating.`, care_walk_btn: "I went for the walk", care_walk_done: "Walk logged. Well done!",
+  care_check: "Check your blood sugar 2 hours after the meal.", care_check_btn: "Remind me in 2 hours", care_check_set: (h: string) => `I'll remind you at ${h}.`,
+  care_water: "Drink a large glass of water.", care_next: "Keep the next meal light: vegetables, eggs, lean meat, unsweetened dairy.",
+  care_meds: "Take your medication exactly as your doctor told you.", care_done: "Done",
+  notif_glu_title: "Time to check your blood sugar", notif_glu_body: "It's been 2 hours since your meal. Log the value in Diabetoline.",
+  plate_how: "How was the meal?", plate_light: "Light", plate_mid: "Moderate", plate_heavy: "Heavy",
+  cal_title: "Your days", cal_good: "Good day", cal_less: "Less good day", cal_hint: "A day is good when your readings are in range and you walked after any heavy meal.", walk_entry: (m: number) => `Walk, ${m} minutes`,
   label_title: "Take a photo of the nutrition table", label_hint: "The table on the pack, straight, well lit and fully in frame.",
   label_reading: "Reading the label…", label_check: "Label read", label_check_hint: "Check the numbers match the label. You can fix one if it's wrong.",
   label_fail: "Couldn't read the table. Take a closer photo in good light.", label_off: "Reading labels from a photo is coming soon. Scan another product meanwhile.",
@@ -131,6 +147,14 @@ const en: typeof ro = {
 };
 
 const de: typeof ro = {
+  care_title_red: "Das passiert. Das hilft jetzt:", care_title_yellow: "Damit es dir nach dem Essen gut geht:",
+  care_walk: (m: number) => `Geh ${m} Minuten zu Fuß, möglichst bald nach dem Essen.`, care_walk_btn: "Spaziergang gemacht", care_walk_done: "Spaziergang eingetragen. Super!",
+  care_check: "Miss deinen Blutzucker 2 Stunden nach dem Essen.", care_check_btn: "In 2 Stunden erinnern", care_check_set: (h: string) => `Ich erinnere dich um ${h}.`,
+  care_water: "Trink ein großes Glas Wasser.", care_next: "Die nächste Mahlzeit leicht halten: Gemüse, Eier, mageres Fleisch, ungesüßte Milchprodukte.",
+  care_meds: "Nimm deine Medikamente genau so, wie dein Arzt es gesagt hat.", care_done: "Fertig",
+  notif_glu_title: "Zeit, den Blutzucker zu messen", notif_glu_body: "2 Stunden nach dem Essen. Trag den Wert in Diabetoline ein.",
+  plate_how: "Wie war die Mahlzeit?", plate_light: "Leicht", plate_mid: "Mäßig", plate_heavy: "Schwer",
+  cal_title: "Deine Tage", cal_good: "Guter Tag", cal_less: "Weniger guter Tag", cal_hint: "Ein Tag ist gut, wenn die Werte im Bereich liegen und du nach einer schweren Mahlzeit spazieren warst.", walk_entry: (m: number) => `Spaziergang, ${m} Minuten`,
   label_title: "Foto der Nährwerttabelle machen", label_hint: "Die Tabelle auf der Packung, gerade, hell und ganz im Bild.",
   label_reading: "Etikett wird gelesen…", label_check: "Etikett gelesen", label_check_hint: "Prüfe, ob die Zahlen zum Etikett passen. Du kannst eine korrigieren.",
   label_fail: "Tabelle nicht lesbar. Mach ein näheres Foto bei gutem Licht.", label_off: "Etiketten per Foto lesen kommt bald. Scanne inzwischen ein anderes Produkt.",

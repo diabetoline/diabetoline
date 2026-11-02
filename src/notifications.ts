@@ -39,3 +39,14 @@ export function parseTime(raw: string): string | null {
   if (h > 23 || mi > 59) return null;
   return `${String(h).padStart(2, "0")}:${String(mi).padStart(2, "0")}`;
 }
+
+/** O singură reamintire, peste `minutes`, să măsoare glicemia după o masă. Întoarce ora, ex. "15:40". */
+export async function scheduleGlucoseCheck(t: Strings, minutes = 120): Promise<string | null> {
+  if (!(await ensurePermission())) return null;
+  const at = new Date(Date.now() + minutes * 60_000);
+  await Notifications.scheduleNotificationAsync({
+    content: { title: t.notif_glu_title, body: t.notif_glu_body, data: { kind: "glucose" }, sound: true },
+    trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: at },
+  });
+  return at.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}

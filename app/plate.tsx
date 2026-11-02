@@ -7,6 +7,7 @@ import { File, Paths } from "expo-file-system";
 import { slotForHour, useStore, type MealEntry } from "../src/store";
 import { useTheme } from "../src/theme";
 import { Button, Hint } from "../src/ui/Primitives";
+import type { Level } from "../src/engine/types";
 
 export default function PlateScreen() {
   const t = useTheme(); const router = useRouter();
@@ -18,6 +19,7 @@ export default function PlateScreen() {
   const [shot, setShot] = useState<string | null>(null);
   const [slot, setSlot] = useState<MealEntry["slot"]>(slotForHour(new Date().getHours()));
   const [busy, setBusy] = useState(false);
+  const [how, setHow] = useState<Level | null>(null);
 
   const take = async () => {
     if (!cam.current || busy) return;
@@ -32,8 +34,9 @@ export default function PlateScreen() {
       const dir = Paths.join(Paths.document, "meals"); const d = new (require("expo-file-system").Directory)(dir); if (!d.exists) d.create();
       const dest = new File(dir, `meal-${Date.now()}.jpg`); new File(shot).copy(dest); uri = dest.uri;
     } catch { /* keep the cache uri if copy fails */ }
-    addMeal({ photoUri: uri, slot });
-    router.back();
+    addMeal({ photoUri: uri, slot, level: how ?? undefined });
+    if (how === "yellow" || how === "red") router.replace({ pathname: "/care", params: { level: how } });
+    else router.back();
   };
   const slots: MealEntry["slot"][] = ["breakfast", "lunch", "snack", "dinner"];
 
@@ -64,7 +67,17 @@ export default function PlateScreen() {
                     </Pressable>
                   ))}
                 </View>
-                <Button title={s.use_photo} size="xl" onPress={save} />
+                <Text style={st.how}>{s.plate_how}</Text>
+                <View style={{ flexDirection: "row", gap: 8 }}>
+                  {([["green", "🟢", s.plate_light], ["yellow", "🟡", s.plate_mid], ["red", "🔴", s.plate_heavy]] as const).map(([lv, dot, lbl]) => (
+                    <Pressable key={lv} onPress={() => setHow(lv)} accessibilityRole="button" accessibilityState={{ selected: how === lv }}
+                      style={[st.howBtn, how === lv && { backgroundColor: "#fff" }]}>
+                      <Text style={{ fontSize: 22 }}>{dot}</Text>
+                      <Text style={{ color: how === lv ? "#000" : "#fff", fontWeight: "700", fontSize: 16 }}>{lbl}</Text>
+                    </Pressable>
+                  ))}
+                </View>
+                <Button title={s.use_photo} size="xl" onPress={save} disabled={!how} />
                 <Button title={s.retake} kind="ghost" onPress={() => setShot(null)} />
               </>
             ) : (
@@ -89,5 +102,7 @@ const st = StyleSheet.create({
   hint: { color: "#fff", fontSize: 18, textAlign: "center" },
   shutter: { alignSelf: "center", width: 84, height: 84, borderRadius: 42, borderWidth: 5, borderColor: "#fff", alignItems: "center", justifyContent: "center" },
   shutterIn: { width: 66, height: 66, borderRadius: 33, backgroundColor: "#fff" },
+  how: { color: "#fff", fontSize: 18, fontWeight: "800", textAlign: "center" },
+  howBtn: { flex: 1, alignItems: "center", gap: 4, borderWidth: 2, borderColor: "#fff", borderRadius: 14, paddingVertical: 10 },
   chip: { borderWidth: 1, borderColor: "#fff", borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8 },
 });
