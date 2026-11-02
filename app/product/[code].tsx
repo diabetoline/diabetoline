@@ -13,6 +13,8 @@ import { Button, Card, Hint, Label, useScale } from "../../src/ui/Primitives";
 import { AfterMeal } from "../../src/ui/AfterMeal";
 import { Quip } from "../../src/ui/Quip";
 import { VerdictBadge } from "../../src/ui/VerdictBadge";
+import { findPartner, partnerAsProduct, pastaAlternative, productUrl } from "../../src/partner";
+import { Linking } from "react-native";
 
 const n = (x: number) => x.toLocaleString(undefined, { maximumFractionDigits: 1 });
 
@@ -30,6 +32,8 @@ export default function ProductScreen() {
   useEffect(() => {
     let alive = true;
     if (p?.source === "user") { recordScan(p, analyze(p)); return; }
+    const partner = findPartner(code);
+    if (partner) { const prod = partnerAsProduct(partner, code); const verdict = analyze(prod); setP(prod); setV(verdict); recordScan(prod, verdict); return; }
     (async () => {
       try {
         const prod = await fetchProduct(code, state.lang);
@@ -88,6 +92,20 @@ export default function ProductScreen() {
           <View style={{ flex: 1 }}><Button title={s.scan_again} kind="ghost" onPress={() => router.replace("/scan")} /></View>
         </View>
 
+        {(() => { const alt = v.level !== "green" ? pastaAlternative(p.categories, p.name) : undefined; const mine = findPartner(p.code, p.name, p.brand);
+          if (mine) return (
+            <Card style={{ borderColor: t.accent, borderWidth: 2 }}>
+              <Text style={{ color: t.ink, fontSize: 18 * k, fontWeight: "800" }}>🇮🇹 {s.partner_mine}</Text>
+              <Text style={{ color: t.ink, fontSize: 16 * k, lineHeight: 23 * k }}>{s.partner_gi(mine.gi)}</Text>
+              <Button title={`${s.partner_order} · ${mine.price.toFixed(2).replace(".", ",")} lei`} onPress={() => Linking.openURL(productUrl(mine))} />
+            </Card>);
+          if (alt) return (
+            <Card style={{ borderColor: t.ok, borderWidth: 2 }}>
+              <Text style={{ color: t.ink, fontSize: 18 * k, fontWeight: "800" }}>✅ {s.partner_alt_title}</Text>
+              <Text style={{ color: t.ink, fontSize: 16 * k, lineHeight: 23 * k }}>{alt.name}. {s.partner_gi(alt.gi)} {s.partner_alt_text}</Text>
+              <Button title={`${s.partner_order} · ${alt.price.toFixed(2).replace(".", ",")} lei`} onPress={() => Linking.openURL(productUrl(alt))} />
+            </Card>);
+          return null; })()}
         {v.level === "red"
           ? <Button title={"🥗 " + s.ideas_lighter} kind="soft" onPress={() => router.push({ pathname: "/ideas", params: { focus: p.name, lighter: "1" } })} />
           : <Button title={"🍲 " + s.ideas_product} kind="soft" onPress={() => router.push({ pathname: "/ideas", params: { focus: p.name } })} />}

@@ -5,6 +5,10 @@ type Verd = { carbs: number; sugars: number; fiber: number; gl: number | null };
 type Dict = Record<string, any>;
 
 const ro = {
+  skin_title: "Îngrijirea pielii", skin_sub: "Cosmeticele Diabetoline pentru pielea uscată, de care au nevoie des persoanele cu diabet.", shop_note: "Prețurile sunt cele de pe diabetoline.com la data actualizării aplicației; comanda se face pe site.",
+  partner_mine: "Distribuit de Diabetoline", partner_gi: (gi: number) => `Indice glicemic certificat ${gi}, cu 15% fibre, din grâu dur italian.`, partner_order: "Comandă pe diabetoline.com",
+  partner_alt_title: "O alternativă mai bună pentru tine", partner_alt_text: "Aceeași mâncare, cu mult mai puțin efect asupra glicemiei.",
+  shop_title: "Alimente cu indice glicemic scăzut", shop_sub: "Produsele FiberPasta, distribuite de Diabetoline. Paste și făină din grâu dur italian, cu indice glicemic certificat 23–29.", shop_open: "Vezi toate pe diabetoline.com", shop_each: "la 100 g",
   ask_title: "Întreabă", ask_sub: "Răspund din jurnalul tău, pe scurt. Nu dau doze și nu înlocuiesc medicul.", ask_placeholder: "Scrie întrebarea ta…", ask_send: "Întreabă", ask_thinking: "Mă uit în jurnalul tău…", ask_err: "Nu am putut răspunde acum. Verifică internetul.", ask_off: "Asistentul pornește în curând.",
   ask_voice_soon: "Vorbitul cu microfonul vine în versiunea din magazin.", ask_emergency: "Dacă îți e rău acum, sună la 112 sau la medicul tău.",
   ask_q: ["Pot mânca o felie de cozonac azi?", "De ce a fost glicemia mare aseară?", "Ce gustare pot lua acum?", "Am voie un pahar de vin?", "Cum a fost săptămâna mea?", "Ce să mănânc la cină?"],
@@ -127,6 +131,10 @@ const ro = {
 };
 
 const en: typeof ro = {
+  skin_title: "Skin care", skin_sub: "Diabetoline cosmetics for dry skin, which people with diabetes often need.", shop_note: "Prices are those on diabetoline.com at the time of the app update; ordering happens on the site.",
+  partner_mine: "Distributed by Diabetoline", partner_gi: (gi: number) => `Certified glycemic index ${gi}, 15% fibre, Italian durum wheat.`, partner_order: "Order on diabetoline.com",
+  partner_alt_title: "A better alternative for you", partner_alt_text: "The same food, with far less effect on your blood sugar.",
+  shop_title: "Low glycemic index foods", shop_sub: "FiberPasta products, distributed by Diabetoline. Pasta and flour from Italian durum wheat, certified glycemic index 23–29.", shop_open: "See all on diabetoline.com", shop_each: "per 100 g",
   ask_title: "Ask", ask_sub: "I answer from your journal, briefly. No doses, and I don't replace your doctor.", ask_placeholder: "Type your question…", ask_send: "Ask", ask_thinking: "Looking at your journal…", ask_err: "Couldn't answer right now. Check your connection.", ask_off: "The helper is coming soon.",
   ask_voice_soon: "Talking with the microphone comes in the store version.", ask_emergency: "If you feel unwell right now, call emergency services or your doctor.",
   ask_q: ["Can I have a slice of cake today?", "Why was my glucose high last night?", "What snack can I have now?", "Is a glass of wine OK?", "How was my week?", "What should I eat for dinner?"],
@@ -239,6 +247,10 @@ const en: typeof ro = {
 };
 
 const de: typeof ro = {
+  skin_title: "Hautpflege", skin_sub: "Diabetoline-Kosmetik für trockene Haut, die Menschen mit Diabetes oft brauchen.", shop_note: "Die Preise sind die von diabetoline.com zum Zeitpunkt des App-Updates; bestellt wird auf der Website.",
+  partner_mine: "Vertrieb durch Diabetoline", partner_gi: (gi: number) => `Zertifizierter glykämischer Index ${gi}, 15 % Ballaststoffe, italienischer Hartweizen.`, partner_order: "Auf diabetoline.com bestellen",
+  partner_alt_title: "Eine bessere Alternative für dich", partner_alt_text: "Dasselbe Essen, mit viel weniger Wirkung auf den Blutzucker.",
+  shop_title: "Lebensmittel mit niedrigem glykämischen Index", shop_sub: "FiberPasta-Produkte, vertrieben von Diabetoline. Pasta und Mehl aus italienischem Hartweizen, zertifizierter GI 23–29.", shop_open: "Alle auf diabetoline.com ansehen", shop_each: "pro 100 g",
   ask_title: "Fragen", ask_sub: "Ich antworte kurz aus deinem Tagebuch. Keine Dosierungen, und ich ersetze deinen Arzt nicht.", ask_placeholder: "Schreib deine Frage…", ask_send: "Fragen", ask_thinking: "Ich schaue in dein Tagebuch…", ask_err: "Ich konnte gerade nicht antworten. Prüfe die Verbindung.", ask_off: "Der Helfer kommt bald.",
   ask_voice_soon: "Sprechen per Mikrofon kommt in der Store-Version.", ask_emergency: "Wenn es dir gerade schlecht geht, ruf den Notruf oder deinen Arzt an.",
   ask_q: ["Darf ich heute ein Stück Kuchen essen?", "Warum war mein Blutzucker gestern Abend hoch?", "Welchen Snack kann ich jetzt essen?", "Ist ein Glas Wein in Ordnung?", "Wie war meine Woche?", "Was soll ich zu Abend essen?"],

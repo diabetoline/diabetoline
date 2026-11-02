@@ -14,7 +14,7 @@ export default function More() {
     { icon: "pill", title: s.meds, sub: state.meds.length ? state.meds.map((m) => m.name).join(", ") : s.meds_sub, to: "/meds" },
     { icon: "family", title: s.family, sub: state.family.role === "child" && state.family.parent ? s.fam_parent_of(state.family.parent.name) : state.family.role === "parent" && state.family.children.length ? state.family.children.map((c) => c.name).join(", ") : s.fam_short, to: "/family" },
     { icon: "report", title: s.report, sub: s.rep_short, to: "/report" },
-    { icon: "care", title: s.care, sub: s.care_soon },
+    { icon: "care", title: s.care, sub: s.skin_sub, to: "/shop" },
     { icon: "settings", title: s.settings, to: "/settings" },
     { icon: "lock", title: s.privacy, sub: s.privacy_sub, url: privacyUrl[state.lang] },
   ];
