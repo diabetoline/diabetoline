@@ -5,6 +5,8 @@ type Verd = { carbs: number; sugars: number; fiber: number; gl: number | null };
 type Dict = Record<string, any>;
 
 const ro = {
+  fam_short: "Copilul tău vede jurnalul, ca să te ajute", rep_short: "PDF pe 30 de zile, de trimis medicului",
+  tile_scan: "Scanează", tile_plate: "Poză la masă", tile_glu: "Glicemia", tile_meds: "Medicamente", med_due_now: "De luat acum", home_first: "Începe cu Scanează la cumpărături sau cu Poză la masă.",
   fam_title: "Familie", fam_intro: "Copilul tău vede ce notezi (glicemii, mese, medicamente) ca să te poată ajuta. Pozele rămân doar pe telefonul tău. Tu accepți și tu poți opri oricând.",
   fam_i_parent: "Sunt părintele", fam_i_parent_sub: "Vreau ca cineva din familie să vadă jurnalul meu", fam_i_child: "Sunt copilul", fam_i_child_sub: "Vreau să văd jurnalul părintelui meu",
   fam_consent: "Sunt de acord ca glicemiile, mesele și medicamentele mele să fie trimise pe serverul Diabetoline (în UE), ca să le vadă persoana pe care o accept.", fam_consent_btn: "Sunt de acord, continuă",
@@ -94,7 +96,7 @@ const ro = {
   no_entries: "Nicio notare încă.", meal: "Masă", med_taken: "luat", med_skipped: "neluat", delete: "Șterge",
   glu_hint: "Intervalele colorate sunt orientative (sub 70 scăzut, peste 130 pe nemâncate sau peste 180 după masă ridicat). Țintele tale le stabilește medicul.",
   // meds
-  meds: "Medicamente", meds_sub: "Reamintiri la orele stabilite de medic. Aplicația nu recomandă doze.", med_add: "Adaugă medicament", med_name: "Numele medicamentului", med_times: "Orele (ex. 8:00, 20:00)", med_saved: "Reamintirea a fost setată.",
+  meds: "Medicamente", meds_sub: "Reamintiri la orele stabilite de medic.", med_add: "Adaugă medicament", med_name: "Numele medicamentului", med_times: "Orele (ex. 8:00, 20:00)", med_saved: "Reamintirea a fost setată.",
   med_take: "Am luat", med_due: "de luat la", notif_title: "E ora pentru", notif_body: (n: string) => `${n}. Apasă „Am luat” după ce l-ai luat.`, notif_denied: "Permite notificările în Setări ca să primești reamintiri.",
   // more
   family: "Familie", family_soon: "Vine în următoarea versiune: copilul tău vede ce scanezi și glicemiile tale, ca să te ajute.", care: "Îngrijire", care_soon: "În curând.", settings: "Setări", report: "Raport pentru medic", report_soon: "În curând.",
@@ -103,6 +105,8 @@ const ro = {
 };
 
 const en: typeof ro = {
+  fam_short: "Your child sees your journal, to help you", rep_short: "30-day PDF to send to your doctor",
+  tile_scan: "Scan", tile_plate: "Photo of meal", tile_glu: "Blood sugar", tile_meds: "Medication", med_due_now: "Due now", home_first: "Start with Scan when shopping or Photo of meal at the table.",
   fam_title: "Family", fam_intro: "Your child sees what you log (glucose, meals, medication) so they can help. Photos stay only on your phone. You accept, and you can stop at any time.",
   fam_i_parent: "I'm the parent", fam_i_parent_sub: "I want someone in my family to see my journal", fam_i_child: "I'm the child", fam_i_child_sub: "I want to see my parent's journal",
   fam_consent: "I agree that my glucose, meals and medication are sent to the Diabetoline server (in the EU) so the person I accept can see them.", fam_consent_btn: "I agree, continue",
@@ -183,7 +187,7 @@ const en: typeof ro = {
   g_low: "Low", g_ok: "In range", g_high: "High", avg7: "7-day average", inrange: "in range", last: "latest",
   no_entries: "Nothing logged yet.", meal: "Meal", med_taken: "taken", med_skipped: "not taken", delete: "Delete",
   glu_hint: "Colored ranges are indicative (below 70 low, above 130 fasting or above 180 after meals high). Your doctor sets your targets.",
-  meds: "Medication", meds_sub: "Reminders at the times your doctor set. The app never suggests doses.", med_add: "Add medication", med_name: "Medication name", med_times: "Times (e.g. 8:00, 20:00)", med_saved: "Reminder set.",
+  meds: "Medication", meds_sub: "Reminders at the times your doctor set.", med_add: "Add medication", med_name: "Medication name", med_times: "Times (e.g. 8:00, 20:00)", med_saved: "Reminder set.",
   med_take: "Taken", med_due: "due at", notif_title: "Time for", notif_body: (n: string) => `${n}. Tap "Taken" once you've had it.`, notif_denied: "Allow notifications in Settings to get reminders.",
   family: "Family", family_soon: "Coming in the next version: your child sees what you scan and your glucose, to help you.", care: "Care", care_soon: "Coming soon.", settings: "Settings", report: "Doctor report", report_soon: "Coming soon.",
   lang: "Language", unit: "Glucose unit", your_name: "Your name", big_text: "Larger text", reset: "Delete all data",
@@ -191,6 +195,8 @@ const en: typeof ro = {
 };
 
 const de: typeof ro = {
+  fam_short: "Dein Kind sieht dein Tagebuch, um dir zu helfen", rep_short: "30-Tage-PDF für den Arzt",
+  tile_scan: "Scannen", tile_plate: "Foto vom Essen", tile_glu: "Blutzucker", tile_meds: "Medikamente", med_due_now: "Jetzt fällig", home_first: "Beginne mit Scannen beim Einkaufen oder Foto vom Essen am Tisch.",
   fam_title: "Familie", fam_intro: "Dein Kind sieht, was du einträgst (Blutzucker, Mahlzeiten, Medikamente), um dir zu helfen. Fotos bleiben nur auf deinem Handy. Du stimmst zu und kannst jederzeit aufhören.",
   fam_i_parent: "Ich bin der Elternteil", fam_i_parent_sub: "Jemand aus der Familie soll mein Tagebuch sehen", fam_i_child: "Ich bin das Kind", fam_i_child_sub: "Ich möchte das Tagebuch meines Elternteils sehen",
   fam_consent: "Ich stimme zu, dass meine Blutzuckerwerte, Mahlzeiten und Medikamente an den Diabetoline-Server (in der EU) gesendet werden, damit die Person, die ich akzeptiere, sie sehen kann.", fam_consent_btn: "Ich stimme zu, weiter",
