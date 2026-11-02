@@ -1,0 +1,11 @@
+name: Publică actualizare (Expo Go)
+on:
+  push:
+    branches: [main]
+jobs:
+  update:
+    name: Update
+    type: update
+    params:
+      branch: preview
+      message: ${{ github.event.head_commit.message }}
