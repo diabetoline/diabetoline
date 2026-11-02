@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { Stack, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -15,6 +15,9 @@ export default function ScanScreen() {
   const [perm, requestPerm] = useCameraPermissions();
   const [torch, setTorch] = useState(false);
   const done = useRef(false);
+  const [typing, setTyping] = useState(false);
+  const [code, setCode] = useState("");
+  const submit = () => { const c = code.replace(/\D/g, ""); if (c.length >= 6) router.replace({ pathname: "/product/[code]", params: { code: c } }); };
 
   const onScan = ({ data }: { data: string }) => {
     if (done.current) return;
@@ -45,10 +48,21 @@ export default function ScanScreen() {
           <View style={st.frameWrap} pointerEvents="none">
             <View style={[st.frame, { borderColor: t.ok }]} />
           </View>
-          <View style={st.bottom}>
+          <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={st.bottom}>
             <Text style={st.hint}>{s.scan_hint}</Text>
             <Text style={st.hint2}>{s.scan_distance}</Text>
-          </View>
+            {typing ? (
+              <View style={{ flexDirection: "row", gap: 8, marginTop: 8 }}>
+                <TextInput value={code} onChangeText={setCode} onSubmitEditing={submit} placeholder="5940000000000" placeholderTextColor="#999"
+                  keyboardType="number-pad" returnKeyType="search" autoFocus accessibilityLabel={s.type_code} style={st.input} />
+                <Button title={s.check} onPress={submit} size="sm" />
+              </View>
+            ) : (
+              <Pressable onPress={() => setTyping(true)} hitSlop={10} accessibilityRole="button" style={{ marginTop: 8 }}>
+                <Text style={[st.hint2, { textDecorationLine: "underline", color: "#fff" }]}>{s.code_toggle}</Text>
+              </Pressable>
+            )}
+          </KeyboardAvoidingView>
         </View>
       </View>
     </View>
@@ -64,4 +78,5 @@ const st = StyleSheet.create({
   bottom: { padding: 24, gap: 6, backgroundColor: "rgba(0,0,0,0.55)" },
   hint: { color: "#fff", fontSize: 20, fontWeight: "700", textAlign: "center" },
   hint2: { color: "#ddd", fontSize: 16, textAlign: "center" },
+  input: { flex: 1, backgroundColor: "#fff", color: "#000", borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: 18 },
 });

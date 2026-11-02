@@ -11,7 +11,7 @@ export default function TabLayout() {
   return (
     <Tabs screenOptions={{ headerShown: false, tabBarActiveTintColor: t.accent, tabBarInactiveTintColor: t.muted,
       tabBarStyle: { backgroundColor: t.surface, borderTopColor: t.line, height: 64, paddingTop: 6 }, tabBarLabelStyle: { fontWeight: "700", fontSize: 13 } }}>
-      <Tabs.Screen name="index" options={{ title: s.tab_scan, tabBarIcon: icon("▥") }} />
+      <Tabs.Screen name="index" options={{ title: s.tab_home, tabBarIcon: icon("🏠") }} />
       <Tabs.Screen name="journal" options={{ title: s.tab_journal, tabBarIcon: icon("📒") }} />
       <Tabs.Screen name="more" options={{ title: s.tab_more, tabBarIcon: icon("☰") }} />
     </Tabs>

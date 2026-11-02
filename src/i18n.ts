@@ -5,6 +5,14 @@ type Verd = { carbs: number; sugars: number; fiber: number; gl: number | null };
 type Dict = Record<string, any>;
 
 const ro = {
+  // home (situații)
+  tab_home: "Acasă", hello: "Bună", hello_name: (n: string) => `Bună, ${n}`,
+  home_promise: "Te ajutăm cu diabetul în fiecare zi: la cumpărături, la masă, cu glicemia și cu medicamentele.", home_ask: "Unde ești acum?",
+  sit_meds: "Medicamentele", sit_meds_sub: "Îți amintim la ora potrivită și bifezi „Am luat”.",
+  sit_shop: "La cumpărături", sit_shop_sub: "Scanează codul de bare. Îți spun pe loc: potrivit, cu măsură sau evită.",
+  sit_meal: "La masă", sit_meal_sub: "Acasă sau la restaurant: fă o poză la farfurie. Rămâne în jurnalul tău.",
+  sit_glu: "Glicemia", sit_glu_sub: "Ai măsurat? Noteaz-o cu o apăsare.",
+  your_day: "Ziua ta", code_toggle: "Nu citește codul? Tastează-l",
   // tabs
   tab_scan: "Scanează", tab_journal: "Jurnal", tab_more: "Mai mult",
   // home
@@ -61,6 +69,13 @@ const ro = {
 };
 
 const en: typeof ro = {
+  tab_home: "Home", hello: "Hello", hello_name: (n: string) => `Hello, ${n}`,
+  home_promise: "We help you with diabetes every day: when shopping, at meals, with your blood sugar and your medication.", home_ask: "Where are you right now?",
+  sit_meds: "Medication", sit_meds_sub: "We remind you at the right time and you tick \"Taken\".",
+  sit_shop: "Shopping", sit_shop_sub: "Scan the barcode. You get an instant answer: good, in moderation or avoid.",
+  sit_meal: "At the table", sit_meal_sub: "At home or in a restaurant: take a photo of your plate. It stays in your journal.",
+  sit_glu: "Blood sugar", sit_glu_sub: "Just measured? Log it with one tap.",
+  your_day: "Your day", code_toggle: "Won't read the code? Type it",
   tab_scan: "Scan", tab_journal: "Journal", tab_more: "More",
   scan_big: "Scan a product", plate_big: "Photo of my plate", type_code: "or type the barcode", check: "Check",
   today: "Today", nothing_today: "Nothing logged today. Scan a product or take a photo of what you eat.", last_scans: "Latest products",
@@ -108,6 +123,13 @@ const en: typeof ro = {
 };
 
 const de: typeof ro = {
+  tab_home: "Start", hello: "Hallo", hello_name: (n: string) => `Hallo, ${n}`,
+  home_promise: "Wir helfen dir jeden Tag mit Diabetes: beim Einkaufen, beim Essen, beim Blutzucker und bei den Medikamenten.", home_ask: "Wo bist du gerade?",
+  sit_meds: "Medikamente", sit_meds_sub: "Wir erinnern dich zur richtigen Zeit, du hakst \"Genommen\" ab.",
+  sit_shop: "Beim Einkaufen", sit_shop_sub: "Barcode scannen. Sofort die Antwort: geeignet, in Maßen oder vermeiden.",
+  sit_meal: "Beim Essen", sit_meal_sub: "Zu Hause oder im Restaurant: Teller fotografieren. Es bleibt in deinem Tagebuch.",
+  sit_glu: "Blutzucker", sit_glu_sub: "Gerade gemessen? Mit einem Tipp eintragen.",
+  your_day: "Dein Tag", code_toggle: "Code wird nicht erkannt? Eintippen",
   tab_scan: "Scannen", tab_journal: "Tagebuch", tab_more: "Mehr",
   scan_big: "Produkt scannen", plate_big: "Foto vom Teller", type_code: "oder Barcode eingeben", check: "Prüfen",
   today: "Heute", nothing_today: "Heute noch nichts eingetragen. Scanne ein Produkt oder fotografiere dein Essen.", last_scans: "Letzte Produkte",

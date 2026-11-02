@@ -1,47 +1,54 @@
-import { useState } from "react";
-import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import { useRouter } from "expo-router";
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useRouter, type Href } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { dayKey, useStore } from "../../src/store";
-import { levelColor, useTheme } from "../../src/theme";
-import { Button, Card, Hint, Label, useScale } from "../../src/ui/Primitives";
+import { levelColor, useTheme, type Theme } from "../../src/theme";
+import { Card, Hint, Label, useScale } from "../../src/ui/Primitives";
 
+/**
+ * Prima pagină: aplicația explicată prin situațiile din zi.
+ * Fiecare card = un loc/moment („Unde ești acum?”) + ce face aplicația acolo, într-o propoziție.
+ */
 export default function Home() {
   const t = useTheme(); const k = useScale();
   const { t: s, s: state } = useStore();
   const router = useRouter();
-  const [code, setCode] = useState("");
-  const [showCode, setShowCode] = useState(false);
   const today = dayKey(Date.now());
   const todayMeals = state.meals.filter((m) => dayKey(m.t) === today);
   const todayGlu = state.glucose.filter((g) => dayKey(g.t) === today);
-  const open = (c: string) => { const clean = c.replace(/\D/g, ""); if (clean.length >= 6) router.push({ pathname: "/product/[code]", params: { code: clean } }); };
+  const open = (c: string) => router.push({ pathname: "/product/[code]", params: { code: c } });
+
+  const situations: { icon: string; title: string; sub: string; to: Href; tint: string; main?: boolean }[] = [
+    { icon: "🛒", title: s.sit_shop, sub: s.sit_shop_sub, to: "/scan", tint: t.accent, main: true },
+    { icon: "🍽️", title: s.sit_meal, sub: s.sit_meal_sub, to: "/plate", tint: t.ok },
+    { icon: "🩸", title: s.sit_glu, sub: s.sit_glu_sub, to: "/glucose/new", tint: t.bad },
+    { icon: "💊", title: s.sit_meds, sub: s.sit_meds_sub, to: "/meds", tint: t.warn },
+  ];
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }} edges={["top"]}>
       <ScrollView contentContainerStyle={st.wrap}>
-        <Image source={require("../../assets/logo-wordmark.png")} style={{ width: 200, height: 200 * 153 / 1062, alignSelf: "flex-start" }} resizeMode="contain" accessibilityLabel="Diabetoline" />
+        <Image source={require("../../assets/logo-wordmark.png")} style={{ width: 170, height: 170 * 153 / 1062 }} resizeMode="contain" accessibilityLabel="Diabetoline" />
 
-        <Button title={s.scan_big} icon="▥" size="xl" onPress={() => router.push("/scan")} />
-        <Button title={s.plate_big} icon="🍽️" size="xl" kind="soft" onPress={() => router.push("/plate")} />
+        <View style={{ gap: 6 }}>
+          <Text style={{ color: t.ink, fontSize: 28 * k, fontWeight: "800", letterSpacing: -0.4 }}>
+            {state.name ? s.hello_name(state.name) : s.hello} 👋
+          </Text>
+          <Text style={{ color: t.ink, fontSize: 18 * k, lineHeight: 25 * k }}>{s.home_promise}</Text>
+        </View>
 
-        {!showCode ? (
-          <Pressable onPress={() => setShowCode(true)} accessibilityRole="button"><Hint style={{ textAlign: "center", textDecorationLine: "underline" }}>{s.type_code}</Hint></Pressable>
-        ) : (
-          <View style={{ flexDirection: "row", gap: 8 }}>
-            <TextInput value={code} onChangeText={setCode} onSubmitEditing={() => open(code)} placeholder="5940000000000" placeholderTextColor={t.muted}
-              keyboardType="number-pad" returnKeyType="search" autoFocus accessibilityLabel={s.type_code}
-              style={[st.input, { borderColor: t.line, backgroundColor: t.surface, color: t.ink, fontSize: 18 * k }]} />
-            <Button title={s.check} onPress={() => open(code)} kind="soft" size="sm" />
-          </View>
-        )}
+        <Text style={{ color: t.muted, fontSize: 16 * k, fontWeight: "700", marginTop: 4 }}>{s.home_ask}</Text>
+
+        {situations.map((x) => (
+          <Situation key={x.title} t={t} k={k} {...x} onPress={() => router.push(x.to)} />
+        ))}
 
         <Card>
-          <Label>{s.today}</Label>
+          <Label>{s.your_day}</Label>
           {todayMeals.length === 0 && todayGlu.length === 0 ? <Hint>{s.nothing_today}</Hint> : (
             <View style={{ gap: 8 }}>
-              {todayGlu.slice(-3).map((g) => <Row key={g.id} t={t} k={k} left="💧" text={`${state.unit === "mg" ? Math.round(g.v) : (g.v / 18).toFixed(1)} ${state.unit === "mg" ? "mg/dL" : "mmol/L"} · ${s.ctx[g.ctx]}`} time={g.t} />)}
-              {todayMeals.slice(-3).map((m) => <Row key={m.id} t={t} k={k} left={m.photoUri ? "🍽️" : "▥"} text={m.name ?? s[`meal_${m.slot}` as `meal_${typeof m.slot}`]} time={m.t} level={m.level} />)}
+              {todayGlu.slice(-3).map((g) => <Row key={g.id} t={t} k={k} left="🩸" text={`${state.unit === "mg" ? Math.round(g.v) : (g.v / 18).toFixed(1)} ${state.unit === "mg" ? "mg/dL" : "mmol/L"} · ${s.ctx[g.ctx]}`} time={g.t} />)}
+              {todayMeals.slice(-3).map((m) => <Row key={m.id} t={t} k={k} left={m.photoUri ? "🍽️" : "🛒"} text={m.name ?? s[`meal_${m.slot}` as `meal_${typeof m.slot}`]} time={m.t} level={m.level} />)}
             </View>
           )}
         </Card>
@@ -49,22 +56,37 @@ export default function Home() {
         {state.history.length > 0 && (
           <Card>
             <Label>{s.last_scans}</Label>
-            {state.history.slice(0, 5).map((h) => {
-              const c = levelColor(t, h.level);
-              return (
-                <Pressable key={h.code} onPress={() => open(h.code)} style={st.row} accessibilityRole="button">
-                  <View style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: c.fg }} />
-                  <Text style={{ flex: 1, color: t.ink, fontSize: 17 * k }} numberOfLines={1}>{h.name}</Text>
-                </Pressable>
-              );
-            })}
+            {state.history.slice(0, 5).map((h) => (
+              <Pressable key={h.code} onPress={() => open(h.code)} style={st.row} accessibilityRole="button">
+                <View style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: levelColor(t, h.level).fg }} />
+                <Text style={{ flex: 1, color: t.ink, fontSize: 17 * k }} numberOfLines={1}>{h.name}</Text>
+              </Pressable>
+            ))}
           </Card>
         )}
       </ScrollView>
     </SafeAreaView>
   );
 }
-function Row({ t, k, left, text, time, level }: { t: ReturnType<typeof useTheme>; k: number; left: string; text: string; time: number; level?: "green" | "yellow" | "red" }) {
+
+function Situation({ t, k, icon, title, sub, tint, main, onPress }: { t: Theme; k: number; icon: string; title: string; sub: string; tint: string; main?: boolean; onPress: () => void }) {
+  const fg = main ? t.accentInk : t.ink;
+  return (
+    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={`${title}. ${sub}`}
+      style={({ pressed }) => [st.sit, { backgroundColor: main ? t.accent : t.surface, borderColor: main ? t.accent : t.line, opacity: pressed ? 0.85 : 1 }]}>
+      <View style={[st.icon, { backgroundColor: main ? "rgba(255,255,255,0.18)" : tint + "22" }]}>
+        <Text style={{ fontSize: 32 }}>{icon}</Text>
+      </View>
+      <View style={{ flex: 1, gap: 4 }}>
+        <Text style={{ color: fg, fontSize: 22 * k, fontWeight: "800" }}>{title}</Text>
+        <Text style={{ color: fg, opacity: main ? 0.92 : 0.75, fontSize: 16 * k, lineHeight: 22 * k }}>{sub}</Text>
+      </View>
+      <Text style={{ color: fg, fontSize: 28, opacity: 0.6 }}>›</Text>
+    </Pressable>
+  );
+}
+
+function Row({ t, k, left, text, time, level }: { t: Theme; k: number; left: string; text: string; time: number; level?: "green" | "yellow" | "red" }) {
   return (
     <View style={st.row}>
       <Text style={{ fontSize: 18 }}>{left}</Text>
@@ -74,8 +96,10 @@ function Row({ t, k, left, text, time, level }: { t: ReturnType<typeof useTheme>
     </View>
   );
 }
+
 const st = StyleSheet.create({
-  wrap: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 32, gap: 14 },
-  input: { flex: 1, borderWidth: 1, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontVariant: ["tabular-nums"] },
+  wrap: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 32, gap: 12 },
+  sit: { flexDirection: "row", alignItems: "center", gap: 14, borderWidth: 1, borderRadius: 20, padding: 16, minHeight: 96 },
+  icon: { width: 60, height: 60, borderRadius: 18, alignItems: "center", justifyContent: "center" },
   row: { flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 8 },
 });
