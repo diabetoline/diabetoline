@@ -1,0 +1,200 @@
+[
+ {
+  "id": "set-complet-diabetoline-crema-corp-200-ml-crema-picioare-75-ml-spray-135-ml",
+  "section": "skin",
+  "name": "Set Complet Diabetoline, Cremă corp 200 ml, cremă picioare 75 ml, spray 135 ml",
+  "desc": null,
+  "price": 199.0,
+  "url": "https://diabetoline.com/products/set-complet-diabetoline-crema-corp-200-ml-crema-picioare-75-ml-spray-135-ml",
+  "image": "https://cdn.shopify.com/s/files/1/0659/4150/4266/files/3_4200ff6b-28df-436c-92e0-bbab10bcfa6e.png?v=1787667466",
+  "available": true,
+  "sku": "DBL-SET-3"
+ },
+ {
+  "id": "crema-picioare-diabetice-diabetoline-formula-pentru-pielea-diabeticilor-10-uree-testat-clinic-200-ml",
+  "section": "skin",
+  "name": "Diabetoline Cremă de Corp 10% uree, 200 ml, piele foarte uscată",
+  "desc": null,
+  "price": 99.0,
+  "url": "https://diabetoline.com/products/crema-picioare-diabetice-diabetoline-formula-pentru-pielea-diabeticilor-10-uree-testat-clinic-200-ml",
+  "image": "https://cdn.shopify.com/s/files/1/0659/4150/4266/files/diabetoline_200.png?v=1770120421",
+  "available": true,
+  "sku": "MDIAB03"
+ },
+ {
+  "id": "crema-de-picioare-formula-pentru-diabetici-testat-clinic-urea-5-mediskin",
+  "section": "skin",
+  "name": "Diabetoline Cremă Emolientă pentru Picioare 5% uree, 75 ml",
+  "desc": null,
+  "price": 99.0,
+  "url": "https://diabetoline.com/products/crema-de-picioare-formula-pentru-diabetici-testat-clinic-urea-5-mediskin",
+  "image": "https://cdn.shopify.com/s/files/1/0659/4150/4266/files/diabetoline_75.png?v=1770120497",
+  "available": true,
+  "sku": "MDIAB01"
+ },
+ {
+  "id": "spray-picioare-vitalitate-și-protecție-mediskin-135-ml",
+  "section": "skin",
+  "name": "Diabetoline Spray Intensiv pentru Picioare, 135 ml",
+  "desc": null,
+  "price": 99.0,
+  "url": "https://diabetoline.com/products/spray-picioare-vitalitate-și-protecție-mediskin-135-ml",
+  "image": "https://cdn.shopify.com/s/files/1/0659/4150/4266/files/1_8925d382-df1a-4ee8-9b0b-715fc3ac1414.png?v=1788506669",
+  "available": true,
+  "sku": "MDIAB02"
+ },
+ {
+  "id": "copy-of-paste-fusilli-indice-glicemic-scazut-fiber-pasta-250-gr-2",
+  "section": "food",
+  "name": "Paste Sedani FiberPasta — 250 g, grâu dur italian",
+  "desc": null,
+  "price": 23.8,
+  "url": "https://diabetoline.com/products/copy-of-paste-fusilli-indice-glicemic-scazut-fiber-pasta-250-gr-2",
+  "image": "https://cdn.shopify.com/s/files/1/0659/4150/4266/files/sedanipasta_1.jpg?v=1700206284",
+  "available": false,
+  "sku": "FP1090"
+ },
+ {
+  "id": "copy-of-paste-penne-indice-glicemic-scazut-fiber-pasta-250-gr",
+  "section": "food",
+  "name": "Paste Fusilli FiberPasta — 250 g, grâu dur italian",
+  "desc": null,
+  "price": 23.8,
+  "url": "https://diabetoline.com/products/copy-of-paste-penne-indice-glicemic-scazut-fiber-pasta-250-gr",
+  "image": "https://cdn.shopify.com/s/files/1/0659/4150/4266/files/fussilli.jpg?v=1696651151",
+  "available": false,
+  "sku": "FP1008"
+ },
+ {
+  "id": "copy-of-paste-fusilli-indice-glicemic-scazut-fiber-pasta-250-gr",
+  "section": "food",
+  "name": "Paste Tubetti FiberPasta — 400 g, grâu dur italian",
+  "desc": null,
+  "price": 33.6,
+  "url": "https://diabetoline.com/products/copy-of-paste-fusilli-indice-glicemic-scazut-fiber-pasta-250-gr",
+  "image": "https://cdn.shopify.com/s/files/1/0659/4150/4266/files/tubetti_4e8a2c59-6965-4532-8859-4c6afa56c4eb.jpg?v=1696652402",
+  "available": true,
+  "sku": "FP1009"
+ },
+ {
+  "id": "faina-din-grau-italian-cu-indice-glicemic-mic-fiber-pasta-500-gr",
+  "section": "food",
+  "name": "Făina FiberPasta — 500 g",
+  "desc": null,
+  "price": 33.6,
+  "url": "https://diabetoline.com/products/faina-din-grau-italian-cu-indice-glicemic-mic-fiber-pasta-500-gr",
+  "image": "https://cdn.shopify.com/s/files/1/0659/4150/4266/files/fainafiber_1.jpg?v=1696654508",
+  "available": false,
+  "sku": "FP1014"
+ },
+ {
+  "id": "paste-tagliatelle-indice-glicemic-scazut-fiber-pasta-200-gr",
+  "section": "food",
+  "name": "Paste Tagliatelle FiberPasta — 250 g, grâu dur italian",
+  "desc": null,
+  "price": 36.5,
+  "url": "https://diabetoline.com/products/paste-tagliatelle-indice-glicemic-scazut-fiber-pasta-200-gr",
+  "image": "https://cdn.shopify.com/s/files/1/0659/4150/4266/files/linguine_1.jpg?v=1696651891",
+  "available": false,
+  "sku": "FP1010"
+ },
+ {
+  "id": "orez-pentru-diabetici-fiberpasta-300-gr",
+  "section": "food",
+  "name": "Orez negru FiberPasta — 300 g",
+  "desc": null,
+  "price": 38.0,
+  "url": "https://diabetoline.com/products/orez-pentru-diabetici-fiberpasta-300-gr",
+  "image": "https://cdn.shopify.com/s/files/1/0659/4150/4266/files/OREZ.jpg?v=1741344498",
+  "available": true,
+  "sku": "OREZ10"
+ },
+ {
+  "id": "faina-proteica-30-proteine",
+  "section": "food",
+  "name": "Făina proteica PastaPro cu 30% proteine — 500 g, grâu dur italian",
+  "desc": null,
+  "price": 38.2,
+  "url": "https://diabetoline.com/products/faina-proteica-30-proteine",
+  "image": "https://cdn.shopify.com/s/files/1/0659/4150/4266/files/faina_proteica.jpg?v=1741352730",
+  "available": false,
+  "sku": "FB-FLOURPRO-01"
+ },
+ {
+  "id": "copy-of-paste-tagliatelle-indice-glicemic-scazut-fiber-pasta-250-gr",
+  "section": "food",
+  "name": "Paste Spaghetti FiberPasta — 500 g, grâu dur italian",
+  "desc": null,
+  "price": 38.2,
+  "url": "https://diabetoline.com/products/copy-of-paste-tagliatelle-indice-glicemic-scazut-fiber-pasta-250-gr",
+  "image": "https://cdn.shopify.com/s/files/1/0659/4150/4266/files/spagette.jpg?v=1696651006",
+  "available": false,
+  "sku": "FP1011"
+ },
+ {
+  "id": "copy-of-pasta-linguine-indice-glicemic-scazut-fiber-pasta-400-gr",
+  "section": "food",
+  "name": "Paste Gramigna FiberPasta — 500 g, grâu dur italian",
+  "desc": null,
+  "price": 39.0,
+  "url": "https://diabetoline.com/products/copy-of-pasta-linguine-indice-glicemic-scazut-fiber-pasta-400-gr",
+  "image": "https://cdn.shopify.com/s/files/1/0659/4150/4266/files/gramigna.jpg?v=1741354586",
+  "available": false,
+  "sku": "FP1006"
+ },
+ {
+  "id": "paste-pentru-diabetici-tortiglioni-fiberpasta-400-gr",
+  "section": "food",
+  "name": "Paste Tortiglioni FiberPasta — 400 g, grâu dur italian",
+  "desc": null,
+  "price": 45.0,
+  "url": "https://diabetoline.com/products/paste-pentru-diabetici-tortiglioni-fiberpasta-400-gr",
+  "image": "https://cdn.shopify.com/s/files/1/0659/4150/4266/files/tortiglioni.jpg?v=1741353678",
+  "available": true,
+  "sku": "FIBERPASTA10"
+ },
+ {
+  "id": "pasta-farfalle-indice-glicemic-scazut-fiber-pasta-400-gr",
+  "section": "food",
+  "name": "Paste Farfalle FiberPasta — 400 g, grâu dur italian",
+  "desc": null,
+  "price": 45.0,
+  "url": "https://diabetoline.com/products/pasta-farfalle-indice-glicemic-scazut-fiber-pasta-400-gr",
+  "image": "https://cdn.shopify.com/s/files/1/0659/4150/4266/files/linguine_2.jpg?v=1696652042",
+  "available": false,
+  "sku": "FP1004"
+ },
+ {
+  "id": "copy-of-pasta-farfalle-indice-glicemic-scazut-fiber-pasta-400-gr",
+  "section": "food",
+  "name": "Paste Linguine FiberPasta — 400 g, grâu dur italian",
+  "desc": null,
+  "price": 45.0,
+  "url": "https://diabetoline.com/products/copy-of-pasta-farfalle-indice-glicemic-scazut-fiber-pasta-400-gr",
+  "image": "https://cdn.shopify.com/s/files/1/0659/4150/4266/files/linguine_6e5928e3-f296-41cc-b7cb-8010548ed078.jpg?v=1741353459",
+  "available": false,
+  "sku": "FP1005"
+ },
+ {
+  "id": "curalin-90-capsule",
+  "section": "supp",
+  "name": "Curalin, 90 capsule",
+  "desc": "Supliment alimentar pe bază de extracte din plante.",
+  "price": 179.0,
+  "url": "https://diabetoline.com/products/curalin-90-capsule",
+  "image": "https://cdn.shopify.com/s/files/1/0659/4150/4266/files/IMG_8774_36b7378e-a452-4cf8-97d7-8e69d9926b67.jpg?v=1716585104",
+  "available": true,
+  "sku": "0000003"
+ },
+ {
+  "id": "2-x-curalin-90-capsule",
+  "section": "supp",
+  "name": "Curalin, 180 capsule",
+  "desc": "Supliment alimentar pe bază de extracte din plante.",
+  "price": 348.0,
+  "url": "https://diabetoline.com/products/2-x-curalin-90-capsule",
+  "image": "https://cdn.shopify.com/s/files/1/0659/4150/4266/files/IMG_87722.jpg?v=1716585038",
+  "available": true,
+  "sku": "0000001"
+ }
+]

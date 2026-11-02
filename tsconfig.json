@@ -1,1 +1,2 @@
-{ "extends": "expo/tsconfig.base", "compilerOptions": { "strict": true }, "exclude": ["node_modules", ".test-build", "src/**/*.test.ts"] }
+{ "extends": "expo/tsconfig.base", "compilerOptions": {
+    "resolveJsonModule": true, "strict": true }, "exclude": ["node_modules", ".test-build", "src/**/*.test.ts"] }

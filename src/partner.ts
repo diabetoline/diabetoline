@@ -35,7 +35,7 @@ export const PARTNER: PartnerProduct[] = [
   { id: "fp-faina", name: "Făina FiberPasta din grâu dur italian, 500 g", price: 33.6, handle: "faina-din-grau-italian-cu-indice-glicemic-mic-fiber-pasta-500-gr", eans: ["8008647000911"], ...flour },
 ];
 
-export const productUrl = (p: PartnerProduct) => `${PASTA_COLLECTION}/products/${p.handle}`;
+export const productUrl = (p: PartnerProduct) => `${SHOP}/products/${p.handle}`;
 
 /** Produsul partener după codul de bare sau după numele/brandul din baza de date. */
 export function findPartner(code: string, name?: string, brand?: string): PartnerProduct | undefined {
