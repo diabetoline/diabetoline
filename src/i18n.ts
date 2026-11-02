@@ -5,6 +5,8 @@ type Verd = { carbs: number; sugars: number; fiber: number; gl: number | null };
 type Dict = Record<string, any>;
 
 const ro = {
+  hi_morning: "Bună dimineața", hi_day: "Bună ziua", hi_evening: "Bună seara", day_all_good: "Azi totul e în regulă.", day_todo: (x: string) => `Azi mai e de făcut: ${x}.`, day_empty: "Azi nu ai notat încă nimic.",
+  d_glu: "glicemia", d_move: "mișcarea", d_meds: "medicamentele", d_meal: "o masă", day_progress: (a: number, b: number) => `${a} din ${b}`,
   ideas_lighter: "Vreau ceva asemănător, dar mai ușor", ideas_lighter_title: "Ceva mai ușor", ideas_lighter_sub: (n: string) => `În loc de ${n}: aceeași poftă, mai puțin zahăr.`,
   ideas_product: "Ce pot găti cu el?", ideas_with: (n: string) => `Idei cu ${n}`,
   ideas_noscan_title: "Întâi scanează câteva produse", ideas_noscan_text: "Ideile se fac din ce ai în casă. Scanează 3–4 produse din bucătărie (iaurt, brânză, pâine, legume la conservă) și revino aici.", ideas_anyway: "Vreau idei oricum, fără produse scanate",
@@ -121,6 +123,8 @@ const ro = {
 };
 
 const en: typeof ro = {
+  hi_morning: "Good morning", hi_day: "Hello", hi_evening: "Good evening", day_all_good: "Everything's in order today.", day_todo: (x: string) => `Still to do today: ${x}.`, day_empty: "Nothing logged yet today.",
+  d_glu: "blood sugar", d_move: "activity", d_meds: "medication", d_meal: "a meal", day_progress: (a: number, b: number) => `${a} of ${b}`,
   ideas_lighter: "I want something similar but lighter", ideas_lighter_title: "Something lighter", ideas_lighter_sub: (n: string) => `Instead of ${n}: same craving, less sugar.`,
   ideas_product: "What can I cook with it?", ideas_with: (n: string) => `Ideas with ${n}`,
   ideas_noscan_title: "Scan a few products first", ideas_noscan_text: "Ideas are built from what you have at home. Scan 3–4 products from your kitchen (yogurt, cheese, bread, tinned vegetables) and come back here.", ideas_anyway: "Give me ideas anyway, without scanned products",
@@ -227,6 +231,8 @@ const en: typeof ro = {
 };
 
 const de: typeof ro = {
+  hi_morning: "Guten Morgen", hi_day: "Guten Tag", hi_evening: "Guten Abend", day_all_good: "Heute ist alles in Ordnung.", day_todo: (x: string) => `Heute noch zu tun: ${x}.`, day_empty: "Heute noch nichts eingetragen.",
+  d_glu: "Blutzucker", d_move: "Bewegung", d_meds: "Medikamente", d_meal: "eine Mahlzeit", day_progress: (a: number, b: number) => `${a} von ${b}`,
   ideas_lighter: "Ich möchte etwas Ähnliches, aber leichter", ideas_lighter_title: "Etwas Leichteres", ideas_lighter_sub: (n: string) => `Statt ${n}: gleiche Lust, weniger Zucker.`,
   ideas_product: "Was kann ich damit kochen?", ideas_with: (n: string) => `Ideen mit ${n}`,
   ideas_noscan_title: "Scanne zuerst ein paar Produkte", ideas_noscan_text: "Die Ideen entstehen aus dem, was du zu Hause hast. Scanne 3–4 Produkte aus der Küche (Joghurt, Käse, Brot, Gemüsekonserven) und komm hierher zurück.", ideas_anyway: "Trotzdem Ideen, ohne gescannte Produkte",

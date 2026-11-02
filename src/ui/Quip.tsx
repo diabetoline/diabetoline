@@ -9,5 +9,5 @@ export function Quip({ k, seed, style }: { k: QuipKey; seed?: number | string; s
   const t = useTheme(); const sc = useScale();
   const { s } = useStore();
   if (!s.humor) return null;
-  return <Text style={[{ color: t.muted, fontSize: 16 * sc, lineHeight: 23 * sc, fontStyle: "italic", textAlign: "center" }, style]}>{quip(s.lang, k, seed)}</Text>;
+  return <Text style={[{ color: t.muted, fontSize: 16 * sc, lineHeight: 23 * sc, fontStyle: "italic", textAlign: "center" }, style]}>{quip(s.lang, k, seed)} 😊</Text>;
 }

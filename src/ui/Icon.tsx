@@ -1,6 +1,6 @@
 import Svg, { Circle, Line, Path, Rect } from "react-native-svg";
 
-export type IconName = "barcode" | "plate" | "drop" | "pill" | "home" | "journal" | "more" | "walk" | "family" | "report" | "settings" | "care" | "lock";
+export type IconName = "pot" | "barcode" | "plate" | "drop" | "pill" | "home" | "journal" | "more" | "walk" | "family" | "report" | "settings" | "care" | "lock";
 
 /** Iconițe desenate, în linie, 2 px: același stil peste tot, nu emoji. */
 export function Icon({ name, size = 28, color = "#14202B", strokeWidth = 2 }: { name: IconName; size?: number; color?: string; strokeWidth?: number }) {
@@ -19,6 +19,7 @@ export function Icon({ name, size = 28, color = "#14202B", strokeWidth = 2 }: { 
     case "report": return <Svg {...s}><Path {...p} d="M7 3h7l4 4v14H7z" /><Path {...p} d="M14 3v4h4" /><Path {...p} d="M10 15l2-3 2 2 2-4" /></Svg>;
     case "settings": return <Svg {...s}><Circle {...p} cx="12" cy="12" r="3" /><Path {...p} d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" /></Svg>;
     case "care": return <Svg {...s}><Path {...p} d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z" /></Svg>;
+    case "pot": return <Svg {...s}><Path {...p} d="M4 10h16v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-6z" /><Path {...p} d="M2 10h20M8 10V8M16 10V8M9 5c0-1 1-1 1-2M13 5c0-1 1-1 1-2" /></Svg>;
     case "lock": return <Svg {...s}><Rect {...p} x="5" y="11" width="14" height="10" rx="2" /><Path {...p} d="M8 11V8a4 4 0 0 1 8 0v3" /></Svg>;
   }
 }

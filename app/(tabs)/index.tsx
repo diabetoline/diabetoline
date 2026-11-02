@@ -8,6 +8,7 @@ import { Icon, type IconName } from "../../src/ui/Icon";
 import { Button, Card, Hint, Label, useScale } from "../../src/ui/Primitives";
 import { Quip } from "../../src/ui/Quip";
 import { MoveCheckin, WeightCheckin } from "../../src/ui/Checkins";
+import { DayHeader } from "../../src/ui/DayHeader";
 import { slotForHour } from "../../src/store";
 
 /**
@@ -33,7 +34,8 @@ export default function Home() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }} edges={["top"]}>
       <ScrollView contentContainerStyle={st.wrap}>
-        <Image source={require("../../assets/logo-wordmark.png")} style={{ width: 150, height: 150 * 153 / 1062, marginBottom: 4 }} resizeMode="contain" accessibilityLabel="Diabetoline" />
+        <DayHeader />
+        <View style={{ paddingHorizontal: 16, gap: 12 }}>
 
         <View style={{ flexDirection: "row", gap: 12 }}>
           <Tile t={t} k={k} icon="barcode" title={s.tile_scan} to="/scan" bg={t.accent} fg={t.accentInk} big />
@@ -60,7 +62,7 @@ export default function Home() {
 
         {!fresh && (
           <Pressable onPress={() => router.push("/ideas")} accessibilityRole="button" style={({ pressed }) => [st.ideas, { backgroundColor: t.surface, borderColor: t.line, opacity: pressed ? 0.85 : 1 }]}>
-            <Text style={{ fontSize: 30 }}>🍲</Text>
+            <View style={{ width: 48, height: 48, borderRadius: 14, backgroundColor: t.accentSoft, alignItems: "center", justifyContent: "center" }}><Icon name="pot" size={26} color={t.accent} /></View>
             <View style={{ flex: 1 }}>
               <Text style={{ color: t.ink, fontSize: 19 * k, fontWeight: "800" }}>{s.ideas_title}</Text>
               <Text style={{ color: t.muted, fontSize: 15 * k }}>{s.ideas_btn} {s.ideas_slot[slotForHour(new Date().getHours())]}</Text>
@@ -94,6 +96,8 @@ export default function Home() {
           </Card>
         )}
 
+        </View>
+        <View style={{ paddingHorizontal: 16, gap: 12 }}>
         {fresh && (
           <Card style={{ borderColor: t.accent, borderWidth: 2, gap: 10 }}>
             <Text style={{ color: t.ink, fontSize: 20 * k, fontWeight: "800" }}>👉 {s.first_title}</Text>
@@ -102,6 +106,7 @@ export default function Home() {
             <Pressable onPress={() => router.push("/welcome")} accessibilityRole="button"><Hint style={{ textAlign: "center", textDecorationLine: "underline" }}>{s.first_again}</Hint></Pressable>
           </Card>
         )}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -115,7 +120,7 @@ function Tile({ t, k, icon, title, to, bg, fg, tint, big, badge }: { t: Theme; k
       <View style={[st.iconWrap, { backgroundColor: big ? "rgba(255,255,255,0.18)" : (tint ?? t.accent) + "1F" }]}>
         <Icon name={icon} size={big ? 34 : 30} color={big ? fg : tint ?? t.accent} strokeWidth={2.2} />
       </View>
-      <Text style={{ color: fg, fontSize: (big ? 20 : 19) * k, lineHeight: (big ? 26 : 24) * k, fontWeight: "800", letterSpacing: -0.2 }}>{title}</Text>
+      <Text style={{ color: fg, fontSize: (big ? 19 : 19) * k, lineHeight: (big ? 25 : 24) * k, fontWeight: "800", letterSpacing: -0.2 }}>{title}</Text>
       {badge ? <View style={[st.badge, { backgroundColor: t.warn }]}><Text style={{ color: "#fff", fontWeight: "800", fontSize: 14 }}>{badge}</Text></View> : null}
     </Pressable>
   );
@@ -133,7 +138,7 @@ function Row({ t, k, icon, tint, text, time, level }: { t: Theme; k: number; ico
 }
 
 const st = StyleSheet.create({
-  wrap: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 32, gap: 12 },
+  wrap: { paddingBottom: 32, gap: 12 },
   tile: { flex: 1, borderWidth: 1, borderRadius: 22, padding: 16, justifyContent: "space-between", gap: 14 },
   iconWrap: { width: 56, height: 56, borderRadius: 16, alignItems: "center", justifyContent: "center" },
   badge: { position: "absolute", top: 12, right: 12, minWidth: 26, height: 26, borderRadius: 13, paddingHorizontal: 7, alignItems: "center", justifyContent: "center" },
