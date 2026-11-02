@@ -34,7 +34,7 @@ export default function ScanScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }} edges={["top"]}>
       <View style={st.wrap}>
-        <Text style={[st.brand, { color: t.ink }]}>Diabetoline</Text>
+        <Image source={require("../../assets/logo-wordmark.png")} style={{ width: 190, height: 190 * 153 / 1062 }} resizeMode="contain" accessibilityLabel="Diabetoline" />
         <Card>
           <View style={[st.cam, { backgroundColor: t.accentSoft }]}>
             {perm?.granted ? (
