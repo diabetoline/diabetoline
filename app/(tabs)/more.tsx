@@ -12,7 +12,7 @@ export default function More() {
   const items: { icon: string; title: string; sub?: string; to?: string; url?: string }[] = [
     { icon: "💊", title: s.meds, sub: state.meds.length ? state.meds.map((m) => m.name).join(", ") : s.meds_sub, to: "/meds" },
     { icon: "👪", title: s.family, sub: s.family_soon },
-    { icon: "🩺", title: s.report, sub: s.report_soon },
+    { icon: "🩺", title: s.report, sub: s.rep_sub, to: "/report" },
     { icon: "🧴", title: s.care, sub: s.care_soon },
     { icon: "⚙️", title: s.settings, to: "/settings" },
     { icon: "🔒", title: s.privacy, sub: s.privacy_sub, url: privacyUrl[state.lang] },

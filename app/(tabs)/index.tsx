@@ -3,7 +3,7 @@ import { useRouter, type Href } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { dayKey, useStore } from "../../src/store";
 import { levelColor, useTheme, type Theme } from "../../src/theme";
-import { Card, Hint, Label, useScale } from "../../src/ui/Primitives";
+import { Button, Card, Hint, Label, useScale } from "../../src/ui/Primitives";
 
 /**
  * Prima pagină: aplicația explicată prin situațiile din zi.
@@ -11,11 +11,16 @@ import { Card, Hint, Label, useScale } from "../../src/ui/Primitives";
  */
 export default function Home() {
   const t = useTheme(); const k = useScale();
-  const { t: s, s: state } = useStore();
+  const { t: s, s: state, markMed } = useStore();
   const router = useRouter();
   const today = dayKey(Date.now());
   const todayMeals = state.meals.filter((m) => dayKey(m.t) === today);
   const todayGlu = state.glucose.filter((g) => dayKey(g.t) === today);
+  const nowHM = new Date().toTimeString().slice(0, 5);
+  const dueMeds = state.meds.flatMap((m) => m.times.map((time) => ({ m, time, done: state.medLog.some((l) => l.medId === m.id && l.time === time && l.day === today) })))
+    .filter((x) => !x.done).sort((a, b) => a.time.localeCompare(b.time));
+  const dueNow = dueMeds.filter((x) => x.time <= nowHM);
+  const next = dueMeds.find((x) => x.time > nowHM);
   const open = (c: string) => router.push({ pathname: "/product/[code]", params: { code: c } });
 
   const situations: { icon: string; title: string; sub: string; to: Href; tint: string; main?: boolean }[] = [
@@ -30,18 +35,25 @@ export default function Home() {
       <ScrollView contentContainerStyle={st.wrap}>
         <Image source={require("../../assets/logo-wordmark.png")} style={{ width: 170, height: 170 * 153 / 1062 }} resizeMode="contain" accessibilityLabel="Diabetoline" />
 
-        <View style={{ gap: 6 }}>
-          <Text style={{ color: t.ink, fontSize: 28 * k, fontWeight: "800", letterSpacing: -0.4 }}>
-            {state.name ? s.hello_name(state.name) : s.hello} 👋
-          </Text>
-          <Text style={{ color: t.ink, fontSize: 18 * k, lineHeight: 25 * k }}>{s.home_promise}</Text>
-        </View>
-
-        <Text style={{ color: t.muted, fontSize: 16 * k, fontWeight: "700", marginTop: 4 }}>{s.home_ask}</Text>
+        <Text style={{ color: t.ink, fontSize: 24 * k, fontWeight: "800", letterSpacing: -0.3, marginTop: 4 }}>{s.home_ask}</Text>
 
         {situations.map((x) => (
           <Situation key={x.title} t={t} k={k} {...x} onPress={() => router.push(x.to)} />
         ))}
+
+        {(dueNow.length > 0 || next) && (
+          <Card style={dueNow.length > 0 ? { borderColor: t.warn, borderWidth: 2 } : undefined}>
+            <Label>{s.meds} · {s.today.toLowerCase()}</Label>
+            {dueNow.map(({ m, time }) => (
+              <View key={m.id + time} style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+                <Text style={{ fontSize: 24 }}>💊</Text>
+                <Text style={{ flex: 1, color: t.ink, fontSize: 18 * k, fontWeight: "700" }}>{m.name} <Text style={{ color: t.muted, fontWeight: "400" }}>{time}</Text></Text>
+                <Button title={s.med_take} size="sm" onPress={() => markMed(m.id, time)} />
+              </View>
+            ))}
+            {dueNow.length === 0 && next && <Hint>{s.med_next(next.m.name, next.time)}</Hint>}
+          </Card>
+        )}
 
         <Card>
           <Label>{s.your_day}</Label>
