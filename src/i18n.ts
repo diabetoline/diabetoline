@@ -5,6 +5,7 @@ type Verd = { carbs: number; sugars: number; fiber: number; gl: number | null };
 type Dict = Record<string, any>;
 
 const ro = {
+  upd_version: "Versiunea aplicației", upd_check: "Caută actualizări", upd_none: "Ai ultima versiune.",
   supp_title: "Suplimente", supp_sub: "Curalin, supliment alimentar pe bază de extracte din plante. Întreabă medicul înainte de a-l lua împreună cu tratamentul.", shop_soldout: "Momentan epuizat",
   skin_title: "Îngrijirea pielii", skin_sub: "Cosmeticele Diabetoline pentru pielea uscată, de care au nevoie des persoanele cu diabet.", shop_note: "Prețurile sunt cele de pe diabetoline.com la data actualizării aplicației; comanda se face pe site.",
   partner_mine: "Distribuit de Diabetoline", partner_gi: (gi: number) => `Indice glicemic certificat ${gi}, cu 15% fibre, din grâu dur italian.`, partner_order: "Comandă pe diabetoline.com",
@@ -132,6 +133,7 @@ const ro = {
 };
 
 const en: typeof ro = {
+  upd_version: "App version", upd_check: "Check for updates", upd_none: "You have the latest version.",
   supp_title: "Supplements", supp_sub: "Curalin, a herbal food supplement. Ask your doctor before taking it alongside your treatment.", shop_soldout: "Currently sold out",
   skin_title: "Skin care", skin_sub: "Diabetoline cosmetics for dry skin, which people with diabetes often need.", shop_note: "Prices are those on diabetoline.com at the time of the app update; ordering happens on the site.",
   partner_mine: "Distributed by Diabetoline", partner_gi: (gi: number) => `Certified glycemic index ${gi}, 15% fibre, Italian durum wheat.`, partner_order: "Order on diabetoline.com",
@@ -249,6 +251,7 @@ const en: typeof ro = {
 };
 
 const de: typeof ro = {
+  upd_version: "App-Version", upd_check: "Nach Updates suchen", upd_none: "Du hast die neueste Version.",
   supp_title: "Nahrungsergänzung", supp_sub: "Curalin, Nahrungsergänzungsmittel auf Pflanzenbasis. Frag deinen Arzt, bevor du es zusätzlich zur Behandlung nimmst.", shop_soldout: "Derzeit ausverkauft",
   skin_title: "Hautpflege", skin_sub: "Diabetoline-Kosmetik für trockene Haut, die Menschen mit Diabetes oft brauchen.", shop_note: "Die Preise sind die von diabetoline.com zum Zeitpunkt des App-Updates; bestellt wird auf der Website.",
   partner_mine: "Vertrieb durch Diabetoline", partner_gi: (gi: number) => `Zertifizierter glykämischer Index ${gi}, 15 % Ballaststoffe, italienischer Hartweizen.`, partner_order: "Auf diabetoline.com bestellen",

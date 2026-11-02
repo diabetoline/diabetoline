@@ -1,6 +1,8 @@
 import { Pressable, ScrollView, Switch, Text, TextInput, View } from "react-native";
 import { Stack } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Updates from "expo-updates";
+import { useState } from "react";
 import { useStore } from "../src/store";
 import type { Lang } from "../src/i18n";
 import { useTheme } from "../src/theme";
@@ -8,6 +10,14 @@ import { Button, Card, Label, Title, useScale } from "../src/ui/Primitives";
 
 export default function Settings() {
   const t = useTheme(); const k = useScale();
+  const [upd, setUpd] = useState("");
+  const build = (process.env.EXPO_PUBLIC_BUILD ?? "dev").slice(0, 7);
+  const when = Updates.createdAt ? new Date(Updates.createdAt).toLocaleString() : "—";
+  const checkUpdates = async () => {
+    setUpd("…");
+    try { const r = await Updates.checkForUpdateAsync(); if (r.isAvailable) { await Updates.fetchUpdateAsync(); await Updates.reloadAsync(); } else setUpd(s.upd_none); }
+    catch (e) { try { await Updates.reloadAsync(); } catch { setUpd(String((e as Error)?.message ?? e)); } }
+  };
   const { t: s, s: state, set } = useStore();
   const langs: { v: Lang; l: string }[] = [{ v: "ro", l: "Română" }, { v: "en", l: "English" }, { v: "de", l: "Deutsch" }];
   const Seg = <T extends string>({ value, options, onChange }: { value: T; options: { v: T; l: string }[]; onChange: (v: T) => void }) => (
@@ -40,6 +50,12 @@ export default function Settings() {
           <Text style={{ color: t.ink, fontSize: 18 * k }}>{s.big_text}</Text>
           <Switch value={state.bigText} onValueChange={(v) => set({ bigText: v })} trackColor={{ true: t.ok }} />
         </View>
+      </Card>
+      <Card>
+        <Label>{s.upd_version}</Label>
+        <Text style={{ color: t.ink, fontSize: 16 * k }}>{build} · {when}</Text>
+        <Button title={s.upd_check} kind="soft" onPress={checkUpdates} />
+        {upd ? <Text style={{ color: t.muted, fontSize: 14 * k }}>{upd}</Text> : null}
       </Card>
       <Button title={s.reset} kind="danger" onPress={async () => { await AsyncStorage.clear(); set({ history: [], glucose: [], meals: [], meds: [], medLog: [], cache: {} }); }} />
     </ScrollView>

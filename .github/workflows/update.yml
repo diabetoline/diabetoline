@@ -6,6 +6,7 @@ on:
 env:
   # adresa serverului (EAS Hosting); aplicația o citește prin EXPO_PUBLIC_API_URL
   EXPO_PUBLIC_API_URL: https://curalife.expo.app
+  EXPO_PUBLIC_BUILD: ${{ github.sha }}
 jobs:
   publish:
     runs-on: ubuntu-latest
