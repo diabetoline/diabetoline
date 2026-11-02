@@ -1,4 +1,4 @@
-const API = process.env.EXPO_PUBLIC_API_URL ?? "";
+const API = process.env.EXPO_PUBLIC_API_URL || "https://curalife.expo.app";
 
 export interface Idea { title: string; why: string; carbs: number | null; minutes: number | null; ingredients: string[]; steps: string[]; uses: string[] }
 

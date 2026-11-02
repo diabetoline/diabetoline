@@ -9,6 +9,7 @@ import { useTheme } from "../src/theme";
 import { Button, Hint } from "../src/ui/Primitives";
 import type { Level } from "../src/engine/types";
 import { analyzePlate } from "../src/api/plate";
+import { lastDetail } from "../src/api/vision";
 import { mealVerdict } from "../src/engine/plate";
 import { quip } from "../src/quips";
 
@@ -25,6 +26,7 @@ export default function PlateScreen() {
   const [how, setHow] = useState<Level | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [unrecognized, setUnrecognized] = useState(false);
+  const [failMsg, setFailMsg] = useState("");
 
   /** Copiază poza în folderul aplicației, ca să rămână în jurnal. */
   const keep = (src: string) => {
@@ -50,7 +52,8 @@ export default function PlateScreen() {
       return;
     }
     // fără analiză (server oprit, fără internet, nimic recunoscut): omul spune cum a fost masa
-    setUnrecognized(r.error === "unrecognized");
+    setUnrecognized(true);
+    setFailMsg(r.error === "unrecognized" ? s.plate_fail : r.error === "not_configured" ? s.plate_off : `${s.network} (${lastDetail})`);
   };
   const save = () => {
     if (!shot) return;
@@ -82,7 +85,7 @@ export default function PlateScreen() {
               <View style={{ alignItems: "center", gap: 10, paddingVertical: 8 }}><ActivityIndicator color="#fff" size="large" /><Text style={st.how}>{s.plate_analyzing}</Text>{state.humor && <Text style={st.hint}>{quip(state.lang, "plate_wait", shot ?? "")}</Text>}</View>
             ) : shot ? (
               <>
-                {unrecognized && <Text style={st.hint}>{s.plate_fail}</Text>}
+                {unrecognized && <Text style={st.hint}>{failMsg}</Text>}
                 <View style={{ flexDirection: "row", gap: 6, flexWrap: "wrap", justifyContent: "center" }}>
                   {slots.map((sl) => (
                     <Pressable key={sl} onPress={() => setSlot(sl)} style={[st.chip, slot === sl && { backgroundColor: t.accent, borderColor: t.accent }]} accessibilityRole="button">
