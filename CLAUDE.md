@@ -5,7 +5,7 @@ Aplicație mobilă (Expo / React Native, TypeScript) pentru diabetici, publicat�
 ## Public și principii
 - Utilizatori în vârstă, puțin obișnuiți cu tehnologia. Copiii lor instalează, plătesc și urmăresc.
 - Simplitate înainte de orice: un buton mare pe primul ecran, text ≥ 18 px, fără gesturi ascunse, fără cont obligatoriu. La prima deschidere, o întâmpinare de 4 ecrane (`app/welcome.tsx`: la ce folosește, nu cum se apasă), apoi pe prima pagină un card „Încearcă acum” până la prima notare.
-- Verdictul pe tot ecranul (cerc colorat + un cuvânt + o propoziție); detaliile doar la „De ce?”. Buton de citit cu voce tare.
+- Verdictul pe tot ecranul (cerc colorat + un cuvânt + o propoziție), iar detaliile (motive, IG, încărcătură, zahăr ascuns, tabel nutrițional) sunt mereu vizibile dedesubt, fără „De ce?” (Alex, 2 nov: „nu mulți o să dea click”). Buton de citit cu voce tare.
 - Rolul aplicației: ajută și ghidează diabeticul în toate situațiile din zi.
 - Doar 3 secțiuni: Acasă · Jurnal · Mai mult. Prima pagină e organizată pe situații („Unde ești acum?”): La cumpărături (scanare) · La masă, acasă sau la restaurant (poză la farfurie) · Glicemia · Medicamentele.
 - Limbi: ro, en, de. Preț: 99 lei/an în RO, 19,99 €/an în rest; pachet de familie.

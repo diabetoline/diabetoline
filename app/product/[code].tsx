@@ -26,7 +26,6 @@ export default function ProductScreen() {
   const [p, setP] = useState<Product | null>(state.cache[code] ?? null);
   const [err, setErr] = useState<"notfound" | "network" | null>(null);
   const [v, setV] = useState<Verdict | null>(p ? analyze(p) : null);
-  const [more, setMore] = useState(false);
   const [ate, setAte] = useState(false);
 
   useEffect(() => {
@@ -109,8 +108,7 @@ export default function ProductScreen() {
         {v.level === "red"
           ? <Button title={"🥗 " + s.ideas_lighter} kind="soft" onPress={() => router.push({ pathname: "/ideas", params: { focus: p.name, lighter: "1" } })} />
           : <Button title={"🍲 " + s.ideas_product} kind="soft" onPress={() => router.push({ pathname: "/ideas", params: { focus: p.name } })} />}
-        <Button title={more ? s.less : s.why} kind="ghost" onPress={() => setMore((x) => !x)} />
-        {more && (
+        {(
           <Card>
             <View>{reasons.map((r, i) => <Text key={i} style={{ color: t.ink, fontSize: 17 * k, lineHeight: 25 * k }}>• {r}</Text>)}</View>
 
