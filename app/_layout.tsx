@@ -19,6 +19,8 @@ export default function Root() {
           <Stack.Screen name="glucose/new" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
           <Stack.Screen name="meds" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
           <Stack.Screen name="meal/[id]" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
+          <Stack.Screen name="family" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
+          <Stack.Screen name="family/parent" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
           <Stack.Screen name="report" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
           <Stack.Screen name="care" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
           <Stack.Screen name="settings" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />

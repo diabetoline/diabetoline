@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { Product, Verdict, Level } from "./engine/types";
 import type { PlateAnalysis } from "./engine/plate";
 import { deviceLang, strings, type Lang, type Strings } from "./i18n";
+import { pushEntries } from "./family/sync";
 
 export interface HistItem { code: string; name: string; level: Level; t: number }
 export type GluCtx = "fasting" | "pre" | "post2h" | "evening" | "other";
@@ -10,14 +11,25 @@ export interface GluEntry { id: string; v: number; ctx: GluCtx; note: string; t:
 export interface MealEntry { id: string; t: number; photoUri?: string; code?: string; name?: string; level?: Level; slot: "breakfast" | "lunch" | "dinner" | "snack"; analysis?: PlateAnalysis; carbs?: number; gl?: number }
 export interface Med { id: string; name: string; times: string[]; notifIds?: string[] }
 export interface Walk { id: string; t: number; min: number }
+/** Contul de familie: rolul pe acest telefon și legăturile. */
+export interface Family {
+  role: "parent" | "child" | null;
+  /** părinte: a acceptat trimiterea jurnalului pe server */
+  consent: boolean;
+  /** copil: părintele urmărit */
+  parent?: { linkId: string; parentId: string; name: string };
+  /** părinte: copiii legați */
+  children: { linkId: string; name: string }[];
+  lastSync?: number;
+}
 export interface MedLog { id: string; medId: string; time: string; day: string; t: number }
 
 export interface State {
   lang: Lang; langManual?: boolean; humor: boolean; unit: "mg" | "mmol"; name: string; bigText: boolean;
-  history: HistItem[]; glucose: GluEntry[]; meals: MealEntry[]; meds: Med[]; medLog: MedLog[]; walks: Walk[];
+  history: HistItem[]; glucose: GluEntry[]; meals: MealEntry[]; meds: Med[]; medLog: MedLog[]; walks: Walk[]; family: Family;
   cache: Record<string, Product>;
 }
-const initial: State = { lang: deviceLang(), humor: true, unit: "mg", name: "", bigText: false, history: [], glucose: [], meals: [], meds: [], medLog: [], walks: [], cache: {} };
+const initial: State = { lang: deviceLang(), humor: true, unit: "mg", name: "", bigText: false, history: [], glucose: [], meals: [], meds: [], medLog: [], walks: [], family: { role: null, consent: false, children: [] }, cache: {} };
 const KEY = "dscan.state.v2";
 
 interface Ctx {
@@ -42,6 +54,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     AsyncStorage.getItem(KEY).then((raw) => { if (raw) { const saved = JSON.parse(raw); setS({ ...initial, ...saved, lang: saved.langManual ? saved.lang : deviceLang() }); } }).catch(() => {}).finally(() => setReady(true));
   }, []);
   useEffect(() => { if (ready) AsyncStorage.setItem(KEY, JSON.stringify(s)).catch(() => {}); }, [s, ready]);
+  // părintele cu consimțământ: jurnalul pleacă pe server la câteva secunde după o modificare
+  useEffect(() => {
+    if (!ready || s.family.role !== "parent" || !s.family.consent) return;
+    const h = setTimeout(() => { pushEntries(s).then(() => setS((p) => ({ ...p, family: { ...p.family, lastSync: Date.now() } }))).catch(() => {}); }, 4000);
+    return () => clearTimeout(h);
+  }, [ready, s.glucose, s.meals, s.medLog, s.walks, s.history, s.family.role, s.family.consent]);
 
   const api = useMemo<Ctx>(() => ({
     s, t: strings(s.lang),

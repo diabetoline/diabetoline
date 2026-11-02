@@ -5,6 +5,16 @@ type Verd = { carbs: number; sugars: number; fiber: number; gl: number | null };
 type Dict = Record<string, any>;
 
 const ro = {
+  fam_title: "Familie", fam_intro: "Copilul tău vede ce notezi (glicemii, mese, medicamente) ca să te poată ajuta. Pozele rămân doar pe telefonul tău. Tu accepți și tu poți opri oricând.",
+  fam_i_parent: "Sunt părintele", fam_i_parent_sub: "Vreau ca cineva din familie să vadă jurnalul meu", fam_i_child: "Sunt copilul", fam_i_child_sub: "Vreau să văd jurnalul părintelui meu",
+  fam_consent: "Sunt de acord ca glicemiile, mesele și medicamentele mele să fie trimise pe serverul Diabetoline (în UE), ca să le vadă persoana pe care o accept.", fam_consent_btn: "Sunt de acord, continuă",
+  fam_code_title: "Codul tău", fam_code_hint: "Spune-i copilului codul ăsta. Îl introduce în aplicația lui, la Familie → Sunt copilul. E valabil 24 de ore.", fam_code_new: "Cod nou",
+  fam_enter_code: "Codul primit de la părinte", fam_your_name: "Numele tău (îl vede părintele)", fam_link: "Leagă", fam_linked: (n: string) => `Legat cu ${n}.`, fam_bad_code: "Codul nu e bun sau a expirat. Cere unul nou.",
+  fam_children: "Cine îți vede jurnalul", fam_unlink: "Rupe legătura", fam_unlinked: "Legătura a fost ruptă. Nu mai vede nimic nou.", fam_none_yet: "Nimeni încă.",
+  fam_parent_of: (n: string) => `Jurnalul lui ${n}`, fam_refresh: "Reîncarcă", fam_last_sync: (h: string) => `Sincronizat la ${h}`, fam_sync_err: "Nu am putut trimite pe server. Verifică internetul.",
+  fam_alert_high: "glicemie mare", fam_alert_low: "glicemie mică", fam_alert_heavy: "masă grea", fam_alert_nomed: "medicament nebifat", fam_quiet: "Nimic îngrijorător în ultimele zile.", fam_attention: "De urmărit",
+  fam_no_entries: "Părintele nu a notat încă nimic, sau nu a deschis aplicația.", fam_stop: "Oprește trimiterea datelor", fam_delete_server: "Șterge datele de pe server", fam_deleted: "Datele de pe server au fost șterse.",
+  fam_off: "Contul de familie are nevoie de internet.", fam_role_reset: "Schimbă rolul",
   humor: "Glumițe pentru bună dispoziție",
   rep_byday: "Pe zile", rep_nowalk: "fără mișcare", rep_walkdays: (p: number) => `după ${p}% din mesele grele a urmat o plimbare`, rep_legend: "Mese: ● verde = potrivită, ● portocaliu = cu măsură, ● roșu = grea (verdictul aplicației, nu al pacientului).",
   med_next: (n: string, h: string) => `Următorul: ${n}, la ${h}.`,
@@ -93,6 +103,16 @@ const ro = {
 };
 
 const en: typeof ro = {
+  fam_title: "Family", fam_intro: "Your child sees what you log (glucose, meals, medication) so they can help. Photos stay only on your phone. You accept, and you can stop at any time.",
+  fam_i_parent: "I'm the parent", fam_i_parent_sub: "I want someone in my family to see my journal", fam_i_child: "I'm the child", fam_i_child_sub: "I want to see my parent's journal",
+  fam_consent: "I agree that my glucose, meals and medication are sent to the Diabetoline server (in the EU) so the person I accept can see them.", fam_consent_btn: "I agree, continue",
+  fam_code_title: "Your code", fam_code_hint: "Tell your child this code. They enter it in their app under Family → I'm the child. Valid for 24 hours.", fam_code_new: "New code",
+  fam_enter_code: "Code from your parent", fam_your_name: "Your name (your parent sees it)", fam_link: "Link", fam_linked: (n: string) => `Linked with ${n}.`, fam_bad_code: "The code is wrong or expired. Ask for a new one.",
+  fam_children: "Who sees your journal", fam_unlink: "Unlink", fam_unlinked: "Unlinked. They no longer see anything new.", fam_none_yet: "Nobody yet.",
+  fam_parent_of: (n: string) => `${n}'s journal`, fam_refresh: "Refresh", fam_last_sync: (h: string) => `Synced at ${h}`, fam_sync_err: "Couldn't send to the server. Check your connection.",
+  fam_alert_high: "high glucose", fam_alert_low: "low glucose", fam_alert_heavy: "heavy meal", fam_alert_nomed: "medication not ticked", fam_quiet: "Nothing worrying in the last few days.", fam_attention: "Worth a look",
+  fam_no_entries: "Your parent hasn't logged anything yet, or hasn't opened the app.", fam_stop: "Stop sending data", fam_delete_server: "Delete server data", fam_deleted: "Server data deleted.",
+  fam_off: "The family account needs an internet connection.", fam_role_reset: "Change role",
   humor: "Little jokes for a better mood",
   rep_byday: "Day by day", rep_nowalk: "no activity", rep_walkdays: (p: number) => `a walk followed ${p}% of heavy meals`, rep_legend: "Meals: ● green = good, ● orange = moderate, ● red = heavy (app verdict).",
   med_next: (n: string, h: string) => `Next: ${n}, at ${h}.`,
@@ -171,6 +191,16 @@ const en: typeof ro = {
 };
 
 const de: typeof ro = {
+  fam_title: "Familie", fam_intro: "Dein Kind sieht, was du einträgst (Blutzucker, Mahlzeiten, Medikamente), um dir zu helfen. Fotos bleiben nur auf deinem Handy. Du stimmst zu und kannst jederzeit aufhören.",
+  fam_i_parent: "Ich bin der Elternteil", fam_i_parent_sub: "Jemand aus der Familie soll mein Tagebuch sehen", fam_i_child: "Ich bin das Kind", fam_i_child_sub: "Ich möchte das Tagebuch meines Elternteils sehen",
+  fam_consent: "Ich stimme zu, dass meine Blutzuckerwerte, Mahlzeiten und Medikamente an den Diabetoline-Server (in der EU) gesendet werden, damit die Person, die ich akzeptiere, sie sehen kann.", fam_consent_btn: "Ich stimme zu, weiter",
+  fam_code_title: "Dein Code", fam_code_hint: "Sag deinem Kind diesen Code. Es gibt ihn in seiner App unter Familie → Ich bin das Kind ein. 24 Stunden gültig.", fam_code_new: "Neuer Code",
+  fam_enter_code: "Code vom Elternteil", fam_your_name: "Dein Name (der Elternteil sieht ihn)", fam_link: "Verbinden", fam_linked: (n: string) => `Verbunden mit ${n}.`, fam_bad_code: "Der Code ist falsch oder abgelaufen. Bitte um einen neuen.",
+  fam_children: "Wer dein Tagebuch sieht", fam_unlink: "Verbindung trennen", fam_unlinked: "Verbindung getrennt. Es wird nichts Neues mehr gesehen.", fam_none_yet: "Noch niemand.",
+  fam_parent_of: (n: string) => `Tagebuch von ${n}`, fam_refresh: "Aktualisieren", fam_last_sync: (h: string) => `Synchronisiert um ${h}`, fam_sync_err: "Senden an den Server fehlgeschlagen. Prüfe die Verbindung.",
+  fam_alert_high: "hoher Blutzucker", fam_alert_low: "niedriger Blutzucker", fam_alert_heavy: "schwere Mahlzeit", fam_alert_nomed: "Medikament nicht abgehakt", fam_quiet: "Nichts Beunruhigendes in den letzten Tagen.", fam_attention: "Beachten",
+  fam_no_entries: "Dein Elternteil hat noch nichts eingetragen oder die App nicht geöffnet.", fam_stop: "Datenübertragung stoppen", fam_delete_server: "Serverdaten löschen", fam_deleted: "Serverdaten gelöscht.",
+  fam_off: "Das Familienkonto braucht eine Internetverbindung.", fam_role_reset: "Rolle ändern",
   humor: "Kleine Witze für gute Laune",
   rep_byday: "Tag für Tag", rep_nowalk: "keine Bewegung", rep_walkdays: (p: number) => `nach ${p}% der schweren Mahlzeiten folgte ein Spaziergang`, rep_legend: "Mahlzeiten: ● grün = geeignet, ● orange = in Maßen, ● rot = schwer (Bewertung der App).",
   med_next: (n: string, h: string) => `Als Nächstes: ${n}, um ${h}.`,

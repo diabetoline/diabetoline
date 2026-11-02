@@ -11,7 +11,7 @@ export default function More() {
   const { t: s, s: state } = useStore();
   const items: { icon: string; title: string; sub?: string; to?: string; url?: string }[] = [
     { icon: "💊", title: s.meds, sub: state.meds.length ? state.meds.map((m) => m.name).join(", ") : s.meds_sub, to: "/meds" },
-    { icon: "👪", title: s.family, sub: s.family_soon },
+    { icon: "👪", title: s.family, sub: state.family.role === "child" && state.family.parent ? s.fam_parent_of(state.family.parent.name) : state.family.role === "parent" && state.family.children.length ? state.family.children.map((c) => c.name).join(", ") : s.fam_intro, to: "/family" },
     { icon: "🩺", title: s.report, sub: s.rep_sub, to: "/report" },
     { icon: "🧴", title: s.care, sub: s.care_soon },
     { icon: "⚙️", title: s.settings, to: "/settings" },
