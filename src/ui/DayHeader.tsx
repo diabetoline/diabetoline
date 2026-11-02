@@ -39,18 +39,18 @@ export function DayHeader() {
   const dark = useTheme().bg === "#0F161D";
   return (
     <LinearGradient colors={dark ? ["#163527", "#0F161D"] : ["#E4F3E9", "#EEF2F5"]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 18, gap: 14 }}>
-      <Image source={require("../../assets/logo-wordmark.png")} style={{ width: 140, height: 140 * 153 / 1062 }} resizeMode="contain" accessibilityLabel="Diabetoline" />
+      <Image source={require("../../assets/logo-wordmark.png")} style={{ width: 200, height: 200 * 153 / 1062, marginBottom: 2 }} resizeMode="contain" accessibilityLabel="Diabetoline" />
       <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
         <View style={{ flex: 1, gap: 4 }}>
-          <Text style={{ color: t.ink, fontSize: 26 * k, fontWeight: "800", letterSpacing: -0.4 }}>{hi}{state.name ? `, ${state.name}` : ""}</Text>
-          <Text style={{ color: t.ink, opacity: 0.8, fontSize: 16 * k, lineHeight: 23 * k }}>{line}</Text>
+          <Text style={{ color: t.ink, fontSize: 20 * k, fontWeight: "700", letterSpacing: -0.2 }}>{hi}{state.name ? `, ${state.name}` : ""}</Text>
+          <Text style={{ color: t.ink, opacity: 0.8, fontSize: 15 * k, lineHeight: 21 * k }}>{line}</Text>
         </View>
-        <View style={{ width: 76, height: 76, alignItems: "center", justifyContent: "center" }} accessibilityLabel={s.day_progress(done, steps.length)}>
-          <Svg width={76} height={76} viewBox="0 0 76 76" style={{ position: "absolute" }}>
+        <View style={{ width: 68, height: 68, alignItems: "center", justifyContent: "center" }} accessibilityLabel={s.day_progress(done, steps.length)}>
+          <Svg width={68} height={68} viewBox="0 0 76 76" style={{ position: "absolute" }}>
             <Circle cx="38" cy="38" r={R} stroke={t.line} strokeWidth="7" fill="none" />
             <Circle cx="38" cy="38" r={R} stroke={ring} strokeWidth="7" fill="none" strokeLinecap="round" strokeDasharray={`${C * pct} ${C}`} transform="rotate(-90 38 38)" />
           </Svg>
-          <Text style={{ color: t.ink, fontSize: 17 * k, fontWeight: "800" }}>{done}/{steps.length}</Text>
+          <Text style={{ color: t.ink, fontSize: 15 * k, fontWeight: "800" }}>{done}/{steps.length}</Text>
         </View>
       </View>
     </LinearGradient>
