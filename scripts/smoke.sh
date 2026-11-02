@@ -17,3 +17,4 @@ b = io.BytesIO(); im.save(b, "JPEG", quality=85)
 open("/tmp/apple.json", "w").write('{"image":"%s","lang":"ro"}' % base64.b64encode(b.getvalue()).decode())
 PY
 echo "== plate"; curl -s -X POST "$BASE/api/plate" -H "content-type: application/json" --data @/tmp/apple.json; echo
+echo "== ideas"; curl -s -o /tmp/ideas.out -w "HTTP %{http_code}\n" -X POST "$BASE/api/ideas" -H "content-type: application/json" -d '{"lang":"ro","slot":"snack","products":[{"name":"Iaurt grecesc","level":"green"},{"name":"Nutella","level":"red"}],"recentMeals":[]}'; head -c 600 /tmp/ideas.out; echo

@@ -16,22 +16,33 @@ export default function Ideas() {
   const [err, setErr] = useState("");
   const [open, setOpen] = useState<number | null>(0);
   const [ate, setAte] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const load = async () => {
-    setIdeas(null); setErr(""); setOpen(0); setAte(null);
+    setIdeas(null); setErr(""); setOpen(0); setAte(null); setLoading(true);
     const products = state.history.slice(0, 40).map((h) => ({ name: h.name, level: h.level }));
     const recentMeals = state.meals.slice(-8).map((m) => m.name).filter((x): x is string => !!x);
     const r = await fetchIdeas({ lang: state.lang, slot, products, recentMeals });
+    setLoading(false);
     if (r.ok) setIdeas(r.ideas); else setErr(r.error === "not_configured" ? s.ideas_off : s.ideas_err);
   };
-  useEffect(() => { load(); }, []);
+  const noProducts = state.history.length === 0;
+  useEffect(() => { if (!noProducts) load(); }, []);
 
   return (
     <ScrollView contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 40 }}>
       <Stack.Screen options={{ title: s.ideas_title }} />
       <Title>{s.ideas_title}</Title>
       <Hint>{s.ideas_sub} · {s.ideas_slot[slot]}</Hint>
-      {!ideas && !err && <View style={{ alignItems: "center", gap: 10, paddingVertical: 20 }}><ActivityIndicator color={t.accent} size="large" /><Hint>{s.ideas_loading}</Hint><Quip k="plate_wait" seed={slot} /></View>}
+      {noProducts && !ideas && (
+        <Card style={{ borderColor: t.accent, borderWidth: 2 }}>
+          <Text style={{ color: t.ink, fontSize: 19 * k, fontWeight: "800" }}>{s.ideas_noscan_title}</Text>
+          <Text style={{ color: t.ink, fontSize: 17 * k, lineHeight: 25 * k }}>{s.ideas_noscan_text}</Text>
+          <Button title={s.tile_scan} size="xl" onPress={() => router.replace("/scan")} />
+          <Pressable onPress={load} accessibilityRole="button"><Hint style={{ textAlign: "center", textDecorationLine: "underline" }}>{s.ideas_anyway}</Hint></Pressable>
+        </Card>
+      )}
+      {(!noProducts || loading) && !ideas && !err && <View style={{ alignItems: "center", gap: 10, paddingVertical: 20 }}><ActivityIndicator color={t.accent} size="large" /><Hint>{s.ideas_loading}</Hint><Quip k="plate_wait" seed={slot} /></View>}
       {err ? <Card><Hint>{err}</Hint><Button title={s.ideas_more} kind="soft" onPress={load} /></Card> : null}
       {ideas?.map((i, n) => (
         <Card key={n} style={open === n ? { borderColor: t.accent, borderWidth: 2 } : undefined}>
