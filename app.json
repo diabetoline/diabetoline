@@ -7,13 +7,55 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "ios": { "supportsTablet": false, "bundleIdentifier": "com.curalife.diabetoline",
-      "infoPlist": { "NSCameraUsageDescription": "Camera is used to scan product barcodes.", "ITSAppUsesNonExemptEncryption": false } },
-    "android": { "package": "com.curalife.diabetoline", "permissions": ["CAMERA"],
-      "adaptiveIcon": { "backgroundColor": "#1F4F8F", "foregroundImage": "./assets/android-icon-foreground.png", "backgroundImage": "./assets/android-icon-background.png", "monochromeImage": "./assets/android-icon-monochrome.png" },
-      "predictiveBackGestureEnabled": false },
-    "web": { "favicon": "./assets/favicon.png", "bundler": "metro" },
-    "plugins": ["expo-router", ["expo-camera", { "cameraPermission": "Diabetoline uses the camera to read product barcodes." }], "expo-localization"],
-    "experiments": { "typedRoutes": true }
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.curalife.diabetoline",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Camera is used to scan product barcodes.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.curalife.diabetoline",
+      "permissions": [
+        "CAMERA"
+      ],
+      "adaptiveIcon": {
+        "backgroundColor": "#1F4F8F",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Diabetoline uses the camera to read product barcodes."
+        }
+      ],
+      "expo-localization"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "owner": "curalife",
+    "extra": {
+      "eas": {
+        "projectId": "c16b0d89-5978-4d04-8189-6bd45744d1dc"
+      }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/c16b0d89-5978-4d04-8189-6bd45744d1dc"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    }
   }
 }
