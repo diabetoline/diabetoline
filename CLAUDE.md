@@ -26,6 +26,8 @@ Aplicație mobilă (Expo / React Native, TypeScript) pentru diabetici, publicat�
 11. Asistentul „Întreabă” (`app/ask.tsx`, `app/api/ask+api.ts`): întrebări gata scrise sau tastate, răspuns în max 4 propoziții din rezumatul jurnalului (7 zile), citit cu voce tare; garduri: fără doze/insulină/tratament/diagnostic, urgențe → 112/medic. Microfonul (vorbit) vine în versiunea compilată. Selector de limbă RO/EN/DE în antet (auto după regiune, manual după).
 8. Produs negăsit → poză la tabelul nutrițional, citit de AI pe server (`app/api/label+api.ts`), omul doar confirmă. Niciodată introducere manuală de la zero.
 
+De făcut (Alex, 2 nov): voce naturală prin OpenAI TTS pe server (`OPENAI_API_KEY` în EAS), aceeași voce la „Citește cu voce tare” și la asistentul „Întreabă”; până atunci `src/speech.ts` alege cea mai bună voce de pe telefon.
+
 După lansare: coș, plan de mese pe săptămână, senzor (Libre/Dexcom), meniu de restaurant, scanare raft.
 
 ## Tehnic
