@@ -75,12 +75,12 @@ export default function Journal() {
                   <Text style={{ color: t.muted, fontSize: 14 * k }}>{time}</Text>
                 </View>); }
               if (it.kind === "meal") { const m = it.data; return (
-                <View key={m.id} style={{ flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 6 }}>
+                <Pressable key={m.id} disabled={!m.photoUri} onPress={() => router.push({ pathname: "/meal/[id]", params: { id: m.id } })} accessibilityRole="button" style={{ flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 6 }}>
                   {m.photoUri ? <Image source={{ uri: m.photoUri }} style={{ width: 56, height: 56, borderRadius: 10 }} /> : <View style={{ width: 56, height: 56, borderRadius: 10, backgroundColor: t.accentSoft, alignItems: "center", justifyContent: "center" }}><Text style={{ fontSize: 24 }}>▥</Text></View>}
                   <View style={{ flex: 1 }}><Text style={{ color: t.ink, fontSize: 16 * k }} numberOfLines={2}>{m.name ?? s.meal}</Text><Text style={{ color: t.muted, fontSize: 14 * k }}>{s[`meal_${m.slot}` as `meal_${MealEntry["slot"]}`]}</Text></View>
                   {m.level && <View style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: levelColor(t, m.level).fg }} />}
                   <Text style={{ color: t.muted, fontSize: 14 * k }}>{time}</Text>
-                </View>); }
+                </Pressable>); }
               if (it.kind === "walk") { const w = it.data; return (
                 <View key={w.id} style={{ flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 6 }}>
                   <Text style={{ fontSize: 22 }}>🚶</Text>

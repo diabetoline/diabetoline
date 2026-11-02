@@ -1,12 +1,13 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { Product, Verdict, Level } from "./engine/types";
+import type { PlateAnalysis } from "./engine/plate";
 import { deviceLang, strings, type Lang, type Strings } from "./i18n";
 
 export interface HistItem { code: string; name: string; level: Level; t: number }
 export type GluCtx = "fasting" | "pre" | "post2h" | "evening" | "other";
 export interface GluEntry { id: string; v: number; ctx: GluCtx; note: string; t: number }
-export interface MealEntry { id: string; t: number; photoUri?: string; code?: string; name?: string; level?: Level; slot: "breakfast" | "lunch" | "dinner" | "snack" }
+export interface MealEntry { id: string; t: number; photoUri?: string; code?: string; name?: string; level?: Level; slot: "breakfast" | "lunch" | "dinner" | "snack"; analysis?: PlateAnalysis; carbs?: number; gl?: number }
 export interface Med { id: string; name: string; times: string[]; notifIds?: string[] }
 export interface Walk { id: string; t: number; min: number }
 export interface MedLog { id: string; medId: string; time: string; day: string; t: number }
@@ -25,7 +26,7 @@ interface Ctx {
   recordScan: (p: Product, v: Verdict) => void;
   addUserProduct: (p: Product) => void;
   addGlucose: (e: Omit<GluEntry, "id" | "t"> & { t?: number }) => void;
-  addMeal: (m: Omit<MealEntry, "id" | "t"> & { t?: number }) => void;
+  addMeal: (m: Omit<MealEntry, "id" | "t"> & { t?: number }) => string;
   markMed: (medId: string, time: string) => void;
   addWalk: (min: number) => void;
 }
@@ -51,7 +52,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     })),
     addUserProduct: (p) => setS((prev) => ({ ...prev, cache: { ...prev.cache, [p.code]: p } })),
     addGlucose: (e) => setS((prev) => ({ ...prev, glucose: [...prev.glucose, { ...e, id: String(Date.now()), t: e.t ?? Date.now() }] })),
-    addMeal: (m) => setS((prev) => ({ ...prev, meals: [...prev.meals, { ...m, id: String(Date.now()), t: m.t ?? Date.now() }] })),
+    addMeal: (m) => { const id = String(Date.now()); setS((prev) => ({ ...prev, meals: [...prev.meals, { ...m, id, t: m.t ?? Date.now() }] })); return id; },
     addWalk: (min) => setS((prev) => ({ ...prev, walks: [...(prev.walks ?? []), { id: String(Date.now()), t: Date.now(), min }] })),
     markMed: (medId, time) => setS((prev) => {
       const day = dayKey(Date.now());

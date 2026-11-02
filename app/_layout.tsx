@@ -18,6 +18,7 @@ export default function Root() {
           <Stack.Screen name="plate" options={{ headerShown: false, presentation: "fullScreenModal" }} />
           <Stack.Screen name="glucose/new" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
           <Stack.Screen name="meds" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
+          <Stack.Screen name="meal/[id]" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
           <Stack.Screen name="care" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
           <Stack.Screen name="settings" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
         </Stack>

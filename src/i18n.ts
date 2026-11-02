@@ -5,6 +5,10 @@ type Verd = { carbs: number; sugars: number; fiber: number; gl: number | null };
 type Dict = Record<string, any>;
 
 const ro = {
+  plate_analyzing: "Mă uit în farfurie…", plate_fail: "Nu am recunoscut mâncarea din poză. Spune tu cum a fost masa:",
+  meal_green: "Masă potrivită", meal_yellow: "Masă cu măsură", meal_red: "Masă grea",
+  plate_foods: "Ce am văzut în farfurie", plate_total: "Carbohidrați în total", plate_gl: "Încărcătură glicemică a mesei", plate_tips: "Recomandări pentru masa asta",
+  plate_note: "Estimare după poză: cantitățile, carbohidrații și indicii glicemici sunt aproximativi. Nu e sfat medical.", gi_short: "IG", no_carbs: "fără carbohidrați",
   care_title_red: "S-a întâmplat. Uite ce te ajută acum:", care_title_yellow: "Ca să-ți fie bine după masă:",
   care_walk: (m: number) => `Mergi pe jos ${m} minute, cât mai curând după masă.`, care_walk_btn: "Am făcut plimbarea", care_walk_done: "Plimbare notată. Bravo!",
   care_check: "Măsoară glicemia la 2 ore după masă.", care_check_btn: "Amintește-mi peste 2 ore", care_check_set: (h: string) => `Te anunț la ora ${h}.`,
@@ -81,6 +85,10 @@ const ro = {
 };
 
 const en: typeof ro = {
+  plate_analyzing: "Looking at your plate…", plate_fail: "I couldn't recognise the food in the photo. Tell me how the meal was:",
+  meal_green: "Good meal", meal_yellow: "Meal in moderation", meal_red: "Heavy meal",
+  plate_foods: "What I see on the plate", plate_total: "Total carbohydrates", plate_gl: "Meal glycemic load", plate_tips: "Tips for this meal",
+  plate_note: "Estimated from the photo: portions, carbs and glycemic indexes are approximate. Not medical advice.", gi_short: "GI", no_carbs: "no carbs",
   care_title_red: "It happens. Here's what helps now:", care_title_yellow: "To feel good after this meal:",
   care_walk: (m: number) => `Walk for ${m} minutes, as soon as you can after eating.`, care_walk_btn: "I went for the walk", care_walk_done: "Walk logged. Well done!",
   care_check: "Check your blood sugar 2 hours after the meal.", care_check_btn: "Remind me in 2 hours", care_check_set: (h: string) => `I'll remind you at ${h}.`,
@@ -147,6 +155,10 @@ const en: typeof ro = {
 };
 
 const de: typeof ro = {
+  plate_analyzing: "Ich schaue auf deinen Teller…", plate_fail: "Ich habe das Essen auf dem Foto nicht erkannt. Sag mir, wie die Mahlzeit war:",
+  meal_green: "Geeignete Mahlzeit", meal_yellow: "Mahlzeit in Maßen", meal_red: "Schwere Mahlzeit",
+  plate_foods: "Was ich auf dem Teller sehe", plate_total: "Kohlenhydrate gesamt", plate_gl: "Glykämische Last der Mahlzeit", plate_tips: "Tipps zu dieser Mahlzeit",
+  plate_note: "Schätzung nach Foto: Mengen, Kohlenhydrate und glykämische Indizes sind ungefähr. Keine medizinische Beratung.", gi_short: "GI", no_carbs: "ohne Kohlenhydrate",
   care_title_red: "Das passiert. Das hilft jetzt:", care_title_yellow: "Damit es dir nach dem Essen gut geht:",
   care_walk: (m: number) => `Geh ${m} Minuten zu Fuß, möglichst bald nach dem Essen.`, care_walk_btn: "Spaziergang gemacht", care_walk_done: "Spaziergang eingetragen. Super!",
   care_check: "Miss deinen Blutzucker 2 Stunden nach dem Essen.", care_check_btn: "In 2 Stunden erinnern", care_check_set: (h: string) => `Ich erinnere dich um ${h}.`,

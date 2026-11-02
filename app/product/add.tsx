@@ -21,7 +21,7 @@ const str = (x: number | null | undefined) => (x == null ? "" : String(x).replac
 export default function AddProduct() {
   const { code, name: name0, brand: brand0 } = useLocalSearchParams<{ code: string; name?: string; brand?: string }>();
   const t = useTheme(); const router = useRouter(); const ins = useSafeAreaInsets();
-  const { t: s, addUserProduct } = useStore();
+  const { t: s, s: state, addUserProduct } = useStore();
   const [perm, requestPerm] = useCameraPermissions();
   const cam = useRef<CameraView>(null);
   const [step, setStep] = useState<"camera" | "reading" | "confirm" | "error">("camera");
@@ -38,7 +38,7 @@ export default function AddProduct() {
     const pic = await cam.current.takePictureAsync({ quality: 0.8 });
     if (!pic?.uri) return;
     setShot(pic.uri); setStep("reading");
-    const r = await readLabel(pic.uri);
+    const r = await readLabel(pic.uri, state.lang);
     if (!r.ok) { setErr(r.error); setStep("error"); return; }
     const d = r.data;
     if (d.name && !name) setName(d.name);
@@ -94,7 +94,7 @@ export default function AddProduct() {
     <View style={{ flex: 1, padding: 16, gap: 12 }}>
       <Stack.Screen options={{ title: "" }} />
       <Card>
-        <Text style={{ color: t.ink, fontWeight: "800", fontSize: 20 }}>{err === "not_configured" ? s.label_off : err === "no_table" ? s.label_fail : s.network}</Text>
+        <Text style={{ color: t.ink, fontWeight: "800", fontSize: 20 }}>{err === "not_configured" ? s.label_off : err === "unrecognized" ? s.label_fail : s.network}</Text>
         {err !== "not_configured" && <Button title={s.retake} onPress={() => { setShot(null); setStep("camera"); }} />}
         <Button title={s.back} kind="ghost" onPress={close} />
       </Card>
