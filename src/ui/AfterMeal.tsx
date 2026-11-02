@@ -6,6 +6,7 @@ import { useStore } from "../store";
 import { levelColor, useTheme } from "../theme";
 import { Button, useScale } from "./Primitives";
 import { Quip } from "./Quip";
+import { RecoCard } from "./RecoCard";
 
 /**
  * După o masă „cu măsură” sau „mai grea”: nu certăm, ghidăm.
@@ -46,6 +47,7 @@ export function AfterMeal({ level, walkMinutes }: { level: Exclude<Level, "green
       <Step icon="💧" text={s.care_water} />
       {level === "red" && <Step icon="🥗" text={s.care_next} />}
       {level === "red" && <Step icon="💊" text={s.care_meds} />}
+      {level === "red" && <RecoCard placement="meal_heavy" />}
     </View>
   );
 }

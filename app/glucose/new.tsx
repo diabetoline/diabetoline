@@ -5,6 +5,7 @@ import { ctxForHour, useStore, type GluCtx } from "../../src/store";
 import { useTheme } from "../../src/theme";
 import { Button, Card, Hint, Label, Title, useScale } from "../../src/ui/Primitives";
 import { Quip } from "../../src/ui/Quip";
+import { RecoCard } from "../../src/ui/RecoCard";
 import { gluClass } from "../../src/engine/days";
 
 const CTX: GluCtx[] = ["fasting", "pre", "post2h", "evening", "other"];
@@ -38,6 +39,7 @@ export default function NewGlucose() {
           <Text style={{ color: t.ink, fontSize: 17 * k }}>{s.glu_saved}</Text>
           <Quip k={c === "ok" ? "glu_ok" : c === "low" ? "glu_low" : "glu_high"} seed={saved.v} />
         </Card>
+        {c === "high" && <RecoCard placement="glucose_high" />}
         <Button title={s.care_done} size="xl" onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))} />
       </ScrollView>
     );

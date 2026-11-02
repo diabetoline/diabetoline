@@ -5,6 +5,10 @@ type Verd = { carbs: number; sugars: number; fiber: number; gl: number | null };
 type Dict = Record<string, any>;
 
 const ro = {
+  reco_label: "De la Diabetoline", reco_view: "Vezi produsul", reco_later: "Nu acum",
+  reco_curalin: "Mulți dintre clienții noștri iau Curalin, un supliment pe bază de extracte din plante. Întreabă medicul dacă e potrivit pentru tine.",
+  reco_pasta: "Nu știi ce să gătești? Pastele FiberPasta au indice glicemic certificat 23: paste adevărate, cu mult mai puțin efect asupra glicemiei.",
+  reco_cream: "Pielea uscată și crăpată la picioare e frecventă în diabet. Crema de picioare Diabetoline, cu 5% uree, o îngrijește zilnic.",
   upd_version: "Versiunea aplicației", upd_check: "Caută actualizări", upd_none: "Ai ultima versiune.",
   supp_title: "Suplimente", supp_sub: "Curalin, supliment alimentar pe bază de extracte din plante. Întreabă medicul înainte de a-l lua împreună cu tratamentul.", shop_soldout: "Momentan epuizat",
   skin_title: "Îngrijirea pielii", skin_sub: "Cosmeticele Diabetoline pentru pielea uscată, de care au nevoie des persoanele cu diabet.", shop_note: "Prețurile sunt cele de pe diabetoline.com la data actualizării aplicației; comanda se face pe site.",
@@ -133,6 +137,10 @@ const ro = {
 };
 
 const en: typeof ro = {
+  reco_label: "From Diabetoline", reco_view: "See product", reco_later: "Not now",
+  reco_curalin: "Many of our customers take Curalin, a herbal food supplement. Ask your doctor whether it's suitable for you.",
+  reco_pasta: "Not sure what to cook? FiberPasta has a certified glycemic index of 23: real pasta, with far less effect on blood sugar.",
+  reco_cream: "Dry, cracked skin on the feet is common in diabetes. Diabetoline foot cream with 5% urea cares for it daily.",
   upd_version: "App version", upd_check: "Check for updates", upd_none: "You have the latest version.",
   supp_title: "Supplements", supp_sub: "Curalin, a herbal food supplement. Ask your doctor before taking it alongside your treatment.", shop_soldout: "Currently sold out",
   skin_title: "Skin care", skin_sub: "Diabetoline cosmetics for dry skin, which people with diabetes often need.", shop_note: "Prices are those on diabetoline.com at the time of the app update; ordering happens on the site.",
@@ -251,6 +259,10 @@ const en: typeof ro = {
 };
 
 const de: typeof ro = {
+  reco_label: "Von Diabetoline", reco_view: "Produkt ansehen", reco_later: "Nicht jetzt",
+  reco_curalin: "Viele unserer Kunden nehmen Curalin, ein pflanzliches Nahrungsergänzungsmittel. Frag deinen Arzt, ob es für dich geeignet ist.",
+  reco_pasta: "Keine Idee, was du kochen sollst? FiberPasta hat einen zertifizierten GI von 23: echte Pasta, mit viel weniger Wirkung auf den Blutzucker.",
+  reco_cream: "Trockene, rissige Haut an den Füßen ist bei Diabetes häufig. Die Diabetoline Fußcreme mit 5 % Urea pflegt sie täglich.",
   upd_version: "App-Version", upd_check: "Nach Updates suchen", upd_none: "Du hast die neueste Version.",
   supp_title: "Nahrungsergänzung", supp_sub: "Curalin, Nahrungsergänzungsmittel auf Pflanzenbasis. Frag deinen Arzt, bevor du es zusätzlich zur Behandlung nimmst.", shop_soldout: "Derzeit ausverkauft",
   skin_title: "Hautpflege", skin_sub: "Diabetoline-Kosmetik für trockene Haut, die Menschen mit Diabetes oft brauchen.", shop_note: "Die Preise sind die von diabetoline.com zum Zeitpunkt des App-Updates; bestellt wird auf der Website.",

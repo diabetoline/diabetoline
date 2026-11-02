@@ -1,1 +1,24 @@
-{ "compilerOptions": { "target": "es2022", "module": "commonjs", "moduleResolution": "node10", "ignoreDeprecations": "6.0", "strict": true, "esModuleInterop": true, "skipLibCheck": true, "outDir": ".test-build", "rootDir": "src", "rewriteRelativeImportExtensions": true, "types": ["node"] }, "include": ["src/engine/**/*", "src/api/**/*"] }
+{
+ "compilerOptions": {
+  "target": "es2022",
+  "module": "commonjs",
+  "moduleResolution": "node10",
+  "ignoreDeprecations": "6.0",
+  "strict": true,
+  "esModuleInterop": true,
+  "skipLibCheck": true,
+  "outDir": ".test-build",
+  "rootDir": "src",
+  "rewriteRelativeImportExtensions": true,
+  "types": [
+   "node"
+  ],
+  "resolveJsonModule": true
+ },
+ "include": [
+  "src/engine/**/*",
+  "src/api/**/*",
+  "src/recommend.ts",
+  "src/catalog.json"
+ ]
+}

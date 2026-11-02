@@ -9,6 +9,7 @@ import { Button, Card, Hint, Label, useScale } from "../../src/ui/Primitives";
 import { Quip } from "../../src/ui/Quip";
 import { MoveCheckin, WeightCheckin } from "../../src/ui/Checkins";
 import { DayHeader } from "../../src/ui/DayHeader";
+import { RecoCard } from "../../src/ui/RecoCard";
 import { slotForHour } from "../../src/store";
 
 /**
@@ -72,6 +73,7 @@ export default function Home() {
         )}
         {!fresh && <MoveCheckin />}
         {!fresh && <WeightCheckin />}
+        {!fresh && <RecoCard placement="home" />}
 
         {hasDay && (
           <Card>

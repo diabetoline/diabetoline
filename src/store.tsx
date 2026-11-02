@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from "
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { Product, Verdict, Level } from "./engine/types";
 import type { PlateAnalysis } from "./engine/plate";
+import type { RecoState } from "./recommend";
 import { deviceLang, strings, type Lang, type Strings } from "./i18n";
 import { pushEntries } from "./family/sync";
 
@@ -30,6 +31,7 @@ export interface State {
   history: HistItem[]; glucose: GluEntry[]; meals: MealEntry[]; meds: Med[]; medLog: MedLog[]; walks: Walk[]; weights: Weight[]; family: Family;
   /** ziua (YYYY-MM-DD) în care a răspuns „nu încă” la întrebarea de seară, ca să nu-l mai întrebăm azi */
   moveAskedDay?: string; moveNotifId?: string;
+  reco?: RecoState;
   cache: Record<string, Product>;
 }
 const initial: State = { lang: deviceLang(), humor: true, unit: "mg", name: "", bigText: false, history: [], glucose: [], meals: [], meds: [], medLog: [], walks: [], weights: [], family: { role: null, consent: false, children: [] }, cache: {} };

@@ -6,6 +6,7 @@ import { slotForHour, useStore } from "../src/store";
 import { useTheme } from "../src/theme";
 import { Button, Card, Hint, Label, Title, useScale } from "../src/ui/Primitives";
 import { Quip } from "../src/ui/Quip";
+import { RecoCard } from "../src/ui/RecoCard";
 
 /** „Ce mănânc azi?”: 3 idei pentru momentul zilei, din produsele scanate (verzi), fără cele roșii. */
 export default function Ideas() {
@@ -68,6 +69,7 @@ export default function Ideas() {
           )}
         </Card>
       ))}
+      {ideas && <RecoCard placement="ideas" />}
       {ideas && <Button title={"🔄 " + s.ideas_more} kind="ghost" onPress={load} />}
       {ideas && <Hint>{s.plate_note}</Hint>}
     </ScrollView>
