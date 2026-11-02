@@ -18,6 +18,10 @@ export interface ReportData {
   walks: { count: number; minutes: number };
   meds: { name: string; expected: number; taken: number; pct: number }[];
   goodDays: number; lessDays: number;
+  /** din zilele cu masă grea, câte au avut și plimbare (procent); null dacă nu au fost mese grele */
+  walkDaysPct: number | null;
+  /** o linie pe zi cu date, cea mai recentă prima */
+  byDay: { day: string; t: number; gluAvg: number | null; gluCount: number; green: number; yellow: number; red: number; walkMin: number; status: "good" | "less" | null }[];
 }
 
 export function buildReport(input: { glucose: Glu[]; meals: Meal[]; walks: Walk[]; meds: Med[]; medLog: MedLog[] }, days = 30, now = Date.now()): ReportData {
@@ -45,6 +49,13 @@ export function buildReport(input: { glucose: Glu[]; meals: Meal[]; walks: Walk[
   for (const st of statuses.values()) st === "good" ? goodDays++ : lessDays++;
   const carbsKnown = m.filter((x) => typeof x.carbs === "number").map((x) => x.carbs as number);
 
+  const byDay = dayKeys.map((day, i) => {
+    const gs = g.filter((x) => dayKeyLocal(x.t) === day), ms = m.filter((x) => dayKeyLocal(x.t) === day), ws = w.filter((x) => dayKeyLocal(x.t) === day);
+    return { day, t: from + (i + 1) * 864e5, gluAvg: avg(gs.map((x) => x.v)), gluCount: gs.length,
+      green: ms.filter((x) => x.level === "green").length, yellow: ms.filter((x) => x.level === "yellow").length, red: ms.filter((x) => x.level === "red").length,
+      walkMin: ws.reduce((a, x) => a + x.min, 0), status: statuses.get(day) ?? null };
+  }).filter((d) => d.gluCount || d.green || d.yellow || d.red || d.walkMin).reverse();
+
   return {
     from, to: now, days,
     glucose: {
@@ -56,6 +67,7 @@ export function buildReport(input: { glucose: Glu[]; meals: Meal[]; walks: Walk[
     },
     meals: { count: m.length, green: m.filter((x) => x.level === "green").length, yellow: m.filter((x) => x.level === "yellow").length, red: m.filter((x) => x.level === "red").length, avgCarbs: avg(carbsKnown) },
     walks: { count: w.length, minutes: w.reduce((a, x) => a + x.min, 0) },
-    meds, goodDays, lessDays,
+    meds, goodDays, lessDays, byDay,
+    walkDaysPct: (() => { const heavy = byDay.filter((d) => d.red > 0); return heavy.length ? Math.round((100 * heavy.filter((d) => d.walkMin > 0).length) / heavy.length) : null; })(),
   };
 }

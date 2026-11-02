@@ -18,6 +18,11 @@ export function reportHtml(r: ReportData, s: Strings, opts: { name: string; unit
     return `<tr><td>${date(e.t)}</td><td>${time(e.t)}</td><td style="font-weight:700;color:${col[c]}">${u(e.v)}</td><td>${esc(s.ctx[e.ctx] ?? e.ctx)}</td><td>${esc(e.note ?? "")}</td></tr>`;
   }).join("");
   const byCtx = g.byCtx.map((x) => `<tr><td>${esc(s.ctx[x.ctx] ?? x.ctx)}</td><td>${x.count}</td><td style="font-weight:700">${u(x.avg)} ${unitLbl}</td></tr>`).join("");
+  const dots = (n: number, c: string) => n ? `<span style="color:${c};font-weight:700">${"●".repeat(Math.min(n, 5))}${n > 5 ? ` ×${n}` : ""}</span>` : "";
+  const byDay = r.byDay.map((d) => `<tr><td>${date(d.t)}</td><td>${d.gluAvg != null ? `<b>${u(d.gluAvg)}</b> <span style="color:#5B6B78">(${d.gluCount})</span>` : "—"}</td>` +
+    `<td>${[dots(d.green, col.ok), dots(d.yellow, col.high), dots(d.red, col.low)].filter(Boolean).join(" ") || "—"}</td>` +
+    `<td>${d.walkMin ? `🚶 <b>${d.walkMin} min</b>` : `<span style="color:#9AABB9">${esc(s.rep_nowalk)}</span>`}</td>` +
+    `<td>${d.status === "good" ? `<span style="color:${col.ok};font-weight:700">✓ ${esc(s.cal_good)}</span>` : d.status === "less" ? `<span style="color:${col.high}">${esc(s.cal_less)}</span>` : "—"}</td></tr>`).join("");
   const meds = r.meds.length ? r.meds.map((m) => `<tr><td>${esc(m.name)}</td><td>${m.taken} / ${m.expected}</td><td style="font-weight:700">${m.pct}%</td></tr>`).join("") : `<tr><td colspan="3">—</td></tr>`;
 
   return `<!doctype html><html><head><meta charset="utf-8"><style>
@@ -45,12 +50,16 @@ export function reportHtml(r: ReportData, s: Strings, opts: { name: string; unit
     ${byCtx ? `<table><tr><th>${esc(s.rep_byctx)}</th><th>${esc(s.rep_readings)}</th><th>${esc(s.rep_avg)}</th></tr>${byCtx}</table>` : ""}
 
     <h2>${esc(s.rep_meals)} · ${esc(s.rep_walks)} · ${esc(s.rep_days)}</h2>
+    <div class="meta">${esc(s.rep_legend)}</div>
     <div class="grid">
       <div class="box"><b>${r.meals.count}</b><span>${esc(s.rep_meals)}: ${esc(s.rep_meals_v(r.meals.green, r.meals.yellow, r.meals.red))}</span></div>
       <div class="box"><b>${r.meals.avgCarbs != null ? `${r.meals.avgCarbs} g` : "—"}</b><span>${esc(s.rep_avgcarbs)}</span></div>
-      <div class="box"><b>${r.walks.minutes} min</b><span>${esc(s.rep_walks_v(r.walks.count, r.walks.minutes))}</span></div>
+      <div class="box"><b>${r.walks.minutes} min</b><span>${esc(s.rep_walks_v(r.walks.count, r.walks.minutes))}${r.walkDaysPct != null ? ` · ${esc(s.rep_walkdays(r.walkDaysPct))}` : ""}</span></div>
       <div class="box"><b>${r.goodDays} / ${r.goodDays + r.lessDays}</b><span>${esc(s.rep_days_v(r.goodDays, r.lessDays))}</span></div>
     </div>
+
+    <h2>${esc(s.rep_byday)}</h2>
+    <table><tr><th>${esc(s.rep_date)}</th><th>${esc(s.rep_glu)} (${unitLbl})</th><th>${esc(s.rep_meals)}</th><th>${esc(s.rep_walks)}</th><th>${esc(s.rep_days)}</th></tr>${byDay || `<tr><td colspan="5">—</td></tr>`}</table>
 
     <h2>${esc(s.rep_meds)}</h2>
     <table><tr><th>${esc(s.med_name)}</th><th>${esc(s.med_taken)}</th><th>%</th></tr>${meds}</table>

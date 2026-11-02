@@ -22,6 +22,9 @@ test("medii, interval și numărători pe 30 de zile", () => {
   assert.equal(r.walks.minutes, 20);
   assert.deepEqual(r.meds[0], { name: "Metformin", expected: 60, taken: 2, pct: 3 });
   assert.equal(r.goodDays + r.lessDays, 3);
+  assert.equal(r.byDay.length, 3);
+  const two = r.byDay.find((x) => x.red === 1)!;
+  assert.equal(two.walkMin, 20); assert.equal(two.status, "less"); // glicemie 200 în ziua aceea
 });
 test("fără date → valori nule, nu erori", () => {
   const r = buildReport({ glucose: [], meals: [], walks: [], meds: [], medLog: [] }, 30, now);
