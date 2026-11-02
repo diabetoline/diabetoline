@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useRouter, type Href } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -25,6 +25,8 @@ export default function Home() {
     .filter((x) => !x.done && x.time <= nowHM).sort((a, b) => a.time.localeCompare(b.time));
   const open = (c: string) => router.push({ pathname: "/product/[code]", params: { code: c } });
   const hasDay = todayMeals.length > 0 || todayGlu.length > 0;
+  const fresh = state.history.length === 0 && state.meals.length === 0 && state.glucose.length === 0;
+  useEffect(() => { if (!state.welcomed) router.replace("/welcome"); }, [state.welcomed]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }} edges={["top"]}>
@@ -77,7 +79,14 @@ export default function Home() {
           </Card>
         )}
 
-        {!hasDay && state.history.length === 0 && <Hint style={{ textAlign: "center", marginTop: 8 }}>{s.home_first}</Hint>}
+        {fresh && (
+          <Card style={{ borderColor: t.accent, borderWidth: 2, gap: 10 }}>
+            <Text style={{ color: t.ink, fontSize: 20 * k, fontWeight: "800" }}>👉 {s.first_title}</Text>
+            <Text style={{ color: t.ink, fontSize: 17 * k, lineHeight: 25 * k }}>{s.first_text}</Text>
+            <Button title={s.first_btn} size="xl" onPress={() => router.push("/scan")} />
+            <Pressable onPress={() => router.push("/welcome")} accessibilityRole="button"><Hint style={{ textAlign: "center", textDecorationLine: "underline" }}>{s.first_again}</Hint></Pressable>
+          </Card>
+        )}
       </ScrollView>
     </SafeAreaView>
   );

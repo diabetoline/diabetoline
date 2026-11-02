@@ -14,6 +14,7 @@ export default function Root() {
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="product/[code]" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
           <Stack.Screen name="product/add" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
+          <Stack.Screen name="welcome" options={{ headerShown: false, presentation: "fullScreenModal", animation: "fade" }} />
           <Stack.Screen name="scan" options={{ headerShown: false, presentation: "fullScreenModal" }} />
           <Stack.Screen name="plate" options={{ headerShown: false, presentation: "fullScreenModal" }} />
           <Stack.Screen name="glucose/new" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />

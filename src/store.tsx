@@ -25,7 +25,7 @@ export interface Family {
 export interface MedLog { id: string; medId: string; time: string; day: string; t: number }
 
 export interface State {
-  lang: Lang; langManual?: boolean; humor: boolean; unit: "mg" | "mmol"; name: string; bigText: boolean;
+  lang: Lang; langManual?: boolean; humor: boolean; welcomed?: boolean; unit: "mg" | "mmol"; name: string; bigText: boolean;
   history: HistItem[]; glucose: GluEntry[]; meals: MealEntry[]; meds: Med[]; medLog: MedLog[]; walks: Walk[]; family: Family;
   cache: Record<string, Product>;
 }

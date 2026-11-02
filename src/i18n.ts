@@ -5,6 +5,12 @@ type Verd = { carbs: number; sugars: number; fiber: number; gl: number | null };
 type Dict = Record<string, any>;
 
 const ro = {
+  w1_title: "Bun venit!", w1_text: "Diabetoline te ajută să mănânci bine și să ai grijă de glicemie, în fiecare zi. Simplu, fără cont, fără cursuri.",
+  w2_title: "La cumpărături", w2_text: "Scanezi codul de bare al unui produs și afli pe loc dacă e bun pentru tine.", w2_g: "Potrivit", w2_y: "Cu măsură", w2_r: "Evită",
+  w3_title: "La masă", w3_text: "Faci o poză la farfurie, acasă sau la restaurant. Îți spunem cât îți crește glicemia și ce să faci după.",
+  w4_title: "Și în fiecare zi", w4_text: "Notezi glicemia cu o apăsare, îți amintim de medicamente, iar copilul tău poate vedea cum ești. Pentru medic, un raport gata făcut.",
+  w_next: "Mai departe", w_start: "Să începem", w_skip: "Sari peste",
+  first_title: "Încearcă acum", first_text: "Ia un produs din bucătărie, de exemplu un biscuit sau un iaurt, și apasă Scanează. Durează 3 secunde.", first_btn: "Scanează primul produs", first_again: "Vezi din nou prezentarea",
   fam_short: "Copilul tău vede jurnalul, ca să te ajute", rep_short: "PDF pe 30 de zile, de trimis medicului",
   tile_scan: "Scanează", tile_plate: "Poză la masă", tile_glu: "Glicemia", tile_meds: "Medicamente", med_due_now: "De luat acum", home_first: "Începe cu Scanează la cumpărături sau cu Poză la masă.",
   fam_title: "Familie", fam_intro: "Copilul tău vede ce notezi (glicemii, mese, medicamente) ca să te poată ajuta. Pozele rămân doar pe telefonul tău. Tu accepți și tu poți opri oricând.",
@@ -105,6 +111,12 @@ const ro = {
 };
 
 const en: typeof ro = {
+  w1_title: "Welcome!", w1_text: "Diabetoline helps you eat well and look after your blood sugar, every day. Simple, no account, no lessons.",
+  w2_title: "When shopping", w2_text: "Scan a product's barcode and find out right away whether it's good for you.", w2_g: "Good", w2_y: "In moderation", w2_r: "Avoid",
+  w3_title: "At the table", w3_text: "Take a photo of your plate, at home or in a restaurant. We tell you how much it raises your blood sugar and what to do after.",
+  w4_title: "And every day", w4_text: "Log your blood sugar with one tap, we remind you about medication, and your child can see how you're doing. For the doctor, a ready-made report.",
+  w_next: "Next", w_start: "Let's start", w_skip: "Skip",
+  first_title: "Try it now", first_text: "Grab a product from your kitchen, say a biscuit or a yogurt, and press Scan. It takes 3 seconds.", first_btn: "Scan your first product", first_again: "See the introduction again",
   fam_short: "Your child sees your journal, to help you", rep_short: "30-day PDF to send to your doctor",
   tile_scan: "Scan", tile_plate: "Photo of meal", tile_glu: "Blood sugar", tile_meds: "Medication", med_due_now: "Due now", home_first: "Start with Scan when shopping or Photo of meal at the table.",
   fam_title: "Family", fam_intro: "Your child sees what you log (glucose, meals, medication) so they can help. Photos stay only on your phone. You accept, and you can stop at any time.",
@@ -195,6 +207,12 @@ const en: typeof ro = {
 };
 
 const de: typeof ro = {
+  w1_title: "Willkommen!", w1_text: "Diabetoline hilft dir, jeden Tag gut zu essen und auf deinen Blutzucker zu achten. Einfach, ohne Konto, ohne Anleitung.",
+  w2_title: "Beim Einkaufen", w2_text: "Scanne den Barcode eines Produkts und erfahre sofort, ob es gut für dich ist.", w2_g: "Geeignet", w2_y: "In Maßen", w2_r: "Vermeiden",
+  w3_title: "Beim Essen", w3_text: "Fotografiere deinen Teller, zu Hause oder im Restaurant. Wir sagen dir, wie stark der Blutzucker steigt und was danach hilft.",
+  w4_title: "Und jeden Tag", w4_text: "Blutzucker mit einem Tipp eintragen, Erinnerung an Medikamente, und dein Kind kann sehen, wie es dir geht. Für den Arzt ein fertiger Bericht.",
+  w_next: "Weiter", w_start: "Los geht's", w_skip: "Überspringen",
+  first_title: "Probier es jetzt", first_text: "Nimm ein Produkt aus der Küche, etwa einen Keks oder einen Joghurt, und drücke Scannen. Dauert 3 Sekunden.", first_btn: "Erstes Produkt scannen", first_again: "Einführung noch einmal ansehen",
   fam_short: "Dein Kind sieht dein Tagebuch, um dir zu helfen", rep_short: "30-Tage-PDF für den Arzt",
   tile_scan: "Scannen", tile_plate: "Foto vom Essen", tile_glu: "Blutzucker", tile_meds: "Medikamente", med_due_now: "Jetzt fällig", home_first: "Beginne mit Scannen beim Einkaufen oder Foto vom Essen am Tisch.",
   fam_title: "Familie", fam_intro: "Dein Kind sieht, was du einträgst (Blutzucker, Mahlzeiten, Medikamente), um dir zu helfen. Fotos bleiben nur auf deinem Handy. Du stimmst zu und kannst jederzeit aufhören.",

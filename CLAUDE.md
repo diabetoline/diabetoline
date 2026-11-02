@@ -4,7 +4,7 @@ Aplicație mobilă (Expo / React Native, TypeScript) pentru diabetici, publicat�
 
 ## Public și principii
 - Utilizatori în vârstă, puțin obișnuiți cu tehnologia. Copiii lor instalează, plătesc și urmăresc.
-- Simplitate înainte de orice: un buton mare pe primul ecran, text ≥ 18 px, fără gesturi ascunse, fără cont obligatoriu, fără tutorial.
+- Simplitate înainte de orice: un buton mare pe primul ecran, text ≥ 18 px, fără gesturi ascunse, fără cont obligatoriu. La prima deschidere, o întâmpinare de 4 ecrane (`app/welcome.tsx`: la ce folosește, nu cum se apasă), apoi pe prima pagină un card „Încearcă acum” până la prima notare.
 - Verdictul pe tot ecranul (cerc colorat + un cuvânt + o propoziție); detaliile doar la „De ce?”. Buton de citit cu voce tare.
 - Rolul aplicației: ajută și ghidează diabeticul în toate situațiile din zi.
 - Doar 3 secțiuni: Acasă · Jurnal · Mai mult. Prima pagină e organizată pe situații („Unde ești acum?”): La cumpărături (scanare) · La masă, acasă sau la restaurant (poză la farfurie) · Glicemia · Medicamentele.
