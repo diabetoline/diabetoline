@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { Stack, useRouter } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { File, Paths } from "expo-file-system";
 import { slotForHour, useStore, type MealEntry } from "../src/store";
 import { useTheme } from "../src/theme";
@@ -10,6 +10,8 @@ import { Button, Hint } from "../src/ui/Primitives";
 
 export default function PlateScreen() {
   const t = useTheme(); const router = useRouter();
+  const ins = useSafeAreaInsets();
+  const close = () => { if (router.canGoBack()) router.back(); else router.replace("/"); };
   const { t: s, addMeal } = useStore();
   const [perm, requestPerm] = useCameraPermissions();
   const cam = useRef<CameraView>(null);
@@ -46,10 +48,10 @@ export default function PlateScreen() {
           <Button title={s.cam_allow} onPress={() => requestPerm()} />
         </View>
       )}
-      <SafeAreaView style={StyleSheet.absoluteFill} pointerEvents="box-none">
+      <View style={[StyleSheet.absoluteFill, st.overlay, { paddingTop: ins.top, paddingBottom: ins.bottom }]} pointerEvents="box-none">
         <View style={{ flex: 1, justifyContent: "space-between" }} pointerEvents="box-none">
           <View style={st.top}>
-            <Pressable onPress={() => router.back()} style={st.round} accessibilityRole="button" accessibilityLabel={s.close}><Text style={st.roundTxt}>✕</Text></Pressable>
+            <Pressable onPress={close} hitSlop={20} style={({ pressed }) => [st.round, pressed && { opacity: 0.6 }]} accessibilityRole="button" accessibilityLabel={s.close}><Text style={st.roundTxt}>✕</Text></Pressable>
             <Text style={st.title}>{s.plate_title}</Text><View style={{ width: 52 }} />
           </View>
           <View style={st.bottom}>
@@ -73,11 +75,12 @@ export default function PlateScreen() {
             )}
           </View>
         </View>
-      </SafeAreaView>
+      </View>
     </View>
   );
 }
 const st = StyleSheet.create({
+  overlay: { zIndex: 10, elevation: 10 },
   top: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", padding: 16 },
   title: { color: "#fff", fontSize: 20, fontWeight: "800" },
   round: { width: 52, height: 52, borderRadius: 26, backgroundColor: "rgba(0,0,0,0.55)", alignItems: "center", justifyContent: "center" },

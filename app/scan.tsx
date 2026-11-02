@@ -2,13 +2,15 @@ import { useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { Stack, useRouter } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useStore } from "../src/store";
 import { useTheme } from "../src/theme";
 import { Button, Hint } from "../src/ui/Primitives";
 
 export default function ScanScreen() {
   const t = useTheme(); const router = useRouter();
+  const ins = useSafeAreaInsets();
+  const close = () => { if (router.canGoBack()) router.back(); else router.replace("/"); };
   const { t: s } = useStore();
   const [perm, requestPerm] = useCameraPermissions();
   const [torch, setTorch] = useState(false);
@@ -34,10 +36,10 @@ export default function ScanScreen() {
           <Button title={s.cam_allow} onPress={() => requestPerm()} />
         </View>
       )}
-      <SafeAreaView style={StyleSheet.absoluteFill} pointerEvents="box-none">
+      <View style={[StyleSheet.absoluteFill, st.overlay, { paddingTop: ins.top, paddingBottom: ins.bottom }]} pointerEvents="box-none">
         <View style={{ flex: 1, justifyContent: "space-between" }} pointerEvents="box-none">
           <View style={st.top}>
-            <Pressable onPress={() => router.back()} style={st.round} accessibilityRole="button" accessibilityLabel={s.close}><Text style={st.roundTxt}>✕</Text></Pressable>
+            <Pressable onPress={close} hitSlop={20} style={({ pressed }) => [st.round, pressed && { opacity: 0.6 }]} accessibilityRole="button" accessibilityLabel={s.close}><Text style={st.roundTxt}>✕</Text></Pressable>
             <Pressable onPress={() => setTorch((v) => !v)} style={[st.round, torch && { backgroundColor: "#fff" }]} accessibilityRole="button" accessibilityLabel={s.torch}><Text style={[st.roundTxt, torch && { color: "#000" }]}>🔦</Text></Pressable>
           </View>
           <View style={st.frameWrap} pointerEvents="none">
@@ -48,11 +50,12 @@ export default function ScanScreen() {
             <Text style={st.hint2}>{s.scan_distance}</Text>
           </View>
         </View>
-      </SafeAreaView>
+      </View>
     </View>
   );
 }
 const st = StyleSheet.create({
+  overlay: { zIndex: 10, elevation: 10 },
   top: { flexDirection: "row", justifyContent: "space-between", padding: 16 },
   round: { width: 52, height: 52, borderRadius: 26, backgroundColor: "rgba(0,0,0,0.55)", alignItems: "center", justifyContent: "center" },
   roundTxt: { color: "#fff", fontSize: 22, fontWeight: "700" },

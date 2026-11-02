@@ -26,7 +26,7 @@ export default function Settings() {
       <Title>{s.settings}</Title>
       <Card>
         <Label>{s.lang}</Label>
-        <Seg value={state.lang} options={langs} onChange={(v) => set({ lang: v })} />
+        <Seg value={state.lang} options={langs} onChange={(v) => set({ lang: v, langManual: true })} />
         <Label>{s.unit}</Label>
         <Seg value={state.unit} options={[{ v: "mg" as const, l: "mg/dL" }, { v: "mmol" as const, l: "mmol/L" }]} onChange={(v) => set({ unit: v })} />
         <Label>{s.your_name}</Label>

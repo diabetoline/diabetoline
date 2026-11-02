@@ -40,7 +40,10 @@
           "cameraPermission": "Diabetoline uses the camera to read product barcodes."
         }
       ],
-      "expo-localization"
+      [
+        "expo-localization",
+        { "supportedLocales": { "ios": ["ro", "en", "de"], "android": ["ro", "en", "de"] } }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

@@ -156,9 +156,18 @@ const de: typeof ro = {
 
 const STR: Record<Lang, typeof ro> = { ro, en, de };
 export type Strings = typeof ro;
+/**
+ * Limba implicită. În Expo Go iOS raportează doar limbile pe care le are Expo Go (engleză),
+ * așa că ne uităm și la regiunea telefonului: telefon din România/Moldova → română,
+ * din Germania/Austria/Elveția → germană. Restul lumii → engleză.
+ */
 export function deviceLang(): Lang {
-  const code = getLocales()[0]?.languageCode ?? "en";
-  return code === "ro" || code === "de" ? code : "en";
+  const locs = getLocales();
+  const langs = locs.map((l) => l.languageCode);
+  const region = locs.map((l) => l.regionCode).find(Boolean) ?? "";
+  if (langs.includes("ro") || region === "RO" || region === "MD") return "ro";
+  if (langs.includes("de") || region === "DE" || region === "AT" || region === "CH") return "de";
+  return "en";
 }
 export function strings(lang: Lang): Strings { return STR[lang] ?? ro; }
 /** BCP-47 tag for text-to-speech */

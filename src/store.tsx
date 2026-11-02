@@ -11,7 +11,7 @@ export interface Med { id: string; name: string; times: string[]; notifIds?: str
 export interface MedLog { id: string; medId: string; time: string; day: string; t: number }
 
 export interface State {
-  lang: Lang; unit: "mg" | "mmol"; name: string; bigText: boolean;
+  lang: Lang; langManual?: boolean; unit: "mg" | "mmol"; name: string; bigText: boolean;
   history: HistItem[]; glucose: GluEntry[]; meals: MealEntry[]; meds: Med[]; medLog: MedLog[];
   cache: Record<string, Product>;
 }
@@ -36,7 +36,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [s, setS] = useState<State>(initial);
   const [ready, setReady] = useState(false);
   useEffect(() => {
-    AsyncStorage.getItem(KEY).then((raw) => { if (raw) setS({ ...initial, ...JSON.parse(raw) }); }).catch(() => {}).finally(() => setReady(true));
+    AsyncStorage.getItem(KEY).then((raw) => { if (raw) { const saved = JSON.parse(raw); setS({ ...initial, ...saved, lang: saved.langManual ? saved.lang : deviceLang() }); } }).catch(() => {}).finally(() => setReady(true));
   }, []);
   useEffect(() => { if (ready) AsyncStorage.setItem(KEY, JSON.stringify(s)).catch(() => {}); }, [s, ready]);
 
