@@ -100,7 +100,7 @@ function Tile({ t, k, icon, title, to, bg, fg, tint, big, badge }: { t: Theme; k
       <View style={[st.iconWrap, { backgroundColor: big ? "rgba(255,255,255,0.18)" : (tint ?? t.accent) + "1F" }]}>
         <Icon name={icon} size={big ? 34 : 30} color={big ? fg : tint ?? t.accent} strokeWidth={2.2} />
       </View>
-      <Text style={{ color: fg, fontSize: (big ? 21 : 19) * k, fontWeight: "800", letterSpacing: -0.2 }}>{title}</Text>
+      <Text style={{ color: fg, fontSize: (big ? 20 : 19) * k, lineHeight: (big ? 26 : 24) * k, fontWeight: "800", letterSpacing: -0.2 }}>{title}</Text>
       {badge ? <View style={[st.badge, { backgroundColor: t.warn }]}><Text style={{ color: "#fff", fontWeight: "800", fontSize: 14 }}>{badge}</Text></View> : null}
     </Pressable>
   );
