@@ -21,7 +21,7 @@
         "CAMERA"
       ],
       "adaptiveIcon": {
-        "backgroundColor": "#1F4F8F",
+        "backgroundColor": "#2C663A",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -56,6 +56,11 @@
     },
     "runtimeVersion": {
       "policy": "sdkVersion"
+    },
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFFFFF"
     }
   }
 }
