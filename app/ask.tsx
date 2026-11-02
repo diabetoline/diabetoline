@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View, type ScrollViewInstance } from "react-native";
 import { Stack, useRouter } from "expo-router";
 import * as Speech from "expo-speech";
+import { say } from "../src/speech";
 import { ask } from "../src/api/ask";
 import { journalContext } from "../src/ui/journalContext";
 import { speechLocale } from "../src/i18n";
@@ -29,7 +30,7 @@ export default function Ask() {
     const answer = r.ok ? r.answer : r.error === "not_configured" ? s.ask_off : s.ask_err;
     setMsgs((m) => [...m, { role: "app", text: answer, emergency: r.ok && r.emergency }]);
     setBusy(false);
-    if (r.ok) Speech.speak(answer, { language: speechLocale[state.lang], rate: 0.95 });
+    if (r.ok) say(answer, state.lang);
     setTimeout(() => sv.current?.scrollToEnd({ animated: true }), 100);
   };
 
@@ -53,7 +54,7 @@ export default function Ask() {
             {m.emergency && <Text style={{ color: t.bad, fontWeight: "800", fontSize: 16 * k }}>⚠️ {s.ask_emergency}</Text>}
             <Text style={{ color: m.role === "me" ? t.accentInk : t.ink, fontSize: 18 * k, lineHeight: 26 * k }}>{m.text}</Text>
             {m.role === "app" && !m.emergency && (
-              <Pressable onPress={() => { Speech.stop(); Speech.speak(m.text, { language: speechLocale[state.lang], rate: 0.95 }); }} accessibilityRole="button" accessibilityLabel={s.speak} style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+              <Pressable onPress={() => { Speech.stop(); say(m.text, state.lang); }} accessibilityRole="button" accessibilityLabel={s.speak} style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
                 <Text style={{ fontSize: 18 }}>🔊</Text><Text style={{ color: t.accent, fontWeight: "700", fontSize: 15 * k }}>{s.speak}</Text>
               </Pressable>
             )}

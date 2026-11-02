@@ -3,6 +3,7 @@ import { Animated } from "react-native";
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import * as Speech from "expo-speech";
+import { say } from "../../src/speech";
 import { giBand } from "../../src/engine/plate";
 import { speechLocale } from "../../src/i18n";
 import { useStore } from "../../src/store";
@@ -32,7 +33,7 @@ export default function MealResult() {
   const bandWord = { low: s.low, mid: s.mid, high: s.high } as const;
   const speak = () => {
     Speech.stop();
-    Speech.speak([title, a?.summary, ...(a?.tips ?? [])].filter(Boolean).join(". "), { language: speechLocale[state.lang], rate: 0.95 });
+    say([title, a?.summary, ...(a?.tips ?? [])].filter(Boolean).join(". "), state.lang);
   };
 
   return (

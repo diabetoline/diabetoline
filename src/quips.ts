@@ -69,7 +69,7 @@ const ro: Record<QuipKey, string[]> = {
     "Nimic notat încă. Nici glicemia nu știe că ai aplicație.",
   ],
   loading: ["Caut produsul… nu fugi nicăieri.", "O clipă, întreb baza de date. Și ea are zilele ei.", "Citesc eticheta mai atent decât producătorul."],
-  plate_wait: ["Mă uit în farfurie… arată bine, în orice caz.", "Număr cartofii. Nu-ți fac poză ție, promit.", "O secundă, îmi pun ochelarii."],
+  plate_wait: ["Mă uit în farfurie… arată bine, în orice caz.", "O secundă, îmi pun ochelarii."],
 };
 
 const en: Record<QuipKey, string[]> = {
@@ -133,7 +133,7 @@ const en: Record<QuipKey, string[]> = {
     "Nothing logged yet. Even your blood sugar doesn't know you have an app.",
   ],
   loading: ["Looking it up… don't go anywhere.", "One moment, asking the database. It has its days too.", "Reading the label more carefully than the manufacturer did."],
-  plate_wait: ["Looking at your plate… it looks good, anyway.", "Counting the potatoes. Not photographing you, promise.", "One second, putting my glasses on."],
+  plate_wait: ["Looking at your plate… it looks good, anyway.", "One second, putting my glasses on."],
 };
 
 const de: Record<QuipKey, string[]> = {
@@ -197,7 +197,7 @@ const de: Record<QuipKey, string[]> = {
     "Noch nichts eingetragen. Dein Blutzucker weiß noch gar nicht, dass du eine App hast.",
   ],
   loading: ["Ich suche das Produkt… bleib kurz da.", "Einen Moment, ich frage die Datenbank. Sie hat auch ihre Tage.", "Ich lese das Etikett genauer als der Hersteller."],
-  plate_wait: ["Ich schaue auf den Teller… sieht jedenfalls gut aus.", "Ich zähle die Kartoffeln. Dich fotografiere ich nicht, versprochen.", "Sekunde, ich setze die Brille auf."],
+  plate_wait: ["Ich schaue auf den Teller… sieht jedenfalls gut aus.", "Sekunde, ich setze die Brille auf."],
 };
 
 const ALL: Record<Lang, Record<QuipKey, string[]>> = { ro, en, de };

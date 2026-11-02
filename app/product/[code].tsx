@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import * as Speech from "expo-speech";
+import { say } from "../../src/speech";
 import { fetchProduct, NotFound } from "../../src/api/off";
 import { analyze, giLevel, glLevel } from "../../src/engine/verdict";
 import type { Product, Verdict } from "../../src/engine/types";
@@ -63,7 +64,7 @@ export default function ProductScreen() {
   const claimText = p.claims.map((x) => s.claim[x] ?? x).join(", ");
   const summary = v.labelTrap ? s.trap(claimText) : s.summary[v.level];
   const reasons = v.reasons.map((r) => s.reason[r]?.(v) ?? r);
-  const speak = () => { Speech.stop(); Speech.speak(`${label}. ${p.name}. ${summary} ${reasons.slice(0, 2).join(" ")}`, { language: speechLocale[state.lang], rate: 0.95 }); };
+  const speak = () => { Speech.stop(); say(`${label}. ${p.name}. ${summary} ${reasons.slice(0, 2).join(" ")}`, state.lang); };
 
   return (
     <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
