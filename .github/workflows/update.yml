@@ -24,5 +24,7 @@ jobs:
         run: |
           npx expo export --platform web
           eas deploy --prod --environment production --non-interactive
+      - name: Test de fum pe server
+        run: pip install -q pillow && bash scripts/smoke.sh https://curalife.expo.app
       - name: Aplicația → Expo Go (ramura preview)
         run: eas update --branch preview --platform all --non-interactive --message "${{ github.sha }}"
