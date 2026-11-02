@@ -1,4 +1,7 @@
-import { Image, Text, View } from "react-native";
+import { Image, Pressable, Text, View } from "react-native";
+import { useRouter } from "expo-router";
+import type { Lang } from "../i18n";
+import { Icon } from "./Icon";
 import { LinearGradient } from "expo-linear-gradient";
 import Svg, { Circle } from "react-native-svg";
 import { dayKeyLocal, gluClass } from "../engine/days";
@@ -12,7 +15,9 @@ import { useScale } from "./Primitives";
  */
 export function DayHeader() {
   const t = useTheme(); const k = useScale();
-  const { t: s, s: state } = useStore();
+  const { t: s, s: state, set } = useStore();
+  const router = useRouter();
+  const langs: Lang[] = ["ro", "en", "de"];
   const h = new Date().getHours();
   const hi = h < 11 ? s.hi_morning : h < 18 ? s.hi_day : s.hi_evening;
   const today = dayKeyLocal(Date.now());
@@ -39,12 +44,25 @@ export function DayHeader() {
   const dark = useTheme().bg === "#0F161D";
   return (
     <LinearGradient colors={dark ? ["#163527", "#0F161D"] : ["#E4F3E9", "#EEF2F5"]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 18, gap: 14 }}>
-      <Image source={require("../../assets/logo-wordmark.png")} style={{ width: 200, height: 200 * 153 / 1062, marginBottom: 2 }} resizeMode="contain" accessibilityLabel="Diabetoline" />
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+        <Image source={require("../../assets/logo-wordmark.png")} style={{ width: 200, height: 200 * 153 / 1062 }} resizeMode="contain" accessibilityLabel="Diabetoline" />
+        <View style={{ flexDirection: "row", backgroundColor: t.surface, borderRadius: 999, padding: 3, borderWidth: 1, borderColor: t.line }} accessibilityLabel={s.lang_pick}>
+          {langs.map((l) => (
+            <Pressable key={l} onPress={() => set({ lang: l, langManual: true })} accessibilityRole="button" accessibilityState={{ selected: state.lang === l }}
+              style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999, backgroundColor: state.lang === l ? t.accent : "transparent" }}>
+              <Text style={{ color: state.lang === l ? t.accentInk : t.muted, fontWeight: "800", fontSize: 13 }}>{l.toUpperCase()}</Text>
+            </Pressable>
+          ))}
+        </View>
+      </View>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
         <View style={{ flex: 1, gap: 4 }}>
           <Text style={{ color: t.ink, fontSize: 20 * k, fontWeight: "700", letterSpacing: -0.2 }}>{hi}{state.name ? `, ${state.name}` : ""}</Text>
           <Text style={{ color: t.ink, opacity: 0.8, fontSize: 15 * k, lineHeight: 21 * k }}>{line}</Text>
         </View>
+        <Pressable onPress={() => router.push("/ask")} accessibilityRole="button" accessibilityLabel={s.ask_title} style={({ pressed }) => ({ width: 52, height: 52, borderRadius: 26, backgroundColor: t.accent, alignItems: "center", justifyContent: "center", opacity: pressed ? 0.85 : 1 })}>
+          <Icon name="chat" size={26} color={t.accentInk} />
+        </Pressable>
         <View style={{ width: 68, height: 68, alignItems: "center", justifyContent: "center" }} accessibilityLabel={s.day_progress(done, steps.length)}>
           <Svg width={68} height={68} viewBox="0 0 76 76" style={{ position: "absolute" }}>
             <Circle cx="38" cy="38" r={R} stroke={t.line} strokeWidth="7" fill="none" />

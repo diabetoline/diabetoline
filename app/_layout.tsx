@@ -22,6 +22,7 @@ export default function Root() {
           <Stack.Screen name="meal/[id]" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
           <Stack.Screen name="family" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
           <Stack.Screen name="family/parent" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
+          <Stack.Screen name="ask" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
           <Stack.Screen name="ideas" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
           <Stack.Screen name="report" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
           <Stack.Screen name="care" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />

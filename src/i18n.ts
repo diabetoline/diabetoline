@@ -5,6 +5,10 @@ type Verd = { carbs: number; sugars: number; fiber: number; gl: number | null };
 type Dict = Record<string, any>;
 
 const ro = {
+  ask_title: "Întreabă", ask_sub: "Răspund din jurnalul tău, pe scurt. Nu dau doze și nu înlocuiesc medicul.", ask_placeholder: "Scrie întrebarea ta…", ask_send: "Întreabă", ask_thinking: "Mă uit în jurnalul tău…", ask_err: "Nu am putut răspunde acum. Verifică internetul.", ask_off: "Asistentul pornește în curând.",
+  ask_voice_soon: "Vorbitul cu microfonul vine în versiunea din magazin.", ask_emergency: "Dacă îți e rău acum, sună la 112 sau la medicul tău.",
+  ask_q: ["Pot mânca o felie de cozonac azi?", "De ce a fost glicemia mare aseară?", "Ce gustare pot lua acum?", "Am voie un pahar de vin?", "Cum a fost săptămâna mea?", "Ce să mănânc la cină?"],
+  lang_pick: "Limba",
   hi_morning: "Bună dimineața", hi_day: "Bună ziua", hi_evening: "Bună seara", day_all_good: "Azi totul e în regulă.", day_todo: (x: string) => `Azi mai e de făcut: ${x}.`, day_empty: "Azi nu ai notat încă nimic.",
   d_glu: "glicemia", d_move: "mișcarea", d_meds: "medicamentele", d_meal: "o masă", day_progress: (a: number, b: number) => `${a} din ${b}`,
   ideas_lighter: "Vreau ceva asemănător, dar mai ușor", ideas_lighter_title: "Ceva mai ușor", ideas_lighter_sub: (n: string) => `În loc de ${n}: aceeași poftă, mai puțin zahăr.`,
@@ -123,6 +127,10 @@ const ro = {
 };
 
 const en: typeof ro = {
+  ask_title: "Ask", ask_sub: "I answer from your journal, briefly. No doses, and I don't replace your doctor.", ask_placeholder: "Type your question…", ask_send: "Ask", ask_thinking: "Looking at your journal…", ask_err: "Couldn't answer right now. Check your connection.", ask_off: "The helper is coming soon.",
+  ask_voice_soon: "Talking with the microphone comes in the store version.", ask_emergency: "If you feel unwell right now, call emergency services or your doctor.",
+  ask_q: ["Can I have a slice of cake today?", "Why was my glucose high last night?", "What snack can I have now?", "Is a glass of wine OK?", "How was my week?", "What should I eat for dinner?"],
+  lang_pick: "Language",
   hi_morning: "Good morning", hi_day: "Hello", hi_evening: "Good evening", day_all_good: "Everything's in order today.", day_todo: (x: string) => `Still to do today: ${x}.`, day_empty: "Nothing logged yet today.",
   d_glu: "blood sugar", d_move: "activity", d_meds: "medication", d_meal: "a meal", day_progress: (a: number, b: number) => `${a} of ${b}`,
   ideas_lighter: "I want something similar but lighter", ideas_lighter_title: "Something lighter", ideas_lighter_sub: (n: string) => `Instead of ${n}: same craving, less sugar.`,
@@ -231,6 +239,10 @@ const en: typeof ro = {
 };
 
 const de: typeof ro = {
+  ask_title: "Fragen", ask_sub: "Ich antworte kurz aus deinem Tagebuch. Keine Dosierungen, und ich ersetze deinen Arzt nicht.", ask_placeholder: "Schreib deine Frage…", ask_send: "Fragen", ask_thinking: "Ich schaue in dein Tagebuch…", ask_err: "Ich konnte gerade nicht antworten. Prüfe die Verbindung.", ask_off: "Der Helfer kommt bald.",
+  ask_voice_soon: "Sprechen per Mikrofon kommt in der Store-Version.", ask_emergency: "Wenn es dir gerade schlecht geht, ruf den Notruf oder deinen Arzt an.",
+  ask_q: ["Darf ich heute ein Stück Kuchen essen?", "Warum war mein Blutzucker gestern Abend hoch?", "Welchen Snack kann ich jetzt essen?", "Ist ein Glas Wein in Ordnung?", "Wie war meine Woche?", "Was soll ich zu Abend essen?"],
+  lang_pick: "Sprache",
   hi_morning: "Guten Morgen", hi_day: "Guten Tag", hi_evening: "Guten Abend", day_all_good: "Heute ist alles in Ordnung.", day_todo: (x: string) => `Heute noch zu tun: ${x}.`, day_empty: "Heute noch nichts eingetragen.",
   d_glu: "Blutzucker", d_move: "Bewegung", d_meds: "Medikamente", d_meal: "eine Mahlzeit", day_progress: (a: number, b: number) => `${a} von ${b}`,
   ideas_lighter: "Ich möchte etwas Ähnliches, aber leichter", ideas_lighter_title: "Etwas Leichteres", ideas_lighter_sub: (n: string) => `Statt ${n}: gleiche Lust, weniger Zucker.`,
