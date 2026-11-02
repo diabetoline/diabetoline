@@ -38,9 +38,9 @@ export async function askVision(image: string, prompt: string, maxTokens = 800):
   const data = (await res.json()) as { content?: { type: string; text?: string }[] };
   const text = (data.content ?? []).filter((c) => c.type === "text").map((c) => c.text ?? "").join("");
   const m = text.match(/\{[\s\S]*\}/);
-  if (!m) return { ok: false, status: 422, reason: "unreadable" };
+  if (!m) return { ok: false, status: 422, reason: `unreadable: ${text.slice(0, 120)}` };
   try { return { ok: true, json: JSON.parse(m[0]) as Record<string, unknown> }; }
-  catch { return { ok: false, status: 422, reason: "unreadable" }; }
+  catch { return { ok: false, status: 422, reason: `unreadable: truncated? ${text.length} chars, stop=${(data as { stop_reason?: string }).stop_reason ?? "?"}` }; }
 }
 
 /** Apel doar cu text; întoarce textul brut al răspunsului. */
