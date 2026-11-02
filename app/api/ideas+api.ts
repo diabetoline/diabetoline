@@ -5,7 +5,7 @@
  */
 import { askText, LANG_NAME } from "../../src/server/claude";
 
-type In = { lang?: string; slot?: string; products?: { name: string; level: string }[]; recentMeals?: string[]; avoid?: string[]; focus?: string };
+type In = { lang?: string; slot?: string; products?: { name: string; level: string }[]; recentMeals?: string[]; avoid?: string[]; focus?: string; lighter?: boolean };
 
 const prompt = (b: In, lang: string) => {
   const good = (b.products ?? []).filter((p) => p.level === "green").map((p) => p.name).slice(0, 25);
@@ -16,7 +16,7 @@ Meal slot now: ${b.slot ?? "lunch"}.
 Products they recently scanned and that are GOOD for them (prefer using these): ${good.join("; ") || "none"}.
 Products OK in moderation (use small amounts, optional): ${mod.join("; ") || "none"}.
 Products to AVOID (never include): ${bad.join("; ") || "none"}.
-${b.focus ? `BUILD EVERY IDEA AROUND THIS PRODUCT they just scanned: "${b.focus}".\n` : ""}Meals they had recently (do not repeat): ${(b.recentMeals ?? []).slice(0, 8).join("; ") || "none"}.
+${b.focus && b.lighter ? `They just scanned "${b.focus}", which is NOT good for their blood sugar. Every idea must be a LIGHTER alternative that satisfies the same craving (same role: sweet treat, snack, bread, pasta, drink...), without that product. Mention in "why" what makes it lighter.\n` : b.focus ? `BUILD EVERY IDEA AROUND THIS PRODUCT they just scanned: "${b.focus}".\n` : ""}Meals they had recently (do not repeat): ${(b.recentMeals ?? []).slice(0, 8).join("; ") || "none"}.
 Rules: low glycemic load (vegetables first, protein, fibre; small portions of bread/potatoes/rice/pasta); max 4 steps per idea, each step under 12 words; max 6 ingredients with rough quantities; "why" under 20 words; no insulin, no doses, no medical claims; friendly tone; portions for one person.
 Reply with ONLY JSON:
 {"ideas":[{"title":string,"why":string,"carbs":number,"minutes":number,"ingredients":[string],"steps":[string],"uses":[string]}]}

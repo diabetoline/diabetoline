@@ -5,6 +5,7 @@ type Verd = { carbs: number; sugars: number; fiber: number; gl: number | null };
 type Dict = Record<string, any>;
 
 const ro = {
+  ideas_lighter: "Vreau ceva asemănător, dar mai ușor", ideas_lighter_title: "Ceva mai ușor", ideas_lighter_sub: (n: string) => `În loc de ${n}: aceeași poftă, mai puțin zahăr.`,
   ideas_product: "Ce pot găti cu el?", ideas_with: (n: string) => `Idei cu ${n}`,
   ideas_noscan_title: "Întâi scanează câteva produse", ideas_noscan_text: "Ideile se fac din ce ai în casă. Scanează 3–4 produse din bucătărie (iaurt, brânză, pâine, legume la conservă) și revino aici.", ideas_anyway: "Vreau idei oricum, fără produse scanate",
   plate_off: "Analiza pozei nu e disponibilă acum. Spune tu cum a fost masa:",
@@ -120,6 +121,7 @@ const ro = {
 };
 
 const en: typeof ro = {
+  ideas_lighter: "I want something similar but lighter", ideas_lighter_title: "Something lighter", ideas_lighter_sub: (n: string) => `Instead of ${n}: same craving, less sugar.`,
   ideas_product: "What can I cook with it?", ideas_with: (n: string) => `Ideas with ${n}`,
   ideas_noscan_title: "Scan a few products first", ideas_noscan_text: "Ideas are built from what you have at home. Scan 3–4 products from your kitchen (yogurt, cheese, bread, tinned vegetables) and come back here.", ideas_anyway: "Give me ideas anyway, without scanned products",
   plate_off: "Photo analysis isn't available right now. Tell me how the meal was:",
@@ -225,6 +227,7 @@ const en: typeof ro = {
 };
 
 const de: typeof ro = {
+  ideas_lighter: "Ich möchte etwas Ähnliches, aber leichter", ideas_lighter_title: "Etwas Leichteres", ideas_lighter_sub: (n: string) => `Statt ${n}: gleiche Lust, weniger Zucker.`,
   ideas_product: "Was kann ich damit kochen?", ideas_with: (n: string) => `Ideen mit ${n}`,
   ideas_noscan_title: "Scanne zuerst ein paar Produkte", ideas_noscan_text: "Die Ideen entstehen aus dem, was du zu Hause hast. Scanne 3–4 Produkte aus der Küche (Joghurt, Käse, Brot, Gemüsekonserven) und komm hierher zurück.", ideas_anyway: "Trotzdem Ideen, ohne gescannte Produkte",
   plate_off: "Die Fotoanalyse ist gerade nicht verfügbar. Sag mir, wie die Mahlzeit war:",

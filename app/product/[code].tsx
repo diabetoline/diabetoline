@@ -86,7 +86,9 @@ export default function ProductScreen() {
           <View style={{ flex: 1 }}><Button title={s.scan_again} kind="ghost" onPress={() => router.replace("/scan")} /></View>
         </View>
 
-        {v.level !== "red" && <Button title={"🍲 " + s.ideas_product} kind="soft" onPress={() => router.push({ pathname: "/ideas", params: { focus: p.name } })} />}
+        {v.level === "red"
+          ? <Button title={"🥗 " + s.ideas_lighter} kind="soft" onPress={() => router.push({ pathname: "/ideas", params: { focus: p.name, lighter: "1" } })} />
+          : <Button title={"🍲 " + s.ideas_product} kind="soft" onPress={() => router.push({ pathname: "/ideas", params: { focus: p.name } })} />}
         <Button title={more ? s.less : s.why} kind="ghost" onPress={() => setMore((x) => !x)} />
         {more && (
           <Card>

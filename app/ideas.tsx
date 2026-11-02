@@ -10,7 +10,7 @@ import { Quip } from "../src/ui/Quip";
 /** „Ce mănânc azi?”: 3 idei pentru momentul zilei, din produsele scanate (verzi), fără cele roșii. */
 export default function Ideas() {
   const t = useTheme(); const k = useScale(); const router = useRouter();
-  const { focus } = useLocalSearchParams<{ focus?: string }>();
+  const { focus, lighter } = useLocalSearchParams<{ focus?: string; lighter?: string }>();
   const { t: s, s: state, addMeal } = useStore();
   const slot = slotForHour(new Date().getHours());
   const [ideas, setIdeas] = useState<Idea[] | null>(null);
@@ -23,7 +23,7 @@ export default function Ideas() {
     setIdeas(null); setErr(""); setOpen(0); setAte(null); setLoading(true);
     const products = state.history.slice(0, 40).map((h) => ({ name: h.name, level: h.level }));
     const recentMeals = state.meals.slice(-8).map((m) => m.name).filter((x): x is string => !!x);
-    const r = await fetchIdeas({ lang: state.lang, slot, products, recentMeals, focus: focus || undefined });
+    const r = await fetchIdeas({ lang: state.lang, slot, products, recentMeals, focus: focus || undefined, lighter: lighter === "1" });
     setLoading(false);
     if (r.ok) setIdeas(r.ideas); else setErr(r.error === "not_configured" ? s.ideas_off : s.ideas_err);
   };
@@ -33,8 +33,8 @@ export default function Ideas() {
   return (
     <ScrollView contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 40 }}>
       <Stack.Screen options={{ title: s.ideas_title }} />
-      <Title>{s.ideas_title}</Title>
-      <Hint>{focus ? s.ideas_with(focus) : s.ideas_sub} · {s.ideas_slot[slot]}</Hint>
+      <Title>{focus && lighter === "1" ? s.ideas_lighter_title : s.ideas_title}</Title>
+      <Hint>{focus && lighter === "1" ? s.ideas_lighter_sub(focus) : focus ? s.ideas_with(focus) : s.ideas_sub} · {s.ideas_slot[slot]}</Hint>
       {noProducts && !ideas && (
         <Card style={{ borderColor: t.accent, borderWidth: 2 }}>
           <Text style={{ color: t.ink, fontSize: 19 * k, fontWeight: "800" }}>{s.ideas_noscan_title}</Text>
