@@ -27,7 +27,7 @@ După lansare: rețete, coș, plan de mese, senzor (Libre/Dexcom), meniu de rest
 ## Tehnic
 - `npm run typecheck`, `npm test` (motorul de verdict, Node test runner, build în `.test-build`)
 - Open Food Facts nu e accesibil din mediul de dezvoltare Claude; testele pe produse reale se fac pe telefon.
-- Server: rute API Expo Router (`app/api/*+api.ts`, `web.output: "server"`), găzduite pe EAS Hosting. Secret: `ANTHROPIC_API_KEY` (variabilă secretă EAS). Aplicația găsește serverul prin `EXPO_PUBLIC_API_URL`.
+- Server: rute API Expo Router (`app/api/*+api.ts`, `web.output: "server"`), găzduite pe EAS Hosting la https://curalife.expo.app (publicare automată din GitHub Actions, `.github/workflows/update.yml`). Secret: `ANTHROPIC_API_KEY` (variabilă secretă EAS). Aplicația găsește serverul prin `EXPO_PUBLIC_API_URL`.
 - Politica de confidențialitate: diabetoline.com/pages/confidentialitate-aplicatie (link în Mai mult).
 - Backend planificat: Supabase în UE (conturi, familie, poze criptate). Abonamente: RevenueCat.
 - Pragurile de verdict (`src/engine/verdict.ts`, obiectul `T`, și `MEAL_T` din `src/engine/plate.ts`) sunt punct de pornire; de validat cu un diabetolog înainte de lansare.

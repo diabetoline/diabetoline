@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 env:
   # adresa serverului (EAS Hosting); aplicația o citește prin EXPO_PUBLIC_API_URL
-  EXPO_PUBLIC_API_URL: https://diabetoline.expo.app
+  EXPO_PUBLIC_API_URL: https://curalife.expo.app
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -23,6 +23,6 @@ jobs:
       - name: Server → EAS Hosting (rutele /api)
         run: |
           npx expo export --platform web
-          eas deploy --prod --alias diabetoline --environment production --non-interactive
+          eas deploy --prod --environment production --non-interactive
       - name: Aplicația → Expo Go (ramura preview)
         run: eas update --branch preview --platform all --non-interactive --message "${{ github.sha }}"
