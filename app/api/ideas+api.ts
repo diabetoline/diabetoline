@@ -5,7 +5,7 @@
  */
 import { askText, LANG_NAME } from "../../src/server/claude";
 
-type In = { lang?: string; slot?: string; products?: { name: string; level: string }[]; recentMeals?: string[]; avoid?: string[] };
+type In = { lang?: string; slot?: string; products?: { name: string; level: string }[]; recentMeals?: string[]; avoid?: string[]; focus?: string };
 
 const prompt = (b: In, lang: string) => {
   const good = (b.products ?? []).filter((p) => p.level === "green").map((p) => p.name).slice(0, 25);
@@ -16,8 +16,8 @@ Meal slot now: ${b.slot ?? "lunch"}.
 Products they recently scanned and that are GOOD for them (prefer using these): ${good.join("; ") || "none"}.
 Products OK in moderation (use small amounts, optional): ${mod.join("; ") || "none"}.
 Products to AVOID (never include): ${bad.join("; ") || "none"}.
-Meals they had recently (do not repeat): ${(b.recentMeals ?? []).slice(0, 8).join("; ") || "none"}.
-Rules: low glycemic load (vegetables first, protein, fibre; small portions of bread/potatoes/rice/pasta); max 5 steps per idea, each step under 15 words; ingredients with rough quantities; no insulin, no doses, no medical claims; friendly tone; portions for one person.
+${b.focus ? `BUILD EVERY IDEA AROUND THIS PRODUCT they just scanned: "${b.focus}".\n` : ""}Meals they had recently (do not repeat): ${(b.recentMeals ?? []).slice(0, 8).join("; ") || "none"}.
+Rules: low glycemic load (vegetables first, protein, fibre; small portions of bread/potatoes/rice/pasta); max 4 steps per idea, each step under 12 words; max 6 ingredients with rough quantities; "why" under 20 words; no insulin, no doses, no medical claims; friendly tone; portions for one person.
 Reply with ONLY JSON:
 {"ideas":[{"title":string,"why":string,"carbs":number,"minutes":number,"ingredients":[string],"steps":[string],"uses":[string]}]}
 "carbs" = estimated grams of carbohydrates for the portion. "uses" = names from the GOOD list used in this idea (may be empty). Exactly 3 ideas: the first the simplest (no cooking or 10 minutes), the others a bit more.`;
@@ -27,7 +27,7 @@ export async function POST(request: Request): Promise<Response> {
   let b: In;
   try { b = (await request.json()) as In; } catch { return Response.json({ ok: false, reason: "bad_request" }, { status: 400 }); }
   const lang = b.lang === "ro" || b.lang === "de" ? b.lang : "en";
-  const r = await askText(prompt(b, lang), 1400);
+  const r = await askText(prompt(b, lang), 3000);
   if (!r.ok) return Response.json({ ok: false, reason: r.reason }, { status: r.status });
   const raw = Array.isArray((r.json as { ideas?: unknown }).ideas) ? ((r.json as { ideas: unknown[] }).ideas) : [];
   const str = (x: unknown, n: number) => (typeof x === "string" ? x.trim().slice(0, n) : "");

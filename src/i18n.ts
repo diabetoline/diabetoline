@@ -5,6 +5,7 @@ type Verd = { carbs: number; sugars: number; fiber: number; gl: number | null };
 type Dict = Record<string, any>;
 
 const ro = {
+  ideas_product: "Ce pot găti cu el?", ideas_with: (n: string) => `Idei cu ${n}`,
   ideas_noscan_title: "Întâi scanează câteva produse", ideas_noscan_text: "Ideile se fac din ce ai în casă. Scanează 3–4 produse din bucătărie (iaurt, brânză, pâine, legume la conservă) și revino aici.", ideas_anyway: "Vreau idei oricum, fără produse scanate",
   plate_off: "Analiza pozei nu e disponibilă acum. Spune tu cum a fost masa:",
   ideas_title: "Ce mănânc azi?", ideas_sub: "Idei simple, din ce ai scanat. Fără produsele de evitat.", ideas_btn: "Idei pentru", ideas_loading: "Mă gândesc la ceva bun…", ideas_more: "Alte idei", ideas_err: "Nu am putut aduce ideile. Verifică internetul.", ideas_off: "Ideile de mese pornesc în curând.",
@@ -119,6 +120,7 @@ const ro = {
 };
 
 const en: typeof ro = {
+  ideas_product: "What can I cook with it?", ideas_with: (n: string) => `Ideas with ${n}`,
   ideas_noscan_title: "Scan a few products first", ideas_noscan_text: "Ideas are built from what you have at home. Scan 3–4 products from your kitchen (yogurt, cheese, bread, tinned vegetables) and come back here.", ideas_anyway: "Give me ideas anyway, without scanned products",
   plate_off: "Photo analysis isn't available right now. Tell me how the meal was:",
   ideas_title: "What shall I eat today?", ideas_sub: "Simple ideas from what you scanned. Without the products to avoid.", ideas_btn: "Ideas for", ideas_loading: "Thinking of something good…", ideas_more: "More ideas", ideas_err: "Couldn't load ideas. Check your connection.", ideas_off: "Meal ideas are coming soon.",
@@ -223,6 +225,7 @@ const en: typeof ro = {
 };
 
 const de: typeof ro = {
+  ideas_product: "Was kann ich damit kochen?", ideas_with: (n: string) => `Ideen mit ${n}`,
   ideas_noscan_title: "Scanne zuerst ein paar Produkte", ideas_noscan_text: "Die Ideen entstehen aus dem, was du zu Hause hast. Scanne 3–4 Produkte aus der Küche (Joghurt, Käse, Brot, Gemüsekonserven) und komm hierher zurück.", ideas_anyway: "Trotzdem Ideen, ohne gescannte Produkte",
   plate_off: "Die Fotoanalyse ist gerade nicht verfügbar. Sag mir, wie die Mahlzeit war:",
   ideas_title: "Was esse ich heute?", ideas_sub: "Einfache Ideen aus dem, was du gescannt hast. Ohne die zu vermeidenden Produkte.", ideas_btn: "Ideen für", ideas_loading: "Ich überlege mir etwas Gutes…", ideas_more: "Weitere Ideen", ideas_err: "Ideen konnten nicht geladen werden. Prüfe die Verbindung.", ideas_off: "Essensideen kommen bald.",

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { fetchIdeas, type Idea } from "../src/api/ideas";
 import { slotForHour, useStore } from "../src/store";
 import { useTheme } from "../src/theme";
@@ -10,6 +10,7 @@ import { Quip } from "../src/ui/Quip";
 /** „Ce mănânc azi?”: 3 idei pentru momentul zilei, din produsele scanate (verzi), fără cele roșii. */
 export default function Ideas() {
   const t = useTheme(); const k = useScale(); const router = useRouter();
+  const { focus } = useLocalSearchParams<{ focus?: string }>();
   const { t: s, s: state, addMeal } = useStore();
   const slot = slotForHour(new Date().getHours());
   const [ideas, setIdeas] = useState<Idea[] | null>(null);
@@ -22,18 +23,18 @@ export default function Ideas() {
     setIdeas(null); setErr(""); setOpen(0); setAte(null); setLoading(true);
     const products = state.history.slice(0, 40).map((h) => ({ name: h.name, level: h.level }));
     const recentMeals = state.meals.slice(-8).map((m) => m.name).filter((x): x is string => !!x);
-    const r = await fetchIdeas({ lang: state.lang, slot, products, recentMeals });
+    const r = await fetchIdeas({ lang: state.lang, slot, products, recentMeals, focus: focus || undefined });
     setLoading(false);
     if (r.ok) setIdeas(r.ideas); else setErr(r.error === "not_configured" ? s.ideas_off : s.ideas_err);
   };
-  const noProducts = state.history.length === 0;
+  const noProducts = state.history.length === 0 && !focus;
   useEffect(() => { if (!noProducts) load(); }, []);
 
   return (
     <ScrollView contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 40 }}>
       <Stack.Screen options={{ title: s.ideas_title }} />
       <Title>{s.ideas_title}</Title>
-      <Hint>{s.ideas_sub} · {s.ideas_slot[slot]}</Hint>
+      <Hint>{focus ? s.ideas_with(focus) : s.ideas_sub} · {s.ideas_slot[slot]}</Hint>
       {noProducts && !ideas && (
         <Card style={{ borderColor: t.accent, borderWidth: 2 }}>
           <Text style={{ color: t.ink, fontSize: 19 * k, fontWeight: "800" }}>{s.ideas_noscan_title}</Text>
