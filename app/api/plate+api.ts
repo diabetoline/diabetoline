@@ -9,8 +9,8 @@ import { askVision, LANG_NAME, readImageBody } from "../../src/server/claude";
 const prompt = (lang: string) => `You help an older person with diabetes understand a meal from a photo of their plate.
 Identify each food on the plate. For each, estimate the portion in grams, the carbohydrates in grams for that portion, its glycemic index (GI, 0-100; null if the food has almost no carbohydrates, e.g. meat, fish, eggs, cheese, oil), and the position of its centre in the photo as percentages: "x" from the left (0-100) and "y" from the top (0-100).
 Then write, in ${LANG_NAME[lang]}:
-- "summary": one short, kind sentence about the meal's likely effect on blood sugar (no blame).
-- "tips": up to 3 short practical tips (max 18 words each) for THIS plate, e.g. eat the vegetables and protein first, leave part of the bread or potatoes, add a salad, take a walk after eating.
+- "summary": one short, kind sentence (max 20 words) about the meal's likely effect on blood sugar (no blame).
+- "tips": up to 3 short practical tips (max 12 words each) for THIS plate, e.g. eat the vegetables and protein first, leave part of the bread or potatoes, add a salad, take a walk after eating.
 Never mention insulin, doses, medication changes, diagnoses or medical treatment.
 Food names also in ${LANG_NAME[lang]}, short and everyday.
 Reply with ONLY JSON:
@@ -22,7 +22,7 @@ const n = (x: unknown, max: number) => (typeof x === "number" && Number.isFinite
 export async function POST(request: Request): Promise<Response> {
   const body = await readImageBody(request);
   if (!body) return Response.json({ ok: false, reason: "bad_request" }, { status: 400 });
-  const r = await askVision(body.image, prompt(body.lang), 900);
+  const r = await askVision(body.image, prompt(body.lang), 2500);
   if (!r.ok) return Response.json({ ok: false, reason: r.reason }, { status: r.status });
   const o = r.json as { ok?: boolean; reason?: string; foods?: unknown; summary?: unknown; tips?: unknown };
   if (!o.ok) return Response.json({ ok: false, reason: o.reason === "no_food" ? "no_food" : "unreadable" }, { status: 422 });
