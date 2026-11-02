@@ -54,10 +54,10 @@ export async function askPlain(prompt: string, maxTokens = 500): Promise<{ ok: t
       body: JSON.stringify({ model: VISION_MODEL, max_tokens: maxTokens, messages: [{ role: "user", content: prompt }] }),
     });
   } catch { return { ok: false, status: 502, reason: "upstream" }; }
-  if (!res.ok) return { ok: false, status: 502, reason: "upstream" };
+  if (!res.ok) return { ok: false, status: 502, reason: `upstream ${res.status} ${(await res.text()).slice(0, 200)}` };
   const data = (await res.json()) as { content?: { type: string; text?: string }[] };
   const text = (data.content ?? []).filter((c) => c.type === "text").map((c) => c.text ?? "").join("").trim();
-  return text ? { ok: true, text } : { ok: false, status: 422, reason: "unreadable" };
+  return text ? { ok: true, text } : { ok: false, status: 422, reason: `unreadable ${JSON.stringify(data).slice(0, 200)}` };
 }
 
 export const LANG_NAME: Record<string, string> = { ro: "Romanian", en: "English", de: "German" };

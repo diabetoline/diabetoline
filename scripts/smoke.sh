@@ -18,4 +18,4 @@ open("/tmp/apple.json", "w").write('{"image":"%s","lang":"ro"}' % base64.b64enco
 PY
 echo "== plate"; curl -s -X POST "$BASE/api/plate" -H "content-type: application/json" --data @/tmp/apple.json; echo
 echo "== ideas"; curl -s -o /tmp/ideas.out -w "HTTP %{http_code}\n" -X POST "$BASE/api/ideas" -H "content-type: application/json" -d '{"lang":"ro","slot":"snack","products":[{"name":"Iaurt grecesc","level":"green"},{"name":"Nutella","level":"red"}],"recentMeals":[]}'; head -c 600 /tmp/ideas.out; echo
-echo "== ask"; curl -s -X POST "$BASE/api/ask" -H "content-type: application/json" -d '{"lang":"ro","question":"Pot mânca o felie de cozonac azi?","context":"glucose 190 mg/dL (La 2 ore după masă, high) lun 20:10\nmeal paste cu pâine [red] 80 g carbs lun 18:00"}' | head -c 500; echo
+echo "== ask"; curl -s -X POST "$BASE/api/ask" -H "content-type: application/json" -d '{"lang":"ro","question":"Pot mânca o felie de cozonac azi?","context":"glucose 190 mg/dL (La 2 ore după masă, high) lun 20:10\nmeal paste cu pâine [red] 80 g carbs lun 18:00"}' | head -c 900; echo
