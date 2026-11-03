@@ -13,8 +13,8 @@ for p in ps:
         item = dict(section="skin", name=t.replace(" — ", ", "), desc=None)
     elif "FiberPasta" in t or "PastaPro" in t:
         item = dict(section="food", name=t.split(" — ")[0].replace(" bogate în fibre", "").replace(" bogat în fibre", "").replace(" din grâu dur italian, bogată în fibre", "") + (" — " + t.split(" — ")[1] if " — " in t else ""), desc=None)
-    elif t.startswith("CURALIN"):
-        n = "90" if "90 capsule" in t and "180" not in t else "180"
+    elif t.lower().startswith("curalin") and "kapsu" not in t.lower():   # fără varianta poloneză
+        n = "180" if "180" in t else "90"
         item = dict(section="supp", name=f"Curalin, {n} capsule", desc="Supliment alimentar pe bază de extracte din plante.")
     if not item: continue
     out.append(dict(id=h, **item, price=price, url=f"{SHOP}/products/{h}", image=img, available=avail, sku=v.get("sku")))

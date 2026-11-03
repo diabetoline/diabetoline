@@ -174,5 +174,27 @@
   "image": "https://cdn.shopify.com/s/files/1/0659/4150/4266/files/linguine_6e5928e3-f296-41cc-b7cb-8010548ed078.jpg?v=1741353459",
   "available": false,
   "sku": "FP1005"
+ },
+ {
+  "id": "curalin-90-capsule",
+  "section": "supp",
+  "name": "Curalin, 90 capsule",
+  "desc": "Supliment alimentar pe bază de extracte din plante.",
+  "price": 179.0,
+  "url": "https://diabetoline.com/products/curalin-90-capsule",
+  "image": "https://cdn.shopify.com/s/files/1/0659/4150/4266/files/IMG_8774_36b7378e-a452-4cf8-97d7-8e69d9926b67.jpg?v=1716585104",
+  "available": true,
+  "sku": "0000003"
+ },
+ {
+  "id": "2-x-curalin-90-capsule",
+  "section": "supp",
+  "name": "Curalin, 180 capsule",
+  "desc": "Supliment alimentar pe bază de extracte din plante.",
+  "price": 348.0,
+  "url": "https://diabetoline.com/products/2-x-curalin-90-capsule",
+  "image": "https://cdn.shopify.com/s/files/1/0659/4150/4266/files/IMG_87722.jpg?v=1716585038",
+  "available": true,
+  "sku": "0000001"
  }
 ]
