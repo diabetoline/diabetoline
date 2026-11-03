@@ -5,6 +5,7 @@ type Verd = { carbs: number; sugars: number; fiber: number; gl: number | null };
 type Dict = Record<string, any>;
 
 const ro = {
+  fam_push_info: "Primești o notificare când părintele are o glicemie în afara intervalului sau o masă grea.", fam_push_btn: "Reactivează notificările", fam_push_ok: "Notificările sunt active.", fam_push_off: "Notificările nu sunt permise. Activează-le din Setările telefonului.",
   reco_label: "De la Diabetoline", reco_view: "Vezi produsul", reco_later: "Nu acum",
   reco_curalin: "Mulți dintre clienții noștri iau Curalin, un supliment pe bază de extracte din plante. Întreabă medicul dacă e potrivit pentru tine.",
   reco_pasta: "Nu știi ce să gătești? Pastele FiberPasta au indice glicemic certificat 23: paste adevărate, cu mult mai puțin efect asupra glicemiei.",
@@ -137,6 +138,7 @@ const ro = {
 };
 
 const en: typeof ro = {
+  fam_push_info: "You get a notification when your parent has a glucose reading out of range or a heavy meal.", fam_push_btn: "Re-enable notifications", fam_push_ok: "Notifications are on.", fam_push_off: "Notifications aren't allowed. Enable them in your phone's Settings.",
   reco_label: "From Diabetoline", reco_view: "See product", reco_later: "Not now",
   reco_curalin: "Many of our customers take Curalin, a herbal food supplement. Ask your doctor whether it's suitable for you.",
   reco_pasta: "Not sure what to cook? FiberPasta has a certified glycemic index of 23: real pasta, with far less effect on blood sugar.",
@@ -259,6 +261,7 @@ const en: typeof ro = {
 };
 
 const de: typeof ro = {
+  fam_push_info: "Du bekommst eine Mitteilung, wenn dein Elternteil einen Blutzuckerwert außerhalb des Bereichs oder eine schwere Mahlzeit hat.", fam_push_btn: "Mitteilungen erneut aktivieren", fam_push_ok: "Mitteilungen sind aktiv.", fam_push_off: "Mitteilungen sind nicht erlaubt. Aktiviere sie in den Einstellungen des Telefons.",
   reco_label: "Von Diabetoline", reco_view: "Produkt ansehen", reco_later: "Nicht jetzt",
   reco_curalin: "Viele unserer Kunden nehmen Curalin, ein pflanzliches Nahrungsergänzungsmittel. Frag deinen Arzt, ob es für dich geeignet ist.",
   reco_pasta: "Keine Idee, was du kochen sollst? FiberPasta hat einen zertifizierten GI von 23: echte Pasta, mit viel weniger Wirkung auf den Blutzucker.",

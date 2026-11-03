@@ -5,6 +5,7 @@ import type { PlateAnalysis } from "./engine/plate";
 import type { RecoState } from "./recommend";
 import { deviceLang, strings, type Lang, type Strings } from "./i18n";
 import { pushEntries } from "./family/sync";
+import { sendNewAlerts } from "./family/alerts";
 
 export interface HistItem { code: string; name: string; level: Level; t: number }
 export type GluCtx = "fasting" | "pre" | "post2h" | "evening" | "other";
@@ -23,6 +24,8 @@ export interface Family {
   /** părinte: copiii legați */
   children: { linkId: string; name: string }[];
   lastSync?: number;
+  /** părinte: ultimul moment pentru care s-au trimis alerte copiilor */
+  lastAlert?: number;
 }
 export interface MedLog { id: string; medId: string; time: string; day: string; t: number }
 
@@ -63,7 +66,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   // părintele cu consimțământ: jurnalul pleacă pe server la câteva secunde după o modificare
   useEffect(() => {
     if (!ready || s.family.role !== "parent" || !s.family.consent) return;
-    const h = setTimeout(() => { pushEntries(s).then(() => setS((p) => ({ ...p, family: { ...p.family, lastSync: Date.now() } }))).catch(() => {}); }, 4000);
+    const h = setTimeout(() => {
+      pushEntries(s).then(async () => {
+        const since = s.family.lastAlert ?? Date.now() - 3600e3;   // la prima activare nu retrimitem istoricul
+        const last = s.family.children.length ? await sendNewAlerts(s, since) : since;
+        setS((p) => ({ ...p, family: { ...p.family, lastSync: Date.now(), lastAlert: last } }));
+      }).catch(() => {});
+    }, 4000);
     return () => clearTimeout(h);
   }, [ready, s.glucose, s.meals, s.medLog, s.walks, s.weights, s.history, s.family.role, s.family.consent]);
 

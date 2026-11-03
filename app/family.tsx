@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { Stack, useRouter } from "expo-router";
 import { claimCode, createCode, deleteServerData, myLinks, pushEntries, revokeLink } from "../src/family/sync";
+import { registerChildPush } from "../src/family/alerts";
 import { useStore } from "../src/store";
 import { useTheme } from "../src/theme";
 import { Button, Card, Hint, Label, Title, useScale } from "../src/ui/Primitives";
@@ -90,7 +91,7 @@ export default function Family() {
           <TextInput value={input} onChangeText={setInput} keyboardType="number-pad" maxLength={6} placeholder="123456" placeholderTextColor={t.muted} accessibilityLabel={s.fam_enter_code}
             style={{ borderWidth: 2, borderColor: input.length === 6 ? t.ok : t.line, borderRadius: 14, padding: 16, fontSize: 36 * k, fontWeight: "800", color: t.ink, textAlign: "center", letterSpacing: 6, backgroundColor: t.bg, fontVariant: ["tabular-nums"] }} />
           <Button title={s.fam_link} size="xl" disabled={busy || input.length !== 6} onPress={() => run(async () => {
-            try { const r = await claimCode(input, childName); setFam({ parent: { linkId: r.linkId, parentId: r.parentId, name: r.parentName || "—" } }); setMsg(s.fam_linked(r.parentName || "—")); }
+            try { const r = await claimCode(input, childName); setFam({ parent: { linkId: r.linkId, parentId: r.parentId, name: r.parentName || "—" } }); setMsg(s.fam_linked(r.parentName || "—")); registerChildPush(r.linkId, state.lang).then((ok) => { if (!ok) setMsg((m) => m + " " + s.fam_push_off); }); }
             catch { setMsg(s.fam_bad_code); }
           })} />
           <Button title={s.back} kind="ghost" onPress={() => setFam({ role: null })} />
@@ -99,6 +100,8 @@ export default function Family() {
       {fam.role === "child" && fam.parent && (<>
         <Card>
           <Text style={{ color: t.ink, fontSize: 18 * k }}>{s.fam_linked(fam.parent.name)}</Text>
+          <Hint>{s.fam_push_info}</Hint>
+          <Button title={s.fam_push_btn} kind="ghost" size="sm" onPress={() => run(async () => { const ok = await registerChildPush(fam.parent!.linkId, state.lang); setMsg(ok ? s.fam_push_ok : s.fam_push_off); })} />
           <Button title={"📒 " + s.fam_parent_of(fam.parent.name)} size="xl" onPress={() => router.push("/family/parent")} />
         </Card>
         <Button title={s.fam_role_reset} kind="ghost" onPress={() => setFam({ role: null, parent: undefined })} />

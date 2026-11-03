@@ -6,6 +6,11 @@ import { gluClass } from "../../src/engine/days";
 import { useStore } from "../../src/store";
 import { levelColor, useTheme } from "../../src/theme";
 import { Button, Card, Hint, Label, Title, useScale } from "../../src/ui/Primitives";
+import * as Print from "expo-print";
+import * as Sharing from "expo-sharing";
+import { buildReport } from "../../src/engine/report";
+import { reportHtml } from "../../src/report/html";
+import { dayKeyLocal } from "../../src/engine/days";
 
 /** Ecranul copilului: jurnalul părintelui pe ultimele 14 zile, cu ce merită urmărit sus. */
 export default function ParentJournal() {
@@ -19,6 +24,32 @@ export default function ParentJournal() {
     try { setRows(await fetchParentEntries(parent.parentId)); setErr(""); } catch (e) { setErr(s.fam_sync_err); }
   }, [parent?.parentId]);
   useEffect(() => { load(); }, [load]);
+
+  const [making, setMaking] = useState(false);
+  /** Raportul pentru medic din jurnalul părintelui (intrările de pe server → același motor de raport). */
+  const makeReport = async () => {
+    if (!rows) return;
+    setMaking(true);
+    try {
+      const all = await fetchParentEntries(parent!.parentId, 31);
+      const ts = (e: Entry) => new Date(e.t).getTime();
+      const glucose = all.filter((e) => e.kind === "glucose").map((e) => ({ v: Number(e.data.v), ctx: String(e.data.ctx), t: ts(e), note: String(e.data.note ?? "") }));
+      const meals = all.filter((e) => e.kind === "meal").map((e) => ({ level: (e.data.level as "green" | "yellow" | "red" | null) ?? undefined, t: ts(e), name: (e.data.name as string) ?? undefined, slot: String(e.data.slot), carbs: typeof e.data.carbs === "number" ? e.data.carbs : undefined }));
+      const walks = all.filter((e) => e.kind === "walk").map((e) => ({ t: ts(e), min: Number(e.data.min) }));
+      const weights = all.filter((e) => e.kind === "weight").map((e) => ({ t: ts(e), kg: Number(e.data.kg) }));
+      // medicamentele: din prizele bifate reconstruim lista (nume + ore văzute)
+      const medMap = new Map<string, Set<string>>();
+      for (const e of all.filter((x) => x.kind === "med")) { const n = String(e.data.name); if (!medMap.has(n)) medMap.set(n, new Set()); medMap.get(n)!.add(String(e.data.time)); }
+      const meds = [...medMap.entries()].map(([name, times]) => ({ id: name, name, times: [...times].sort() }));
+      const medLog = all.filter((e) => e.kind === "med").map((e) => ({ medId: String(e.data.name), time: String(e.data.time), day: dayKeyLocal(ts(e)) }));
+      const r = buildReport({ glucose, meals, walks, meds, medLog, weights });
+      const LOCALE = { ro: "ro-RO", en: "en-GB", de: "de-DE" } as const;
+      const html = reportHtml(r, s, { name: parent!.name, unit: state.unit, locale: LOCALE[state.lang] });
+      const { uri } = await Print.printToFileAsync({ html });
+      if (await Sharing.isAvailableAsync()) await Sharing.shareAsync(uri, { mimeType: "application/pdf", UTI: "com.adobe.pdf", dialogTitle: s.rep_share }); else await Print.printAsync({ uri });
+    } catch (e) { setErr(String((e as Error)?.message ?? e)); }
+    finally { setMaking(false); }
+  };
 
   if (!parent) return null;
   const toU = (v: number) => (state.unit === "mg" ? String(Math.round(v)) : (v / 18).toFixed(1));
@@ -68,6 +99,7 @@ export default function ParentJournal() {
           })}
         </Card>
       ))}
+      {rows && rows.length > 0 && <Button title={making ? s.rep_making : "📄 " + s.rep_title} size="xl" disabled={making} onPress={makeReport} />}
       <Button title={s.fam_refresh} kind="soft" onPress={() => { setRows(null); load(); }} />
     </ScrollView>
   );
