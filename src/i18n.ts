@@ -5,6 +5,7 @@ type Verd = { carbs: number; sugars: number; fiber: number; gl: number | null };
 type Dict = Record<string, any>;
 
 const ro = {
+  other_food_note: "Produs din gama cu indice glicemic scăzut, distribuit de Diabetoline.", other_food_hint: "Valorile nutriționale pentru acest produs vor fi adăugate în curând; până atunci, verifică eticheta.",
   fam_push_info: "Primești o notificare când părintele are o glicemie în afara intervalului sau o masă grea.", fam_push_btn: "Reactivează notificările", fam_push_ok: "Notificările sunt active.", fam_push_off: "Notificările nu sunt permise. Activează-le din Setările telefonului.",
   reco_label: "De la Diabetoline", reco_view: "Vezi produsul", reco_later: "Nu acum",
   reco_curalin: "Mulți dintre clienții noștri iau Curalin, un supliment pe bază de extracte din plante. Întreabă medicul dacă e potrivit pentru tine.",
@@ -138,6 +139,7 @@ const ro = {
 };
 
 const en: typeof ro = {
+  other_food_note: "Low glycemic index product, distributed by Diabetoline.", other_food_hint: "Nutrition values for this product are coming soon; until then, check the label.",
   fam_push_info: "You get a notification when your parent has a glucose reading out of range or a heavy meal.", fam_push_btn: "Re-enable notifications", fam_push_ok: "Notifications are on.", fam_push_off: "Notifications aren't allowed. Enable them in your phone's Settings.",
   reco_label: "From Diabetoline", reco_view: "See product", reco_later: "Not now",
   reco_curalin: "Many of our customers take Curalin, a herbal food supplement. Ask your doctor whether it's suitable for you.",
@@ -261,6 +263,7 @@ const en: typeof ro = {
 };
 
 const de: typeof ro = {
+  other_food_note: "Produkt aus der Linie mit niedrigem glykämischen Index, vertrieben von Diabetoline.", other_food_hint: "Die Nährwerte für dieses Produkt folgen bald; bis dahin das Etikett prüfen.",
   fam_push_info: "Du bekommst eine Mitteilung, wenn dein Elternteil einen Blutzuckerwert außerhalb des Bereichs oder eine schwere Mahlzeit hat.", fam_push_btn: "Mitteilungen erneut aktivieren", fam_push_ok: "Mitteilungen sind aktiv.", fam_push_off: "Mitteilungen sind nicht erlaubt. Aktiviere sie in den Einstellungen des Telefons.",
   reco_label: "Von Diabetoline", reco_view: "Produkt ansehen", reco_later: "Nicht jetzt",
   reco_curalin: "Viele unserer Kunden nehmen Curalin, ein pflanzliches Nahrungsergänzungsmittel. Frag deinen Arzt, ob es für dich geeignet ist.",

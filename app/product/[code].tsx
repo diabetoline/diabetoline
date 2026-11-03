@@ -13,7 +13,8 @@ import { Button, Card, Hint, Label, useScale } from "../../src/ui/Primitives";
 import { AfterMeal } from "../../src/ui/AfterMeal";
 import { Quip } from "../../src/ui/Quip";
 import { VerdictBadge } from "../../src/ui/VerdictBadge";
-import { findPartner, partnerAsProduct, pastaAlternative, productUrl } from "../../src/partner";
+import { findOther, findPartner, partnerAsProduct, pastaAlternative, productUrl } from "../../src/partner";
+import catalog from "../../src/catalog.json";
 import { Linking } from "react-native";
 import { money } from "../../src/money";
 
@@ -48,6 +49,27 @@ export default function ProductScreen() {
     })();
     return () => { alive = false; Speech.stop(); };
   }, [code]);
+
+  // produsele Diabetoline care nu sunt alimente cu verdict (creme, Curalin, alimente fără valori confirmate): ecran de produs
+  const other = findOther(code);
+  if (other) {
+    const item = (catalog as { id: string; name: string; desc: string | null; price: number; url: string; image: string | null; available: boolean }[]).find((c) => c.id === other.catalogId);
+    return (
+      <ScrollView contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 40 }}>
+        <Stack.Screen options={{ title: "Diabetoline" }} />
+        <Card style={{ borderColor: t.accent, borderWidth: 2, alignItems: "center", gap: 12 }}>
+          {item?.image ? <Image source={{ uri: item.image }} style={{ width: 160, height: 160, borderRadius: 16 }} /> : null}
+          <Text style={{ color: t.muted, fontSize: 12 * k, fontWeight: "700", letterSpacing: 1, textTransform: "uppercase" }}>{s.partner_mine}</Text>
+          <Text style={{ color: t.ink, fontSize: 22 * k, fontWeight: "800", textAlign: "center" }}>{item?.name ?? other.name}</Text>
+          <Text style={{ color: t.ink, fontSize: 17 * k, lineHeight: 25 * k, textAlign: "center" }}>{other.kind === "supp" ? s.supp_sub : other.kind === "skin" ? s.skin_sub : s.other_food_note}</Text>
+          {item && <Text style={{ color: t.accent, fontSize: 24 * k, fontWeight: "800" }}>{money(item.price)}</Text>}
+          {item && <Button title={s.partner_order} size="xl" onPress={() => Linking.openURL(item.url)} />}
+        </Card>
+        <Button title={s.scan_again} kind="soft" onPress={() => router.replace("/scan")} />
+        {other.kind === "food" && <Hint>{s.other_food_hint}</Hint>}
+      </ScrollView>
+    );
+  }
 
   if (err || (p && p.incomplete)) return (
     <View style={{ flex: 1, padding: 16, gap: 12 }}>
