@@ -2,6 +2,7 @@ import { Image, Linking, Pressable, ScrollView, Text, View } from "react-native"
 import { Stack } from "expo-router";
 import catalog from "../src/catalog.json";
 import { PARTNER, SHOP } from "../src/partner";
+import { money } from "../src/money";
 import { useStore } from "../src/store";
 import { useTheme } from "../src/theme";
 import { Button, Card, Hint, Label, Title, useScale } from "../src/ui/Primitives";
@@ -13,7 +14,7 @@ const ITEMS = catalog as Item[];
 export default function Shop() {
   const t = useTheme(); const k = useScale();
   const { t: s } = useStore();
-  const lei = (x: number) => `${x.toFixed(2).replace(".", ",")} lei`;
+  const lei = (x: number) => money(x);
   const sections: { key: Item["section"]; title: string; sub: string }[] = [
     { key: "skin", title: s.skin_title, sub: s.skin_sub },
     { key: "food", title: s.shop_title, sub: s.shop_sub },

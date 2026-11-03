@@ -1,6 +1,6 @@
 import { Image, Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
-import type { Lang } from "../i18n";
+import { deviceLang, type Lang } from "../i18n";
 import { Icon } from "./Icon";
 import { LinearGradient } from "expo-linear-gradient";
 import Svg, { Circle } from "react-native-svg";
@@ -17,7 +17,8 @@ export function DayHeader() {
   const t = useTheme(); const k = useScale();
   const { t: s, s: state, set } = useStore();
   const router = useRouter();
-  const langs: Lang[] = ["ro", "en", "de"];
+  const first = deviceLang();
+  const langs: Lang[] = [first, ...(["ro", "en", "de"] as Lang[]).filter((l) => l !== first)];
   const h = new Date().getHours();
   const hi = h < 11 ? s.hi_morning : h < 18 ? s.hi_day : s.hi_evening;
   const today = dayKeyLocal(Date.now());

@@ -10,6 +10,8 @@ jobs:
           mkdir -p data/catalog
           for p in 1 2 3; do curl -sS "https://diabetoline.com/products.json?limit=250&page=$p" -o data/catalog/products-$p.json; done
           curl -sS "https://diabetoline.com/collections.json?limit=250" -o data/catalog/collections.json
+          curl -sS "https://api.frankfurter.app/latest?from=RON&to=EUR,USD,GBP,CHF,PLN,HUF,CZK,SEK,DKK,NOK,BGN,MDL" -o data/catalog/rates.json || true
+          python3 scripts/catalog.py
           git config user.name "catalog-bot"; git config user.email "noreply@diabetoline.com"
-          git add data/catalog && git commit -m "Catalog diabetoline.com ($(date -u +%F))" || echo "nimic nou"
+          git add data/catalog src/catalog.json src/rates.json && git commit -m "Catalog diabetoline.com ($(date -u +%F))" || echo "nimic nou"
           git push

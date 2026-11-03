@@ -15,6 +15,7 @@ import { Quip } from "../../src/ui/Quip";
 import { VerdictBadge } from "../../src/ui/VerdictBadge";
 import { findPartner, partnerAsProduct, pastaAlternative, productUrl } from "../../src/partner";
 import { Linking } from "react-native";
+import { money } from "../../src/money";
 
 const n = (x: number) => x.toLocaleString(undefined, { maximumFractionDigits: 1 });
 
@@ -96,13 +97,13 @@ export default function ProductScreen() {
             <Card style={{ borderColor: t.accent, borderWidth: 2 }}>
               <Text style={{ color: t.ink, fontSize: 18 * k, fontWeight: "800" }}>🇮🇹 {s.partner_mine}</Text>
               <Text style={{ color: t.ink, fontSize: 16 * k, lineHeight: 23 * k }}>{s.partner_gi(mine.gi)}</Text>
-              <Button title={`${s.partner_order} · ${mine.price.toFixed(2).replace(".", ",")} lei`} onPress={() => Linking.openURL(productUrl(mine))} />
+              <Button title={`${s.partner_order} · ${money(mine.price)}`} onPress={() => Linking.openURL(productUrl(mine))} />
             </Card>);
           if (alt) return (
             <Card style={{ borderColor: t.ok, borderWidth: 2 }}>
               <Text style={{ color: t.ink, fontSize: 18 * k, fontWeight: "800" }}>✅ {s.partner_alt_title}</Text>
               <Text style={{ color: t.ink, fontSize: 16 * k, lineHeight: 23 * k }}>{alt.name}. {s.partner_gi(alt.gi)} {s.partner_alt_text}</Text>
-              <Button title={`${s.partner_order} · ${alt.price.toFixed(2).replace(".", ",")} lei`} onPress={() => Linking.openURL(productUrl(alt))} />
+              <Button title={`${s.partner_order} · ${money(alt.price)}`} onPress={() => Linking.openURL(productUrl(alt))} />
             </Card>);
           return null; })()}
         {v.level === "red"

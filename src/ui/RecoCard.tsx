@@ -4,6 +4,7 @@ import { markShown, pickReco, snooze, type Placement } from "../recommend";
 import { useStore } from "../store";
 import { useTheme } from "../theme";
 import { Button, useScale } from "./Primitives";
+import { money } from "../money";
 
 /** Un card discret „De la Diabetoline”, cu poză, o propoziție și două butoane: vezi / nu acum. */
 export function RecoCard({ placement }: { placement: Placement }) {
@@ -19,7 +20,7 @@ export function RecoCard({ placement }: { placement: Placement }) {
         {reco.image ? <Image source={{ uri: reco.image }} style={{ width: 64, height: 64, borderRadius: 12, backgroundColor: t.bg }} /> : null}
         <View style={{ flex: 1, gap: 3 }}>
           <Text style={{ color: t.ink, fontSize: 16 * k, lineHeight: 23 * k }}>{s[reco.textKey]}</Text>
-          <Text style={{ color: t.ink, fontSize: 15 * k, fontWeight: "700" }}>{reco.name} · {reco.price.toFixed(2).replace(".", ",")} lei</Text>
+          <Text style={{ color: t.ink, fontSize: 15 * k, fontWeight: "700" }}>{reco.name} · {money(reco.price)}</Text>
         </View>
       </Pressable>
       <View style={{ flexDirection: "row", gap: 8 }}>
