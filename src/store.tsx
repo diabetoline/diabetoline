@@ -5,6 +5,8 @@ import type { PlateAnalysis } from "./engine/plate";
 import type { RecoState } from "./recommend";
 import { deviceLang, strings, type Lang, type Strings } from "./i18n";
 import { pushDeletes, pushEntries, syncList } from "./family/sync";
+import { planReminders, type Plan, type RemindPrefs } from "./reminders";
+import { AppState } from "react-native";
 import { sendNewAlerts } from "./family/alerts";
 
 export interface HistItem { code: string; name: string; level: Level; t: number }
@@ -37,6 +39,8 @@ export interface State {
   /** ziua (YYYY-MM-DD) în care a răspuns „nu încă” la întrebarea de seară, ca să nu-l mai întrebăm azi */
   moveAskedDay?: string; moveNotifId?: string;
   reco?: RecoState;
+  /** reamintiri blânde: care sunt pornite și ce am programat (src/reminders.ts) */
+  remind?: Partial<RemindPrefs>; plan?: Plan;
   /** notări șterse local, de șters și de pe server la următoarea sincronizare (client_id) */
   trash?: string[];
   cache: Record<string, Product>;
@@ -73,6 +77,16 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     AsyncStorage.getItem(KEY).then((raw) => { if (raw) { const saved = JSON.parse(raw); setS({ ...initial, ...saved, lang: saved.langManual ? saved.lang : deviceLang() }); } }).catch(() => {}).finally(() => setReady(true));
   }, []);
   useEffect(() => { if (ready) AsyncStorage.setItem(KEY, JSON.stringify(s)).catch(() => {}); }, [s, ready]);
+  // reamintirile se replanifică la deschidere și după fiecare notare (cu o mică întârziere, ca să nu le facem de 10 ori)
+  const planKey = JSON.stringify([s.glucose.length, s.walks?.length, s.medLog.length, s.meds, s.moveAskedDay, s.remind]);
+  useEffect(() => {
+    if (!ready || !s.welcomed) return;
+    let alive = true;
+    const run = () => planReminders(s, strings(s.lang)).then((plan) => { if (alive) setS((p) => ({ ...p, plan })); }).catch(() => {});
+    const h = setTimeout(run, 2500);
+    const sub = AppState.addEventListener("change", (st) => { if (st === "active") run(); });
+    return () => { alive = false; clearTimeout(h); sub.remove(); };
+  }, [ready, s.welcomed, planKey, s.lang]);
   // părintele cu consimțământ: jurnalul pleacă pe server la câteva secunde după o modificare
   useEffect(() => {
     if (!ready || s.family.role !== "parent" || !s.family.consent) return;

@@ -5,6 +5,7 @@ type Verd = { carbs: number; sugars: number; fiber: number; gl: number | null };
 type Dict = Record<string, any>;
 
 const ro = {
+  rem_glu_title: "Glicemia de azi", rem_glu_body: "Ai măsurat? O apăsare și e notată.", rem_glu_body2: "De două zile nu e nimic notat. O măsurare acum ar prinde bine.", rem_med_title: "Reamintire", rem_med_body: (n: string) => `${n}: ai luat? Apasă „Am luat” când e gata.`, rem_title: "Reamintiri", rem_glu: "Glicemia (dimineața, dacă n-ai notat)", rem_move: "Mișcarea (seara, dacă n-ai bifat)", rem_med: "Medicamentele (la o oră după, dacă n-ai apăsat „Am luat”)", rem_hint: "Cel mult două pe zi. Dacă le ignori, le rărim singuri.",
   ideas_missing: "Lipsește", ideas_missing_add: "Pune lipsurile pe listă",
   fam_list_hint: (n: string) => `Ce pui aici apare pe telefonul lui ${n}, la magazin.`,
   list_title: "Lista de cumpărături", list_sub: "Ce iei data viitoare de la magazin", list_add: "Pune pe listă", list_added: "Pe listă", list_placeholder: "Scrie ce mai trebuie…", list_empty: "Lista e goală. Pune pe ea produsele verzi pe care le scanezi, sau scrie-le aici.", list_done_clear: "Șterge ce ai bifat", list_from_child: "pus de", list_count: (n: number) => n === 1 ? "1 produs" : `${n} produse`, list_to_buy: "De cumpărat", list_bought: "Cumpărate",
@@ -143,6 +144,7 @@ const ro = {
 };
 
 const en: typeof ro = {
+  rem_glu_title: "Today's glucose", rem_glu_body: "Did you measure? One tap and it's logged.", rem_glu_body2: "Nothing logged for two days. A reading now would help.", rem_med_title: "Reminder", rem_med_body: (n: string) => `${n}: taken? Tap “Taken” when done.`, rem_title: "Reminders", rem_glu: "Glucose (morning, if not logged)", rem_move: "Movement (evening, if not ticked)", rem_med: "Medication (an hour after, if not marked taken)", rem_hint: "At most two a day. If you ignore them, we space them out.",
   ideas_missing: "Missing", ideas_missing_add: "Put the missing ones on the list",
   fam_list_hint: (n: string) => `What you add here shows up on ${n}'s phone at the shop.`,
   list_title: "Shopping list", list_sub: "What to buy next time at the shop", list_add: "Put on the list", list_added: "On the list", list_placeholder: "Write what else you need…", list_empty: "The list is empty. Add the green products you scan, or write them here.", list_done_clear: "Clear ticked items", list_from_child: "added by", list_count: (n: number) => n === 1 ? "1 item" : `${n} items`, list_to_buy: "To buy", list_bought: "Bought",
@@ -271,6 +273,7 @@ const en: typeof ro = {
 };
 
 const de: typeof ro = {
+  rem_glu_title: "Blutzucker heute", rem_glu_body: "Schon gemessen? Ein Tipp und es ist notiert.", rem_glu_body2: "Seit zwei Tagen nichts eingetragen. Eine Messung jetzt täte gut.", rem_med_title: "Erinnerung", rem_med_body: (n: string) => `${n}: genommen? Tippe auf „Genommen“, wenn erledigt.`, rem_title: "Erinnerungen", rem_glu: "Blutzucker (morgens, falls nicht notiert)", rem_move: "Bewegung (abends, falls nicht abgehakt)", rem_med: "Medikamente (eine Stunde danach, falls nicht bestätigt)", rem_hint: "Höchstens zwei am Tag. Wenn du sie ignorierst, werden sie seltener.",
   ideas_missing: "Fehlt", ideas_missing_add: "Fehlendes auf die Liste",
   fam_list_hint: (n: string) => `Was du hier einträgst, erscheint auf dem Handy von ${n} beim Einkaufen.`,
   list_title: "Einkaufsliste", list_sub: "Was du beim nächsten Einkauf mitnimmst", list_add: "Auf die Liste", list_added: "Auf der Liste", list_placeholder: "Schreib, was noch fehlt…", list_empty: "Die Liste ist leer. Setz die grünen Produkte darauf, die du scannst, oder schreib sie hier.", list_done_clear: "Abgehakte löschen", list_from_child: "hinzugefügt von", list_count: (n: number) => n === 1 ? "1 Artikel" : `${n} Artikel`, list_to_buy: "Zu kaufen", list_bought: "Gekauft",

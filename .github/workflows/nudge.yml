@@ -1,0 +1,11 @@
+name: Alerte de inactivitate (zilnic)
+# O dată pe zi, serverul verifică părinții cu cont de familie și trimite copilului o alertă dacă părintele n-a mai notat nimic.
+on:
+  schedule:
+    - cron: "0 17 * * *"   # 19:00 ora României (iarna)
+  workflow_dispatch:
+jobs:
+  nudge:
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -sS -X POST https://curalife.expo.app/api/nudge

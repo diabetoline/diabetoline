@@ -1,7 +1,7 @@
+import * as Notifications from "expo-notifications";
 import { useEffect, useState } from "react";
 import { Text, TextInput, View } from "react-native";
 import { dayKeyLocal } from "../engine/days";
-import { scheduleMoveQuestion } from "../notifications";
 import { useStore } from "../store";
 import { useTheme } from "../theme";
 import { Icon } from "./Icon";
@@ -53,8 +53,8 @@ export function MoveCheckin() {
   const hour = new Date().getHours();
   const [done, setDone] = useState<"yes" | "no" | null>(null);
   const walkedToday = (state.walks ?? []).some((w) => dayKeyLocal(w.t) === today);
-  // notificarea zilnică se programează o singură dată
-  useEffect(() => { if (!state.moveNotifId) scheduleMoveQuestion(s).then((id) => { if (id) set({ moveNotifId: id }); }).catch(() => {}); }, []);
+  // vechea notificare zilnică fixă (înlocuită de src/reminders.ts) se anulează o singură dată
+  useEffect(() => { if (state.moveNotifId) { Notifications.cancelScheduledNotificationAsync(state.moveNotifId).catch(() => {}); set({ moveNotifId: undefined }); } }, []);
   if (hour < 17 || walkedToday || state.moveAskedDay === today) return null;
   if (done === "yes") return (
     <Card style={{ borderColor: t.ok, borderWidth: 2 }}>

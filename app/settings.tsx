@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useStore } from "../src/store";
 import type { Lang } from "../src/i18n";
 import { useTheme } from "../src/theme";
-import { Button, Card, Label, Title, useScale } from "../src/ui/Primitives";
+import { Button, Card, Hint, Label, Title, useScale } from "../src/ui/Primitives";
 
 export default function Settings() {
   const t = useTheme(); const k = useScale();
@@ -50,6 +50,16 @@ export default function Settings() {
           <Text style={{ color: t.ink, fontSize: 18 * k }}>{s.big_text}</Text>
           <Switch value={state.bigText} onValueChange={(v) => set({ bigText: v })} trackColor={{ true: t.ok }} />
         </View>
+      </Card>
+      <Card>
+        <Label>{s.rem_title}</Label>
+        {([["glucose", s.rem_glu], ["move", s.rem_move], ["medFollow", s.rem_med]] as const).map(([key, label]) => (
+          <View key={key} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+            <Text style={{ flex: 1, color: t.ink, fontSize: 17 * k }}>{label}</Text>
+            <Switch value={state.remind?.[key] ?? true} onValueChange={(v) => set({ remind: { ...(state.remind ?? {}), [key]: v } })} trackColor={{ true: t.ok }} />
+          </View>
+        ))}
+        <Hint>{s.rem_hint}</Hint>
       </Card>
       <Card>
         <Label>{s.upd_version}</Label>
