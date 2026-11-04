@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { ctxForHour, useStore, type GluCtx } from "../../src/store";
 import { useTheme } from "../../src/theme";
@@ -12,7 +13,7 @@ const CTX: GluCtx[] = ["fasting", "pre", "post2h", "evening", "other"];
 
 export default function NewGlucose() {
   const { after } = useLocalSearchParams<{ after?: string }>();
-  const t = useTheme(); const k = useScale(); const router = useRouter();
+  const t = useTheme(); const k = useScale(); const router = useRouter(); const ins = useSafeAreaInsets();
   const { t: s, s: state, addGlucose } = useStore();
   const [val, setVal] = useState("");
   const [saved, setSaved] = useState<{ v: number; ctx: GluCtx } | null>(null);
@@ -44,14 +45,16 @@ export default function NewGlucose() {
       </ScrollView>
     );
   }
+  // Butonul de salvare stă într-o bară fixă jos, deasupra tastaturii, ca să fie mereu la vedere.
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
+    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: t.bg }} behavior={Platform.OS === "ios" ? "padding" : undefined} keyboardVerticalOffset={Platform.OS === "ios" ? 96 : 0}>
+    <ScrollView contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 24 }} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" style={{ flex: 1 }}>
       <Stack.Screen options={{ title: s.glu_add }} />
       <Title>{s.glu_add}</Title>
       {after ? <Hint>{after}</Hint> : null}
       <Card>
         <Label>{s.glu_value} ({unitLbl})</Label>
-        <TextInput value={val} onChangeText={setVal} keyboardType="decimal-pad" autoFocus placeholder={state.unit === "mg" ? "120" : "6,7"} placeholderTextColor={t.muted} accessibilityLabel={s.glu_value}
+        <TextInput value={val} onChangeText={setVal} keyboardType="decimal-pad" autoFocus returnKeyType="done" onSubmitEditing={() => Keyboard.dismiss()} placeholder={state.unit === "mg" ? "120" : "6,7"} placeholderTextColor={t.muted} accessibilityLabel={s.glu_value}
           style={{ borderWidth: 2, borderColor: valid ? t.ok : t.line, borderRadius: 14, padding: 16, fontSize: 40 * k, fontWeight: "800", color: t.ink, textAlign: "center", backgroundColor: t.bg, fontVariant: ["tabular-nums"] }} />
         <Label>{s.glu_when}</Label>
         <View style={{ gap: 8 }}>
@@ -62,9 +65,12 @@ export default function NewGlucose() {
             </Pressable>
           ))}
         </View>
-        <Button title={s.save.split(" ")[0]} size="xl" onPress={save} disabled={!valid} />
       </Card>
       <Hint>{s.glu_hint}</Hint>
     </ScrollView>
+    <View style={{ padding: 16, paddingBottom: Math.max(ins.bottom, 12), backgroundColor: t.surface, borderTopWidth: 1, borderTopColor: t.line }}>
+      <Button title={s.save.split(" ")[0]} size="xl" onPress={() => { Keyboard.dismiss(); save(); }} disabled={!valid} />
+    </View>
+    </KeyboardAvoidingView>
   );
 }

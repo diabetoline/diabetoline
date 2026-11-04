@@ -107,7 +107,7 @@ export default function AddProduct() {
         style={{ borderWidth: 1, borderColor: t.line, borderRadius: 10, padding: 12, fontSize: 18, color: t.ink, backgroundColor: t.bg }} /></View>
   );
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
+    <ScrollView contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 40 }} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
       <Stack.Screen options={{ title: s.add_title, headerShown: true }} />
       <Card>
         <Text style={{ color: t.ink, fontWeight: "800", fontSize: 20 }}>{s.label_check}</Text>

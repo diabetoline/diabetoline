@@ -37,7 +37,7 @@ export default function ShoppingList() {
   );
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
+    <ScrollView contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 40 }} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
       <Stack.Screen options={{ title: s.list_title }} />
       <Title>🛒 {s.list_title}</Title>
       <Hint>{s.list_sub}</Hint>

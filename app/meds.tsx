@@ -26,7 +26,7 @@ export default function Meds() {
   const remove = async (med: Med) => { await cancelMed(med); set({ meds: state.meds.filter((m) => m.id !== med.id) }); };
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
+    <ScrollView contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 40 }} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
       <Stack.Screen options={{ title: s.meds }} />
       <Title>{s.meds}</Title>
       <Hint>{s.meds_sub}</Hint>

@@ -77,7 +77,7 @@ export default function ParentJournal() {
   for (const r of rows ?? []) { const d = r.t.slice(0, 10); if (!days.has(d)) days.set(d, []); days.get(d)!.push(r); }
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
+    <ScrollView contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 40 }} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
       <Stack.Screen options={{ title: parent.name }} />
       <Title>{s.fam_parent_of(parent.name)}</Title>
       {rows == null && !err && <ActivityIndicator color={t.accent} size="large" />}
