@@ -1,5 +1,5 @@
 import { supabase, ensureUser } from "./client";
-import type { State } from "../store";
+import type { ListItem, State } from "../store";
 
 /**
  * Urcă jurnalul părintelui pe server, ca să-l vadă copilul. Doar când legătura e activă și părintele a acceptat.
@@ -90,4 +90,49 @@ export async function deleteServerData() {
   const { error } = await supabase().rpc("delete_me");
   if (error) throw error;
   await supabase().auth.signOut();
+}
+
+/* ---------- Lista de cumpărături (părinte ↔ copil) ---------- */
+export type ShopRow = { client_id: string; name: string; code: string | null; level: "green" | "yellow" | "red" | null; done: boolean; added_by: "parent" | "child"; updated_at: string };
+
+/**
+ * Părintele: urcă lista lui, șterge ce a scos și ia înapoi ce a pus copilul.
+ * Întoarce lista îmbinată: rândurile de pe server mai noi (puse sau bifate de copil) câștigă.
+ */
+export async function syncList(local: ListItem[], trash: string[]): Promise<ListItem[]> {
+  const uid = await ensureUser();
+  const db = supabase();
+  const gone = trash.filter((x) => x.startsWith("l")).map((x) => x.slice(1));
+  if (gone.length) { const { error } = await db.from("shopping").delete().eq("parent_id", uid).in("client_id", gone); if (error) throw error; }
+  const { data, error } = await db.from("shopping").select("client_id,name,code,level,done,added_by,updated_at").eq("parent_id", uid);
+  if (error) throw error;
+  const server = new Map((data as ShopRow[] ?? []).map((r) => [r.client_id, r]));
+  const merged: ListItem[] = local.map((it) => {
+    const r = server.get(it.id);
+    if (r && new Date(r.updated_at).getTime() > it.t) return { ...it, done: r.done, t: new Date(r.updated_at).getTime() };
+    return it;
+  });
+  for (const r of server.values()) if (!local.some((it) => it.id === r.client_id) && !gone.includes(r.client_id))
+    merged.push({ id: r.client_id, name: r.name, code: r.code ?? undefined, level: r.level ?? undefined, done: r.done, t: new Date(r.updated_at).getTime(), by: r.added_by === "child" ? "child" : "me" });
+  const rows = merged.map((it) => ({ parent_id: uid, client_id: it.id, name: it.name, code: it.code ?? null, level: it.level ?? null, done: it.done, added_by: it.by === "child" ? "child" : "parent", updated_at: new Date(it.t).toISOString() }));
+  if (rows.length) { const { error: e2 } = await db.from("shopping").upsert(rows, { onConflict: "parent_id,client_id" }); if (e2) throw e2; }
+  return merged.sort((a, b) => b.t - a.t);
+}
+
+/** Copilul: lista părintelui. */
+export async function fetchParentList(parentId: string): Promise<ShopRow[]> {
+  await ensureUser();
+  const { data, error } = await supabase().from("shopping").select("client_id,name,code,level,done,added_by,updated_at").eq("parent_id", parentId).order("updated_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as ShopRow[];
+}
+/** Copilul pune ceva pe lista părintelui. */
+export async function addToParentList(parentId: string, name: string) {
+  const { error } = await supabase().from("shopping").insert({ parent_id: parentId, client_id: "c" + Date.now(), name: name.slice(0, 80), added_by: "child" });
+  if (error) throw error;
+}
+/** Copilul bifează / debifează. */
+export async function tickParentList(parentId: string, clientId: string, done: boolean) {
+  const { error } = await supabase().from("shopping").update({ done, updated_at: new Date().toISOString() }).eq("parent_id", parentId).eq("client_id", clientId);
+  if (error) throw error;
 }

@@ -4,7 +4,7 @@ import type { Product, Verdict, Level } from "./engine/types";
 import type { PlateAnalysis } from "./engine/plate";
 import type { RecoState } from "./recommend";
 import { deviceLang, strings, type Lang, type Strings } from "./i18n";
-import { pushDeletes, pushEntries } from "./family/sync";
+import { pushDeletes, pushEntries, syncList } from "./family/sync";
 import { sendNewAlerts } from "./family/alerts";
 
 export interface HistItem { code: string; name: string; level: Level; t: number }
@@ -14,6 +14,8 @@ export interface MealEntry { id: string; t: number; photoUri?: string; code?: st
 export interface Med { id: string; name: string; times: string[]; notifIds?: string[] }
 export interface Walk { id: string; t: number; min: number }
 export interface Weight { id: string; t: number; kg: number }
+/** Un rând de pe lista de cumpărături. `code`/`level` vin de la produsele scanate; `by` spune cine l-a pus (părintele sau copilul, prin contul de familie). */
+export interface ListItem { id: string; name: string; code?: string; level?: Level; done: boolean; t: number; by?: "me" | "child" | "parent" }
 /** Contul de familie: rolul pe acest telefon și legăturile. */
 export interface Family {
   role: "parent" | "child" | null;
@@ -31,7 +33,7 @@ export interface MedLog { id: string; medId: string; time: string; day: string; 
 
 export interface State {
   lang: Lang; langManual?: boolean; humor: boolean; welcomed?: boolean; unit: "mg" | "mmol"; name: string; bigText: boolean;
-  history: HistItem[]; glucose: GluEntry[]; meals: MealEntry[]; meds: Med[]; medLog: MedLog[]; walks: Walk[]; weights: Weight[]; family: Family;
+  history: HistItem[]; glucose: GluEntry[]; meals: MealEntry[]; meds: Med[]; medLog: MedLog[]; walks: Walk[]; weights: Weight[]; list: ListItem[]; family: Family;
   /** ziua (YYYY-MM-DD) în care a răspuns „nu încă” la întrebarea de seară, ca să nu-l mai întrebăm azi */
   moveAskedDay?: string; moveNotifId?: string;
   reco?: RecoState;
@@ -39,7 +41,7 @@ export interface State {
   trash?: string[];
   cache: Record<string, Product>;
 }
-const initial: State = { lang: deviceLang(), humor: true, unit: "mg", name: "", bigText: false, history: [], glucose: [], meals: [], meds: [], medLog: [], walks: [], weights: [], family: { role: null, consent: false, children: [] }, cache: {} };
+const initial: State = { lang: deviceLang(), humor: true, unit: "mg", name: "", bigText: false, history: [], glucose: [], meals: [], meds: [], medLog: [], walks: [], weights: [], list: [], family: { role: null, consent: false, children: [] }, cache: {} };
 const KEY = "dscan.state.v2";
 
 interface Ctx {
@@ -53,6 +55,10 @@ interface Ctx {
   addWalk: (min: number) => void;
   addWeight: (kg: number) => void;
   /** Șterge o notare din jurnal (și de pe server, la următoarea sincronizare). */
+  /** Lista de cumpărături: pune, bifează, scoate. */
+  addToList: (it: Omit<ListItem, "id" | "t" | "done"> & { id?: string }) => void;
+  toggleList: (id: string) => void;
+  removeFromList: (id: string) => void;
   removeEntry: (kind: "glucose" | "meal" | "walk" | "weight" | "med", id: string) => void;
 }
 const C = createContext<Ctx | null>(null);
@@ -72,15 +78,17 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     if (!ready || s.family.role !== "parent" || !s.family.consent) return;
     const h = setTimeout(() => {
       pushEntries(s).then(async () => {
-        const gone = await pushDeletes(s.trash ?? []);
-        if (gone.length) setS((p) => ({ ...p, trash: (p.trash ?? []).filter((id) => !gone.includes(id)) }));
+        const gone = await pushDeletes((s.trash ?? []).filter((id) => !id.startsWith("l")));
+        const list = await syncList(s.list ?? [], s.trash ?? []);
+        // scriem doar dacă s-a schimbat ceva, altfel efectul s-ar relua la nesfârșit
+        setS((p) => (JSON.stringify(list) === JSON.stringify(p.list ?? []) && !(p.trash ?? []).length ? p : { ...p, list, trash: [] }));
         const since = s.family.lastAlert ?? Date.now() - 3600e3;   // la prima activare nu retrimitem istoricul
         const last = s.family.children.length ? await sendNewAlerts(s, since) : since;
         setS((p) => ({ ...p, family: { ...p.family, lastSync: Date.now(), lastAlert: last } }));
       }).catch(() => {});
     }, 4000);
     return () => clearTimeout(h);
-  }, [ready, s.glucose, s.meals, s.medLog, s.walks, s.weights, s.history, s.trash, s.family.role, s.family.consent]);
+  }, [ready, s.glucose, s.meals, s.medLog, s.walks, s.weights, s.history, s.trash, s.list, s.family.role, s.family.consent]);
 
   const api = useMemo<Ctx>(() => ({
     s, t: strings(s.lang),
@@ -94,6 +102,15 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     addMeal: (m) => { const id = String(Date.now()); setS((prev) => ({ ...prev, meals: [...prev.meals, { ...m, id, t: m.t ?? Date.now() }] })); return id; },
     addWeight: (kg) => setS((prev) => ({ ...prev, weights: [...(prev.weights ?? []), { id: String(Date.now()), t: Date.now(), kg }] })),
     addWalk: (min) => setS((prev) => ({ ...prev, walks: [...(prev.walks ?? []), { id: String(Date.now()), t: Date.now(), min }] })),
+    addToList: (it) => setS((prev) => {
+      const list = prev.list ?? [];
+      // același produs scanat nu intră de două ori; dacă era bifat, îl readucem pe listă
+      const dup = it.code ? list.find((x) => x.code === it.code) : list.find((x) => x.name.trim().toLowerCase() === it.name.trim().toLowerCase());
+      if (dup) return { ...prev, list: list.map((x) => (x.id === dup.id ? { ...x, done: false, t: Date.now() } : x)) };
+      return { ...prev, list: [{ ...it, id: it.id ?? `${Date.now()}${Math.floor(Math.random() * 1e4)}`, done: false, t: Date.now() }, ...list] };
+    }),
+    toggleList: (id) => setS((prev) => ({ ...prev, list: (prev.list ?? []).map((x) => (x.id === id ? { ...x, done: !x.done, t: Date.now() } : x)) })),
+    removeFromList: (id) => setS((prev) => ({ ...prev, list: (prev.list ?? []).filter((x) => x.id !== id), trash: [...(prev.trash ?? []), "l" + id] })),
     removeEntry: (kind, id) => setS((prev) => {
       const prefix = { glucose: "g", meal: "m", walk: "w", weight: "k", med: "d" }[kind];
       const trash = [...(prev.trash ?? []), prefix + id];

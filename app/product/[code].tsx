@@ -24,11 +24,12 @@ export default function ProductScreen() {
   const { code } = useLocalSearchParams<{ code: string }>();
   const t = useTheme(); const k = useScale();
   const router = useRouter();
-  const { t: s, s: state, recordScan, addMeal } = useStore();
+  const { t: s, s: state, recordScan, addMeal, addToList, removeFromList } = useStore();
   const [p, setP] = useState<Product | null>(state.cache[code] ?? null);
   const [err, setErr] = useState<"notfound" | "network" | null>(null);
   const [v, setV] = useState<Verdict | null>(p ? analyze(p) : null);
   const [ate, setAte] = useState(false);
+  const onList = (state.list ?? []).find((x) => x.code === code && !x.done);
 
   useEffect(() => {
     let alive = true;
@@ -109,6 +110,9 @@ export default function ProductScreen() {
       <View style={{ padding: 16, gap: 12 }}>
         <Button title={ate ? "✓ " + s.ate_this : s.ate_this} kind="soft" size="xl" disabled={ate} onPress={() => { addMeal({ code: p.code, name: p.name, level: v.level, slot: slotForHour(new Date().getHours()) }); setAte(true); }} />
         {ate && v.level !== "green" && <AfterMeal level={v.level} walkMinutes={v.walkMinutes} />}
+        {v.level !== "red" && (
+          <Button title={onList ? "✓ " + s.list_added : "🛒 " + s.list_add} kind={onList ? "ghost" : "soft"} onPress={() => (onList ? removeFromList(onList.id) : addToList({ name: p.name, code: p.code, level: v.level, by: "me" }))} />
+        )}
         <View style={{ flexDirection: "row", gap: 10 }}>
           <View style={{ flex: 1 }}><Button title={s.log_after} kind="ghost" onPress={() => router.push({ pathname: "/glucose/new", params: { after: p.name } })} /></View>
           <View style={{ flex: 1 }}><Button title={s.scan_again} kind="ghost" onPress={() => router.replace("/scan")} /></View>

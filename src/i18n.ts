@@ -5,6 +5,9 @@ type Verd = { carbs: number; sugars: number; fiber: number; gl: number | null };
 type Dict = Record<string, any>;
 
 const ro = {
+  ideas_missing: "Lipsește", ideas_missing_add: "Pune lipsurile pe listă",
+  fam_list_hint: (n: string) => `Ce pui aici apare pe telefonul lui ${n}, la magazin.`,
+  list_title: "Lista de cumpărături", list_sub: "Ce iei data viitoare de la magazin", list_add: "Pune pe listă", list_added: "Pe listă", list_placeholder: "Scrie ce mai trebuie…", list_empty: "Lista e goală. Pune pe ea produsele verzi pe care le scanezi, sau scrie-le aici.", list_done_clear: "Șterge ce ai bifat", list_from_child: "pus de", list_count: (n: number) => n === 1 ? "1 produs" : `${n} produse`, list_to_buy: "De cumpărat", list_bought: "Cumpărate",
   meal_ate: "Am mâncat asta", meal_looking: "Doar mă uitam, nu nota", meal_removed: "Nu am notat nimic.", del_q: "Ștergi această notare?", del_sub: "Dispare din jurnal și din raportul pentru medic.", cancel: "Renunță",
   other_food_note: "Produs din gama cu indice glicemic scăzut, distribuit de Diabetoline.", other_food_hint: "Valorile nutriționale pentru acest produs vor fi adăugate în curând; până atunci, verifică eticheta.",
   fam_push_info: "Primești o notificare când părintele are o glicemie în afara intervalului sau o masă grea.", fam_push_btn: "Reactivează notificările", fam_push_ok: "Notificările sunt active.", fam_push_off: "Notificările nu sunt permise. Activează-le din Setările telefonului.",
@@ -140,6 +143,9 @@ const ro = {
 };
 
 const en: typeof ro = {
+  ideas_missing: "Missing", ideas_missing_add: "Put the missing ones on the list",
+  fam_list_hint: (n: string) => `What you add here shows up on ${n}'s phone at the shop.`,
+  list_title: "Shopping list", list_sub: "What to buy next time at the shop", list_add: "Put on the list", list_added: "On the list", list_placeholder: "Write what else you need…", list_empty: "The list is empty. Add the green products you scan, or write them here.", list_done_clear: "Clear ticked items", list_from_child: "added by", list_count: (n: number) => n === 1 ? "1 item" : `${n} items`, list_to_buy: "To buy", list_bought: "Bought",
   meal_ate: "I ate this", meal_looking: "Just looking, don't log it", meal_removed: "Nothing was logged.", del_q: "Delete this entry?", del_sub: "It disappears from the journal and the doctor report.", cancel: "Cancel",
   other_food_note: "Low glycemic index product, distributed by Diabetoline.", other_food_hint: "Nutrition values for this product are coming soon; until then, check the label.",
   fam_push_info: "You get a notification when your parent has a glucose reading out of range or a heavy meal.", fam_push_btn: "Re-enable notifications", fam_push_ok: "Notifications are on.", fam_push_off: "Notifications aren't allowed. Enable them in your phone's Settings.",
@@ -265,6 +271,9 @@ const en: typeof ro = {
 };
 
 const de: typeof ro = {
+  ideas_missing: "Fehlt", ideas_missing_add: "Fehlendes auf die Liste",
+  fam_list_hint: (n: string) => `Was du hier einträgst, erscheint auf dem Handy von ${n} beim Einkaufen.`,
+  list_title: "Einkaufsliste", list_sub: "Was du beim nächsten Einkauf mitnimmst", list_add: "Auf die Liste", list_added: "Auf der Liste", list_placeholder: "Schreib, was noch fehlt…", list_empty: "Die Liste ist leer. Setz die grünen Produkte darauf, die du scannst, oder schreib sie hier.", list_done_clear: "Abgehakte löschen", list_from_child: "hinzugefügt von", list_count: (n: number) => n === 1 ? "1 Artikel" : `${n} Artikel`, list_to_buy: "Zu kaufen", list_bought: "Gekauft",
   meal_ate: "Das habe ich gegessen", meal_looking: "Nur geschaut, nicht eintragen", meal_removed: "Nichts eingetragen.", del_q: "Diesen Eintrag löschen?", del_sub: "Er verschwindet aus dem Tagebuch und dem Arztbericht.", cancel: "Abbrechen",
   other_food_note: "Produkt aus der Linie mit niedrigem glykämischen Index, vertrieben von Diabetoline.", other_food_hint: "Die Nährwerte für dieses Produkt folgen bald; bis dahin das Etikett prüfen.",
   fam_push_info: "Du bekommst eine Mitteilung, wenn dein Elternteil einen Blutzuckerwert außerhalb des Bereichs oder eine schwere Mahlzeit hat.", fam_push_btn: "Mitteilungen erneut aktivieren", fam_push_ok: "Mitteilungen sind aktiv.", fam_push_off: "Mitteilungen sind nicht erlaubt. Aktiviere sie in den Einstellungen des Telefons.",

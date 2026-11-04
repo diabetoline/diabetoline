@@ -12,7 +12,8 @@ import { RecoCard } from "../src/ui/RecoCard";
 export default function Ideas() {
   const t = useTheme(); const k = useScale(); const router = useRouter();
   const { focus, lighter } = useLocalSearchParams<{ focus?: string; lighter?: string }>();
-  const { t: s, s: state, addMeal } = useStore();
+  const { t: s, s: state, addMeal, addToList } = useStore();
+  const [listed, setListed] = useState<number | null>(null);
   const slot = slotForHour(new Date().getHours());
   const [ideas, setIdeas] = useState<Idea[] | null>(null);
   const [err, setErr] = useState("");
@@ -24,11 +25,12 @@ export default function Ideas() {
     setIdeas(null); setErr(""); setOpen(0); setAte(null); setLoading(true);
     const products = state.history.slice(0, 40).map((h) => ({ name: h.name, level: h.level }));
     const recentMeals = state.meals.slice(-8).map((m) => m.name).filter((x): x is string => !!x);
-    const r = await fetchIdeas({ lang: state.lang, slot, products, recentMeals, focus: focus || undefined, lighter: lighter === "1" });
+    const list = (state.list ?? []).filter((x) => !x.done).map((x) => x.name);
+    const r = await fetchIdeas({ lang: state.lang, slot, products, recentMeals, focus: focus || undefined, lighter: lighter === "1", list });
     setLoading(false);
     if (r.ok) setIdeas(r.ideas); else setErr(r.error === "not_configured" ? s.ideas_off : s.ideas_err);
   };
-  const noProducts = state.history.length === 0 && !focus;
+  const noProducts = state.history.length === 0 && !(state.list ?? []).length && !focus;
   useEffect(() => { if (!noProducts) load(); }, []);
 
   return (
@@ -63,6 +65,12 @@ export default function Ideas() {
               <Text style={{ color: t.ink, fontSize: 17 * k, lineHeight: 25 * k }}>{i.why}</Text>
               {i.uses.length > 0 && <Text style={{ color: t.ok, fontSize: 15 * k, fontWeight: "700" }}>✓ {s.ideas_uses} {i.uses.join(", ")}</Text>}
               <View><Label>{s.ideas_ingredients}</Label>{i.ingredients.map((x, j) => <Text key={j} style={{ color: t.ink, fontSize: 17 * k, lineHeight: 25 * k }}>• {x}</Text>)}</View>
+              {!!i.missing?.length && (
+                <View style={{ backgroundColor: t.accentSoft, borderRadius: 12, padding: 12, gap: 8 }}>
+                  <Text style={{ color: t.ink, fontSize: 16 * k }}>🛒 {s.ideas_missing}: <Text style={{ fontWeight: "700" }}>{i.missing.join(", ")}</Text></Text>
+                  <Button title={listed === n ? "✓ " + s.list_added : s.ideas_missing_add} kind={listed === n ? "ghost" : "soft"} size="sm" disabled={listed === n} onPress={() => { i.missing!.forEach((m) => addToList({ name: m, by: "me" })); setListed(n); }} />
+                </View>
+              )}
               <View><Label>{s.ideas_steps}</Label>{i.steps.map((x, j) => <Text key={j} style={{ color: t.ink, fontSize: 17 * k, lineHeight: 25 * k }}>{j + 1}. {x}</Text>)}</View>
               <Button title={ate === n ? "✓ " + s.ideas_ate : s.ideas_ate} kind="soft" disabled={ate === n} onPress={() => { addMeal({ name: i.title, slot, level: "green", carbs: i.carbs ?? undefined }); setAte(n); }} />
             </View>

@@ -13,6 +13,7 @@ export default function More() {
   const items: { icon: IconName; title: string; sub?: string; to?: string; url?: string }[] = [
     { icon: "pill", title: s.meds, sub: state.meds.length ? state.meds.map((m) => m.name).join(", ") : s.meds_sub, to: "/meds" },
     { icon: "family", title: s.family, sub: state.family.role === "child" && state.family.parent ? s.fam_parent_of(state.family.parent.name) : state.family.role === "parent" && state.family.children.length ? state.family.children.map((c) => c.name).join(", ") : s.fam_short, to: "/family" },
+    { icon: "cart", title: s.list_title, sub: (state.list ?? []).filter((x) => !x.done).length ? s.list_count((state.list ?? []).filter((x) => !x.done).length) : s.list_sub, to: "/list" },
     { icon: "report", title: s.report, sub: s.rep_short, to: "/report" },
     { icon: "care", title: s.care, sub: s.skin_sub, to: "/shop" },
     { icon: "settings", title: s.settings, to: "/settings" },

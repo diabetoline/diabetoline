@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { Stack } from "expo-router";
-import { fetchParentEntries, type Entry } from "../../src/family/sync";
+import { addToParentList, fetchParentEntries, fetchParentList, tickParentList, type Entry, type ShopRow } from "../../src/family/sync";
 import { gluClass } from "../../src/engine/days";
 import { useStore } from "../../src/store";
 import { levelColor, useTheme } from "../../src/theme";
@@ -24,6 +24,14 @@ export default function ParentJournal() {
     try { setRows(await fetchParentEntries(parent.parentId)); setErr(""); } catch (e) { setErr(s.fam_sync_err); }
   }, [parent?.parentId]);
   useEffect(() => { load(); }, [load]);
+
+  // lista de cumpărături a părintelui: copilul vede, bifează și pune produse
+  const [list, setList] = useState<ShopRow[]>([]);
+  const [newItem, setNewItem] = useState("");
+  const loadList = useCallback(async () => { if (parent) try { setList(await fetchParentList(parent.parentId)); } catch {} }, [parent?.parentId]);
+  useEffect(() => { loadList(); }, [loadList]);
+  const addItem = async () => { const n = newItem.trim(); if (!n || !parent) return; setNewItem(""); try { await addToParentList(parent.parentId, n); await loadList(); } catch { setErr(s.fam_sync_err); } };
+  const tick = async (r: ShopRow) => { if (!parent) return; setList((l) => l.map((x) => (x.client_id === r.client_id ? { ...x, done: !x.done } : x))); try { await tickParentList(parent.parentId, r.client_id, !r.done); } catch { loadList(); } };
 
   const [making, setMaking] = useState(false);
   /** Raportul pentru medic din jurnalul părintelui (intrările de pe server → același motor de raport). */
@@ -69,7 +77,7 @@ export default function ParentJournal() {
   for (const r of rows ?? []) { const d = r.t.slice(0, 10); if (!days.has(d)) days.set(d, []); days.get(d)!.push(r); }
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 40 }}>
+    <ScrollView contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
       <Stack.Screen options={{ title: parent.name }} />
       <Title>{s.fam_parent_of(parent.name)}</Title>
       {rows == null && !err && <ActivityIndicator color={t.accent} size="large" />}
@@ -81,6 +89,24 @@ export default function ParentJournal() {
           {alerts.length === 0 ? <Hint>{s.fam_quiet}</Hint> : alerts.slice(0, 6).map((a, i) => <Text key={i} style={{ color: t.ink, fontSize: 17 * k }}>⚠️ {a}</Text>)}
         </Card>
       )}
+
+      <Card>
+        <Label>🛒 {s.list_title}</Label>
+        <Hint>{s.fam_list_hint(parent.name)}</Hint>
+        <View style={{ flexDirection: "row", gap: 10 }}>
+          <TextInput value={newItem} onChangeText={setNewItem} onSubmitEditing={addItem} returnKeyType="done" placeholder={s.list_placeholder} placeholderTextColor={t.muted} accessibilityLabel={s.list_placeholder}
+            style={{ flex: 1, borderWidth: 1, borderColor: t.line, borderRadius: 14, padding: 12, fontSize: 17 * k, color: t.ink, backgroundColor: t.bg }} />
+          <Button title="+" disabled={!newItem.trim()} onPress={addItem} />
+        </View>
+        {list.filter((r) => !r.done).map((r) => (
+          <Pressable key={r.client_id} onPress={() => tick(r)} accessibilityRole="checkbox" accessibilityState={{ checked: r.done }} style={{ flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 6 }}>
+            <View style={{ width: 30, height: 30, borderRadius: 9, borderWidth: 2, borderColor: t.line, backgroundColor: t.bg }} />
+            {r.level && <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: levelColor(t, r.level).fg }} />}
+            <Text style={{ flex: 1, color: t.ink, fontSize: 17 * k }}>{r.name}{r.added_by === "child" ? <Text style={{ color: t.muted }}> · {s.fam_i_child.toLowerCase()}</Text> : null}</Text>
+          </Pressable>
+        ))}
+        {list.filter((r) => r.done).length > 0 && <Hint>✓ {s.list_bought}: {list.filter((r) => r.done).map((r) => r.name).join(", ")}</Hint>}
+      </Card>
 
       {rows && rows.length === 0 && <Hint>{s.fam_no_entries}</Hint>}
       {[...days.entries()].map(([d, list]) => (
@@ -100,7 +126,7 @@ export default function ParentJournal() {
         </Card>
       ))}
       {rows && rows.length > 0 && <Button title={making ? s.rep_making : "📄 " + s.rep_title} size="xl" disabled={making} onPress={makeReport} />}
-      <Button title={s.fam_refresh} kind="soft" onPress={() => { setRows(null); load(); }} />
+      <Button title={s.fam_refresh} kind="soft" onPress={() => { setRows(null); load(); loadList(); }} />
     </ScrollView>
   );
 }
