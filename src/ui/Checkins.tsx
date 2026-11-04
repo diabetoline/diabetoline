@@ -11,15 +11,29 @@ import { Quip } from "./Quip";
 const WEEK = 7 * 864e5;
 
 /** Greutatea: o dată pe săptămână, un card pe prima pagină. Dispare după ce notează sau amână (până a doua zi). */
-export function WeightCheckin() {
+export function WeightCheckin({ always }: { always?: boolean } = {}) {
   const t = useTheme(); const k = useScale();
   const { t: s, s: state, addWeight } = useStore();
   const [val, setVal] = useState("");
   const [later, setLater] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [open, setOpen] = useState(false);
   const last = state.weights?.[state.weights.length - 1];
   const due = !last || Date.now() - last.t > WEEK;
-  if (!due || later) return null;
+  // în Jurnal (always): un card mic, mereu prezent, cu ultima valoare și buton de notat oricând
+  if (always && !open && !saved) return (
+    <Card>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+        <Text style={{ fontSize: 26 }}>⚖️</Text>
+        <View style={{ flex: 1 }}>
+          <Text style={{ color: t.ink, fontSize: 18 * k, fontWeight: "800" }}>{s.wt_title}</Text>
+          <Hint>{last ? s.wt_last(last.kg, new Date(last.t).toLocaleDateString()) : s.wt_none}</Hint>
+        </View>
+        <Button title={s.wt_save_short} size="sm" kind="soft" onPress={() => setOpen(true)} />
+      </View>
+    </Card>
+  );
+  if (!always && (!due || later)) return null;
   const kg = parseFloat(val.replace(",", "."));
   const valid = Number.isFinite(kg) && kg >= 30 && kg <= 300;
   if (saved) return (
@@ -40,7 +54,7 @@ export function WeightCheckin() {
         <Text style={{ color: t.muted, fontSize: 22 * k, fontWeight: "700" }}>{s.wt_kg}</Text>
       </View>
       <Button title={s.wt_save} size="xl" disabled={!valid} onPress={() => { addWeight(Math.round(kg * 10) / 10); setSaved(true); }} />
-      <Button title={s.wt_later} kind="ghost" onPress={() => setLater(true)} />
+      <Button title={s.wt_later} kind="ghost" onPress={() => { setLater(true); setOpen(false); }} />
     </Card>
   );
 }

@@ -8,6 +8,7 @@ import { Button, Card, Hint, Label, Title, useScale } from "../../src/ui/Primiti
 import { DaysCalendar } from "../../src/ui/DaysCalendar";
 import { Quip } from "../../src/ui/Quip";
 import { Icon } from "../../src/ui/Icon";
+import { WeightCheckin } from "../../src/ui/Checkins";
 
 import type { GluEntry, MealEntry, MedLog, Walk, Weight } from "../../src/store";
 type Item = { t: number; kind: "glu"; data: GluEntry } | { t: number; kind: "meal"; data: MealEntry } | { t: number; kind: "med"; data: MedLog } | { t: number; kind: "walk"; data: Walk } | { t: number; kind: "weight"; data: Weight };
@@ -61,6 +62,7 @@ export default function Journal() {
         )}
 
         {(state.glucose.length > 0 || state.meals.length > 0) && <DaysCalendar />}
+        <WeightCheckin always />
 
         {dueMeds.length > 0 && (
           <Card>

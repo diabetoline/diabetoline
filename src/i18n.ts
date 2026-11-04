@@ -5,6 +5,7 @@ type Verd = { carbs: number; sugars: number; fiber: number; gl: number | null };
 type Dict = Record<string, any>;
 
 const ro = {
+  wt_none: "Nimic notat încă.", wt_save_short: "Notează",
   rem_glu_title: "Glicemia de azi", rem_glu_body: "Ai măsurat? O apăsare și e notată.", rem_glu_body2: "De două zile nu e nimic notat. O măsurare acum ar prinde bine.", rem_med_title: "Reamintire", rem_med_body: (n: string) => `${n}: ai luat? Apasă „Am luat” când e gata.`, rem_title: "Reamintiri", rem_glu: "Glicemia (dimineața, dacă n-ai notat)", rem_move: "Mișcarea (seara, dacă n-ai bifat)", rem_med: "Medicamentele (la o oră după, dacă n-ai apăsat „Am luat”)", rem_hint: "Cel mult două pe zi. Dacă le ignori, le rărim singuri.",
   ideas_missing: "Lipsește", ideas_missing_add: "Pune lipsurile pe listă",
   fam_list_hint: (n: string) => `Ce pui aici apare pe telefonul lui ${n}, la magazin.`,
@@ -144,6 +145,7 @@ const ro = {
 };
 
 const en: typeof ro = {
+  wt_none: "Nothing logged yet.", wt_save_short: "Log",
   rem_glu_title: "Today's glucose", rem_glu_body: "Did you measure? One tap and it's logged.", rem_glu_body2: "Nothing logged for two days. A reading now would help.", rem_med_title: "Reminder", rem_med_body: (n: string) => `${n}: taken? Tap “Taken” when done.`, rem_title: "Reminders", rem_glu: "Glucose (morning, if not logged)", rem_move: "Movement (evening, if not ticked)", rem_med: "Medication (an hour after, if not marked taken)", rem_hint: "At most two a day. If you ignore them, we space them out.",
   ideas_missing: "Missing", ideas_missing_add: "Put the missing ones on the list",
   fam_list_hint: (n: string) => `What you add here shows up on ${n}'s phone at the shop.`,
@@ -273,6 +275,7 @@ const en: typeof ro = {
 };
 
 const de: typeof ro = {
+  wt_none: "Noch nichts eingetragen.", wt_save_short: "Eintragen",
   rem_glu_title: "Blutzucker heute", rem_glu_body: "Schon gemessen? Ein Tipp und es ist notiert.", rem_glu_body2: "Seit zwei Tagen nichts eingetragen. Eine Messung jetzt täte gut.", rem_med_title: "Erinnerung", rem_med_body: (n: string) => `${n}: genommen? Tippe auf „Genommen“, wenn erledigt.`, rem_title: "Erinnerungen", rem_glu: "Blutzucker (morgens, falls nicht notiert)", rem_move: "Bewegung (abends, falls nicht abgehakt)", rem_med: "Medikamente (eine Stunde danach, falls nicht bestätigt)", rem_hint: "Höchstens zwei am Tag. Wenn du sie ignorierst, werden sie seltener.",
   ideas_missing: "Fehlt", ideas_missing_add: "Fehlendes auf die Liste",
   fam_list_hint: (n: string) => `Was du hier einträgst, erscheint auf dem Handy von ${n} beim Einkaufen.`,
