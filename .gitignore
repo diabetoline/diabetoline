@@ -42,3 +42,5 @@ yarn-error.*
 .test-build
 .expo/
 dist/
+credentials.json
+*.jks

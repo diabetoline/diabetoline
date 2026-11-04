@@ -1,0 +1,50 @@
+name: Build Android (Play Store)
+# Pornire manuală. Prima rulare creează cheia de semnare (upload key) și o păstrează în EAS, ca variabile „sensitive”
+# ale mediului production; rulările următoare o refolosesc. Rezultatul: un fișier .aab de încărcat în Play Console.
+on:
+  workflow_dispatch:
+env:
+  EXPO_PUBLIC_API_URL: https://curalife.expo.app
+  EXPO_PUBLIC_BUILD: ${{ github.sha }}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "17" }
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - run: npm ci
+      - name: Cheia de semnare (din EAS sau nouă)
+        run: |
+          set -e
+          get() { eas env:get production --variable-name "$1" --format short --non-interactive 2>/dev/null | sed -n "s/^$1=//p"; }
+          KS_B64="$(get ANDROID_KEYSTORE_B64 || true)"
+          if [ -z "$KS_B64" ]; then
+            echo "Nu există cheie în EAS: generez una nouă și o salvez."
+            KS_PASS="$(openssl rand -hex 24)"; KEY_PASS="$(openssl rand -hex 24)"; ALIAS="diabetoline"
+            keytool -genkeypair -v -keystore upload.jks -alias "$ALIAS" -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass "$KS_PASS" -keypass "$KEY_PASS" -dname "CN=Diabetoline, O=Curalife Development SRL, L=Bucuresti, C=RO"
+            KS_B64="$(base64 -w0 upload.jks)"
+            for pair in "ANDROID_KEYSTORE_B64=$KS_B64" "ANDROID_KEYSTORE_PASSWORD=$KS_PASS" "ANDROID_KEY_ALIAS=$ALIAS" "ANDROID_KEY_PASSWORD=$KEY_PASS"; do
+              eas env:create production --name "${pair%%=*}" --value "${pair#*=}" --type string --visibility sensitive --scope project --non-interactive --force
+            done
+          else
+            echo "$KS_B64" | base64 -d > upload.jks
+            KS_PASS="$(get ANDROID_KEYSTORE_PASSWORD)"; KEY_PASS="$(get ANDROID_KEY_PASSWORD)"; ALIAS="$(get ANDROID_KEY_ALIAS)"
+          fi
+          cat > credentials.json <<JSON
+          { "android": { "keystore": { "keystorePath": "upload.jks", "keystorePassword": "$KS_PASS", "keyAlias": "$ALIAS", "keyPassword": "$KEY_PASS" } } }
+          JSON
+          echo "::add-mask::$KS_PASS"; echo "::add-mask::$KEY_PASS"
+      - name: Build .aab pe EAS
+        run: eas build --platform android --profile production --non-interactive --json > build.json && cat build.json
+      - name: Linkul de descărcare
+        run: |
+          echo "## Fișierul .aab" >> "$GITHUB_STEP_SUMMARY"
+          node -e 'const b=require("./build.json");const x=Array.isArray(b)?b[0]:b;console.log(x.artifacts?.buildUrl||x.artifacts?.applicationArchiveUrl||JSON.stringify(x))' >> "$GITHUB_STEP_SUMMARY"
