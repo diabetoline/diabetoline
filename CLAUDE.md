@@ -32,7 +32,7 @@ Aplicație mobilă (Expo / React Native, TypeScript) pentru diabetici, publicat�
 
 De făcut (Alex, 2 nov): voce naturală prin OpenAI TTS pe server (`OPENAI_API_KEY` în EAS), aceeași voce la „Citește cu voce tare” și la asistentul „Întreabă”; până atunci `src/speech.ts` alege cea mai bună voce de pe telefon.
 
-După lansare: coș, plan de mese pe săptămână, senzor (Libre/Dexcom), meniu de restaurant, scanare raft.
+După lansare: plan de mese pe săptămână, senzor (Libre/Dexcom), meniu de restaurant, scanare raft.
 
 ## Tehnic
 - `npm run typecheck`, `npm test` (motorul de verdict, Node test runner, build în `.test-build`)
