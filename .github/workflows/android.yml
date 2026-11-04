@@ -23,7 +23,9 @@ jobs:
       - name: Cheia de semnare (din EAS sau nouă)
         run: |
           set -e
-          get() { eas env:get production --variable-name "$1" --format short --non-interactive 2>/dev/null | sed -n "s/^$1=//p"; }
+          # valorile „sensitive” se citesc într-un fișier (nu în log), apoi fișierul e șters
+          eas env:pull production --path .env.eas --non-interactive >/dev/null 2>&1 || true
+          get() { sed -n "s/^$1=//p" .env.eas 2>/dev/null | head -1 | sed 's/^"//; s/"$//'; }
           KS_B64="$(get ANDROID_KEYSTORE_B64 || true)"
           if [ -z "$KS_B64" ]; then
             echo "Nu există cheie în EAS: generez una nouă și o salvez."
@@ -41,7 +43,7 @@ jobs:
           cat > credentials.json <<JSON
           { "android": { "keystore": { "keystorePath": "upload.jks", "keystorePassword": "$KS_PASS", "keyAlias": "$ALIAS", "keyPassword": "$KEY_PASS" } } }
           JSON
-          echo "::add-mask::$KS_PASS"; echo "::add-mask::$KEY_PASS"
+          echo "::add-mask::$KS_PASS"; echo "::add-mask::$KEY_PASS"; rm -f .env.eas
       - name: Build .aab pe EAS
         run: eas build --platform android --profile production --non-interactive --json > build.json; cat build.json
       - name: Motivul erorii (dacă a picat)
