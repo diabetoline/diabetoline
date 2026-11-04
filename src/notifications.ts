@@ -22,7 +22,7 @@ export async function scheduleMed(med: Med, t: Strings): Promise<string[]> {
     if (!Number.isFinite(h) || !Number.isFinite(m)) continue;
     const id = await Notifications.scheduleNotificationAsync({
       content: { title: `${t.notif_title} ${med.name}`, body: t.notif_body(med.name), data: { medId: med.id, time }, sound: true },
-      trigger: { type: Notifications.SchedulableTriggerInputTypes.DAILY, hour: h, minute: m },
+      trigger: { type: Notifications.SchedulableTriggerInputTypes.DAILY, hour: h, minute: m, channelId: "reminders" },
     });
     ids.push(id);
   }
@@ -46,7 +46,7 @@ export async function scheduleGlucoseCheck(t: Strings, minutes = 120): Promise<s
   const at = new Date(Date.now() + minutes * 60_000);
   await Notifications.scheduleNotificationAsync({
     content: { title: t.notif_glu_title, body: t.notif_glu_body, data: { kind: "glucose" }, sound: true },
-    trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: at },
+    trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: at, channelId: "reminders" },
   });
   return at.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }

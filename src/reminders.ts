@@ -1,4 +1,5 @@
 import * as Notifications from "expo-notifications";
+import { Platform } from "react-native";
 import { dayKeyLocal } from "./engine/days";
 import type { Strings } from "./i18n";
 import type { State } from "./store";
@@ -21,8 +22,11 @@ const tomorrow = (d: Date) => { const x = new Date(d); x.setDate(x.getDate() + 1
 export async function planReminders(s: State, t: Strings): Promise<Plan> {
   const prefs = { ...REMIND_DEFAULT, ...(s.remind ?? {}) };
   const prev: Plan = s.plan ?? { ids: [], gluIgnored: 0, medFollow: {} };
-  const perm = await Notifications.getPermissionsAsync();
+  // Android 13+: permisiunea se cere explicit (o singură dată, sistemul nu mai întreabă dacă a fost refuzată); plus canalul de notificări
+  let perm = await Notifications.getPermissionsAsync();
+  if (!perm.granted && perm.canAskAgain) perm = await Notifications.requestPermissionsAsync();
   if (!perm.granted) return prev;
+  if (Platform.OS === "android") await Notifications.setNotificationChannelAsync("reminders", { name: t.rem_title, importance: Notifications.AndroidImportance.DEFAULT, sound: "default" }).catch(() => {});
   // curățăm tot ce am programat noi înainte (nu și reamintirile fixe de medicamente)
   for (const id of [...prev.ids, ...Object.values(prev.medFollow)]) { try { await Notifications.cancelScheduledNotificationAsync(id); } catch {} }
   const ids: string[] = []; const medFollow: Record<string, string> = {};
@@ -32,7 +36,7 @@ export async function planReminders(s: State, t: Strings): Promise<Plan> {
   const gluYesterday = s.glucose.some((g) => dayKeyLocal(g.t) === yesterday);
   const schedule = async (date: Date, title: string, body: string, kind: string) => {
     if (date.getTime() <= Date.now()) return;
-    ids.push(await Notifications.scheduleNotificationAsync({ content: { title, body, data: { kind } }, trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date } }));
+    ids.push(await Notifications.scheduleNotificationAsync({ content: { title, body, data: { kind } }, trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date, channelId: "reminders" } }));
   };
 
   // a ignorat reamintirea de ieri? (a fost programată, a trecut, și n-a notat nimic după)
@@ -61,7 +65,7 @@ export async function planReminders(s: State, t: Strings): Promise<Plan> {
       const [h, mi] = time.split(":").map(Number);
       const follow = at(now, h, mi + 60);
       if (follow.getTime() <= Date.now() || time > nowHM && follow.getTime() - Date.now() > 25 * 3600e3) continue;
-      const id = await Notifications.scheduleNotificationAsync({ content: { title: t.rem_med_title, body: t.rem_med_body(m.name), data: { kind: "med", medId: m.id, time } }, trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: follow } });
+      const id = await Notifications.scheduleNotificationAsync({ content: { title: t.rem_med_title, body: t.rem_med_body(m.name), data: { kind: "med", medId: m.id, time } }, trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: follow, channelId: "reminders" } });
       medFollow[`${m.id}|${time}`] = id;
     }
   }
