@@ -12,7 +12,8 @@
       "ios": {
         "simulator": false
       },
-      "channel": "preview"
+      "channel": "preview",
+      "credentialsSource": "local"
     },
     "production": {
       "autoIncrement": true,

@@ -3,6 +3,12 @@ name: Build Android (Play Store)
 # ale mediului production; rulările următoare o refolosesc. Rezultatul: un fișier .aab de încărcat în Play Console.
 on:
   workflow_dispatch:
+    inputs:
+      profile:
+        description: "production = .aab pentru Play Store · preview = .apk de instalat direct"
+        default: production
+        type: choice
+        options: [production, preview]
 env:
   EXPO_PUBLIC_API_URL: https://curalife.expo.app
   EXPO_PUBLIC_BUILD: ${{ github.sha }}
@@ -46,11 +52,11 @@ jobs:
           JSON
           echo "::add-mask::$KS_PASS"; echo "::add-mask::$KEY_PASS"; rm -f .env.eas
       - name: Build .aab pe EAS
-        run: eas build --platform android --profile production --non-interactive --json > build.json; cat build.json
+        run: eas build --platform android --profile ${{ inputs.profile || 'production' }} --non-interactive --json > build.json; cat build.json
       - name: Motivul erorii (dacă a picat)
         if: failure()
         run: eas build:list --platform android --limit 1 --json --non-interactive | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>{const b=JSON.parse(d)[0];console.log(b.status, b.error||"", b.logFiles||"", b.buildDetailsPageUrl||"")})'
       - name: Linkul de descărcare
         run: |
-          echo "## Fișierul .aab" >> "$GITHUB_STEP_SUMMARY"
+          echo "## Fișierul (${{ inputs.profile || 'production' }})" >> "$GITHUB_STEP_SUMMARY"
           node -e 'const b=require("./build.json");const x=Array.isArray(b)?b[0]:b;console.log(x.artifacts?.buildUrl||x.artifacts?.applicationArchiveUrl||JSON.stringify(x))' >> "$GITHUB_STEP_SUMMARY"
