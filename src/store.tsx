@@ -4,7 +4,7 @@ import type { Product, Verdict, Level } from "./engine/types";
 import type { PlateAnalysis } from "./engine/plate";
 import type { RecoState } from "./recommend";
 import { deviceLang, strings, type Lang, type Strings } from "./i18n";
-import { pushEntries } from "./family/sync";
+import { pushDeletes, pushEntries } from "./family/sync";
 import { sendNewAlerts } from "./family/alerts";
 
 export interface HistItem { code: string; name: string; level: Level; t: number }
@@ -35,6 +35,8 @@ export interface State {
   /** ziua (YYYY-MM-DD) în care a răspuns „nu încă” la întrebarea de seară, ca să nu-l mai întrebăm azi */
   moveAskedDay?: string; moveNotifId?: string;
   reco?: RecoState;
+  /** notări șterse local, de șters și de pe server la următoarea sincronizare (client_id) */
+  trash?: string[];
   cache: Record<string, Product>;
 }
 const initial: State = { lang: deviceLang(), humor: true, unit: "mg", name: "", bigText: false, history: [], glucose: [], meals: [], meds: [], medLog: [], walks: [], weights: [], family: { role: null, consent: false, children: [] }, cache: {} };
@@ -50,6 +52,8 @@ interface Ctx {
   markMed: (medId: string, time: string) => void;
   addWalk: (min: number) => void;
   addWeight: (kg: number) => void;
+  /** Șterge o notare din jurnal (și de pe server, la următoarea sincronizare). */
+  removeEntry: (kind: "glucose" | "meal" | "walk" | "weight" | "med", id: string) => void;
 }
 const C = createContext<Ctx | null>(null);
 export const dayKey = (t: number) => new Date(t).toISOString().slice(0, 10);
@@ -68,13 +72,15 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     if (!ready || s.family.role !== "parent" || !s.family.consent) return;
     const h = setTimeout(() => {
       pushEntries(s).then(async () => {
+        const gone = await pushDeletes(s.trash ?? []);
+        if (gone.length) setS((p) => ({ ...p, trash: (p.trash ?? []).filter((id) => !gone.includes(id)) }));
         const since = s.family.lastAlert ?? Date.now() - 3600e3;   // la prima activare nu retrimitem istoricul
         const last = s.family.children.length ? await sendNewAlerts(s, since) : since;
         setS((p) => ({ ...p, family: { ...p.family, lastSync: Date.now(), lastAlert: last } }));
       }).catch(() => {});
     }, 4000);
     return () => clearTimeout(h);
-  }, [ready, s.glucose, s.meals, s.medLog, s.walks, s.weights, s.history, s.family.role, s.family.consent]);
+  }, [ready, s.glucose, s.meals, s.medLog, s.walks, s.weights, s.history, s.trash, s.family.role, s.family.consent]);
 
   const api = useMemo<Ctx>(() => ({
     s, t: strings(s.lang),
@@ -88,6 +94,15 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     addMeal: (m) => { const id = String(Date.now()); setS((prev) => ({ ...prev, meals: [...prev.meals, { ...m, id, t: m.t ?? Date.now() }] })); return id; },
     addWeight: (kg) => setS((prev) => ({ ...prev, weights: [...(prev.weights ?? []), { id: String(Date.now()), t: Date.now(), kg }] })),
     addWalk: (min) => setS((prev) => ({ ...prev, walks: [...(prev.walks ?? []), { id: String(Date.now()), t: Date.now(), min }] })),
+    removeEntry: (kind, id) => setS((prev) => {
+      const prefix = { glucose: "g", meal: "m", walk: "w", weight: "k", med: "d" }[kind];
+      const trash = [...(prev.trash ?? []), prefix + id];
+      if (kind === "glucose") return { ...prev, trash, glucose: prev.glucose.filter((x) => x.id !== id) };
+      if (kind === "meal") return { ...prev, trash, meals: prev.meals.filter((x) => x.id !== id) };
+      if (kind === "walk") return { ...prev, trash, walks: (prev.walks ?? []).filter((x) => x.id !== id) };
+      if (kind === "weight") return { ...prev, trash, weights: (prev.weights ?? []).filter((x) => x.id !== id) };
+      return { ...prev, trash, medLog: prev.medLog.filter((x) => x.id !== id) };
+    }),
     markMed: (medId, time) => setS((prev) => {
       const day = dayKey(Date.now());
       if (prev.medLog.some((l) => l.medId === medId && l.time === time && l.day === day)) return prev;

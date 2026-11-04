@@ -35,6 +35,15 @@ export async function pushEntries(s: State): Promise<void> {
   lastPushed = sig;
 }
 
+/** Șterge de pe server notările șterse local. Întoarce ce s-a șters, ca să fie scos din `trash`. */
+export async function pushDeletes(ids: string[]): Promise<string[]> {
+  if (ids.length === 0) return [];
+  const uid = await ensureUser();
+  const { error } = await supabase().from("entries").delete().eq("user_id", uid).in("client_id", ids);
+  if (error) throw error;
+  return ids;
+}
+
 /** Copilul: citește jurnalul părintelui pe ultimele N zile. */
 export async function fetchParentEntries(parentId: string, days = 14) {
   const since = new Date(Date.now() - days * 864e5).toISOString();

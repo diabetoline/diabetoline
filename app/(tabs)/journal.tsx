@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Image, Pressable, ScrollView, Text, View } from "react-native";
+import { Alert, Image, Pressable, ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { dayKey, useStore } from "../../src/store";
@@ -7,18 +7,27 @@ import { levelColor, useTheme } from "../../src/theme";
 import { Button, Card, Hint, Label, Title, useScale } from "../../src/ui/Primitives";
 import { DaysCalendar } from "../../src/ui/DaysCalendar";
 import { Quip } from "../../src/ui/Quip";
+import { Icon } from "../../src/ui/Icon";
 
 import type { GluEntry, MealEntry, MedLog, Walk, Weight } from "../../src/store";
 type Item = { t: number; kind: "glu"; data: GluEntry } | { t: number; kind: "meal"; data: MealEntry } | { t: number; kind: "med"; data: MedLog } | { t: number; kind: "walk"; data: Walk } | { t: number; kind: "weight"; data: Weight };
 
 export default function Journal() {
   const t = useTheme(); const k = useScale(); const router = useRouter();
-  const { t: s, s: state, set, markMed } = useStore();
+  const { t: s, s: state, markMed, removeEntry } = useStore();
   const [justTook, setJustTook] = useState<string | null>(null);
   const toU = (v: number) => (state.unit === "mg" ? String(Math.round(v)) : (v / 18).toFixed(1));
   const unitLbl = state.unit === "mg" ? "mg/dL" : "mmol/L";
   const cls = (v: number, ctx: string) => (v < 70 ? "low" : (ctx === "fasting" && v > 130) || v > 180 ? "high" : "ok");
   const col = { low: t.bad, ok: t.ok, high: t.warn } as const;
+  /** Ștergere cu confirmare: o notare greșită sau o farfurie pozată doar din curiozitate. */
+  const ask = (kind: Parameters<typeof removeEntry>[0], id: string) =>
+    Alert.alert(s.del_q, s.del_sub, [{ text: s.cancel, style: "cancel" }, { text: s.delete, style: "destructive", onPress: () => removeEntry(kind, id) }]);
+  const Del = ({ onPress }: { onPress: () => void }) => (
+    <Pressable onPress={onPress} hitSlop={10} accessibilityRole="button" accessibilityLabel={s.delete} style={({ pressed }) => ({ padding: 6, opacity: pressed ? 0.5 : 1 })}>
+      <Icon name="trash" size={22} color={t.muted} />
+    </Pressable>
+  );
 
   const last7 = state.glucose.filter((g) => g.t > Date.now() - 7 * 864e5);
   const avg = last7.length ? last7.reduce((a, g) => a + g.v, 0) / last7.length : null;
@@ -78,6 +87,7 @@ export default function Journal() {
                   <Text style={{ fontSize: 26 * k, fontWeight: "800", color: col[c], width: 76, fontVariant: ["tabular-nums"] }}>{toU(g.v)}</Text>
                   <View style={{ flex: 1 }}><Text style={{ color: t.ink, fontSize: 16 * k }}>{s.ctx[g.ctx]}{g.note ? ` · ${g.note}` : ""}</Text><Text style={{ color: t.muted, fontSize: 14 * k }}>{c === "ok" ? s.g_ok : c === "low" ? s.g_low : s.g_high} · {unitLbl}</Text></View>
                   <Text style={{ color: t.muted, fontSize: 14 * k }}>{time}</Text>
+                  <Del onPress={() => ask("glucose", g.id)} />
                 </View>); }
               if (it.kind === "meal") { const m = it.data; return (
                 <Pressable key={m.id} disabled={!m.photoUri} onPress={() => router.push({ pathname: "/meal/[id]", params: { id: m.id } })} accessibilityRole="button" style={{ flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 6 }}>
@@ -85,18 +95,21 @@ export default function Journal() {
                   <View style={{ flex: 1 }}><Text style={{ color: t.ink, fontSize: 16 * k }} numberOfLines={2}>{m.name ?? s.meal}</Text><Text style={{ color: t.muted, fontSize: 14 * k }}>{s[`meal_${m.slot}` as `meal_${MealEntry["slot"]}`]}</Text></View>
                   {m.level && <View style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: levelColor(t, m.level).fg }} />}
                   <Text style={{ color: t.muted, fontSize: 14 * k }}>{time}</Text>
+                  <Del onPress={() => ask("meal", m.id)} />
                 </Pressable>); }
               if (it.kind === "weight") { const w = it.data; return (
                 <View key={w.id} style={{ flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 6 }}>
                   <Text style={{ fontSize: 22 }}>⚖️</Text>
                   <Text style={{ flex: 1, color: t.ink, fontSize: 16 * k }}>{s.wt_entry(w.kg)}</Text>
                   <Text style={{ color: t.muted, fontSize: 14 * k }}>{time}</Text>
+                  <Del onPress={() => ask("weight", w.id)} />
                 </View>); }
               if (it.kind === "walk") { const w = it.data; return (
                 <View key={w.id} style={{ flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 6 }}>
                   <Text style={{ fontSize: 22 }}>🚶</Text>
                   <Text style={{ flex: 1, color: t.ink, fontSize: 16 * k }}>{s.walk_entry(w.min)}</Text>
                   <Text style={{ color: t.muted, fontSize: 14 * k }}>{time}</Text>
+                  <Del onPress={() => ask("walk", w.id)} />
                 </View>); }
               const l = it.data; const med = state.meds.find((m) => m.id === l.medId);
               return (
@@ -104,13 +117,11 @@ export default function Journal() {
                   <Text style={{ fontSize: 22 }}>💊</Text>
                   <Text style={{ flex: 1, color: t.ink, fontSize: 16 * k }}>{med?.name ?? s.meds} · {s.med_taken}</Text>
                   <Text style={{ color: t.muted, fontSize: 14 * k }}>{time}</Text>
+                  <Del onPress={() => ask("med", l.id)} />
                 </View>);
             })}
           </Card>
         ))}
-        {state.glucose.length > 0 && (
-          <Pressable onPress={() => set({ glucose: state.glucose.slice(0, -1) })} accessibilityRole="button"><Hint style={{ textAlign: "center", textDecorationLine: "underline" }}>{s.delete}: {s.last}</Hint></Pressable>
-        )}
       </ScrollView>
     </SafeAreaView>
   );

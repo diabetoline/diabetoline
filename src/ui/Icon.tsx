@@ -1,11 +1,11 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-export type IconName = "mic" | "chat" | "pot" | "barcode" | "plate" | "drop" | "pill" | "home" | "journal" | "more" | "walk" | "family" | "report" | "settings" | "care" | "lock";
+export type IconName = "mic" | "chat" | "pot" | "barcode" | "plate" | "drop" | "pill" | "home" | "journal" | "more" | "walk" | "family" | "report" | "settings" | "care" | "lock" | "trash" | "cart";
 
 /** Iconițe din setul Material Community (profesionist, consecvent), un singur loc de mapare. */
 const MAP: Record<IconName, keyof typeof MaterialCommunityIcons.glyphMap> = {
   mic: "microphone", chat: "chat-question-outline", barcode: "barcode-scan", plate: "silverware-fork-knife", drop: "water", pill: "pill", home: "home-variant", journal: "notebook-outline", more: "menu",
-  walk: "walk", family: "account-group-outline", report: "file-chart-outline", settings: "cog-outline", care: "heart-outline", lock: "lock-outline", pot: "pot-steam-outline",
+  walk: "walk", family: "account-group-outline", report: "file-chart-outline", settings: "cog-outline", care: "heart-outline", lock: "lock-outline", pot: "pot-steam-outline", trash: "trash-can-outline", cart: "cart-outline",
 };
 
 export function Icon({ name, size = 28, color = "#14202B" }: { name: IconName; size?: number; color?: string; strokeWidth?: number }) {

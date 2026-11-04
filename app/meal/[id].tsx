@@ -17,7 +17,7 @@ import { VerdictBadge } from "../../src/ui/VerdictBadge";
 export default function MealResult() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const t = useTheme(); const k = useScale(); const router = useRouter();
-  const { t: s, s: state } = useStore();
+  const { t: s, s: state, removeEntry } = useStore();
   const m = state.meals.find((x) => x.id === id);
   useEffect(() => () => { Speech.stop(); }, []);
   const fade = useRef(new Animated.Value(0)).current;
@@ -105,7 +105,8 @@ export default function MealResult() {
           </Card>
         )}
 
-        <Button title={s.care_done} size="xl" onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))} />
+        <Button title={"✓ " + s.meal_ate} size="xl" onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))} />
+        <Button title={s.meal_looking} kind="ghost" onPress={() => { Speech.stop(); removeEntry("meal", m.id); if (router.canGoBack()) router.back(); else router.replace("/"); }} />
         {a && <Hint>{s.plate_note}</Hint>}
       </View>
     </ScrollView>
