@@ -14,7 +14,7 @@ type AudioMod = { createAudioPlayer: (src: { uri: string }) => Player; setAudioM
 let audio: AudioMod | null | undefined;
 function audioMod(): AudioMod | null {
   if (audio !== undefined) return audio;
-  try { audio = require("expo-audio") as AudioMod; audio.setAudioModeAsync?.({ playsInSilentMode: true }).catch(() => {}); } catch { audio = null; }
+  try { audio = require("expo-audio") as AudioMod; } catch { audio = null; }
   return audio;
 }
 let current: Player | null = null;
@@ -60,20 +60,23 @@ export function stop() {
 
 /** Citește cu voce tare: vocea naturală dacă se poate, altfel cea de pe telefon. */
 export async function say(text: string, lang: Lang) {
-  stop();
-  const mod = audioMod();
-  if (mod) {
-    const uri = await fetchNatural(text, lang);
-    if (uri) {
-      try {
+  try { stop(); } catch {}
+  try {
+    const mod = audioMod();
+    if (mod) {
+      await mod.setAudioModeAsync?.({ playsInSilentMode: true, interruptionMode: "mixWithOthers" }).catch(() => {});
+      const uri = await fetchNatural(text, lang);
+      if (uri) {
         const p = mod.createAudioPlayer({ uri });
         current = p;
         p.addListener("playbackStatusUpdate", (st) => { if (st.didJustFinish && current === p) { try { p.remove(); } catch {} current = null; } });
         p.play();
         return;
-      } catch { current = null; }
+      }
     }
-  }
-  const voice = await bestVoice(lang);
-  Speech.speak(text, { language: speechLocale[lang], voice, rate: 0.92, pitch: 1.0 });
+  } catch { current = null; }
+  try {
+    const voice = await bestVoice(lang);
+    Speech.speak(text, { language: speechLocale[lang], voice, rate: 0.92, pitch: 1.0 });
+  } catch { Speech.speak(text, { language: speechLocale[lang] }); }
 }
