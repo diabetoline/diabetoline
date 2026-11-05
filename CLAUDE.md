@@ -35,6 +35,8 @@ Aplicație mobilă (Expo / React Native, TypeScript) pentru diabetici, publicat�
 18. Evoluția (5 nov 2026; `src/ui/Trend.tsx`): în Jurnal, grafic SVG pe 30 de zile cu glicemia de dimineață (banda 70–130) și greutatea pe 3 luni; apare doar de la 3 zile cu date; fără interpretări medicale.
 8. Produs negăsit → poză la tabelul nutrițional, citit de AI pe server (`app/api/label+api.ts`), omul doar confirmă. Niciodată introducere manuală de la zero.
 
+**De testat foarte, foarte bine înainte de lansare (Alex, 5 nov 2026): funcția Familie**, cap-coadă, pe două telefoane reale (Android din Play + iPhone din TestFlight), cu toate migrările rulate (0001–0007): chestionar părinte / copil → accept → cod → legare; jurnalul părintelui apare la copil (glicemii, mese, medicamente, mișcare, greutate, scanări); „de urmărit”; lista de cumpărături în ambele sensuri (adăugare, bifare, ștergere) și la revenirea în aplicație; alerte push la copil (glicemie mare/mică, masă grea) și reamintirile de pe server (nimic notat 3 zile); mesaje în ambele sensuri cu push și cardul de pe prima pagină; raportul pentru medic generat de copil; rupere legătură, „Oprește trimiterea datelor”, ștergerea datelor de pe server; un părinte cu doi copii și un copil cu doi părinți; ce se întâmplă fără internet. Lista de verificare se bifează la fiecare build nou.
+
 De făcut (Alex, 2 nov): voce naturală prin OpenAI TTS pe server (`OPENAI_API_KEY` în EAS), aceeași voce la „Citește cu voce tare” și la asistentul „Întreabă”; până atunci `src/speech.ts` alege cea mai bună voce de pe telefon.
 
 După lansare: plan de mese pe săptămână, senzor (Libre/Dexcom), meniu de restaurant, scanare raft.
