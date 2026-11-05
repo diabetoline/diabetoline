@@ -10,6 +10,7 @@ import { slotForHour, useStore } from "../../src/store";
 import { speechLocale } from "../../src/i18n";
 import { levelColor, useTheme } from "../../src/theme";
 import { Button, Card, Hint, Label, useScale } from "../../src/ui/Primitives";
+import { GreenAlternatives } from "../../src/ui/GreenAlternatives";
 import { AfterMeal } from "../../src/ui/AfterMeal";
 import { Quip } from "../../src/ui/Quip";
 import { VerdictBadge } from "../../src/ui/VerdictBadge";
@@ -132,6 +133,7 @@ export default function ProductScreen() {
               <Button title={`${s.partner_order} · ${money(alt.price)}`} onPress={() => Linking.openURL(productUrl(alt))} />
             </Card>);
           return null; })()}
+        {v.level !== "green" && !p.incomplete && <GreenAlternatives product={p} />}
         {v.level === "red"
           ? <Button title={"🥗 " + s.ideas_lighter} kind="soft" onPress={() => router.push({ pathname: "/ideas", params: { focus: p.name, lighter: "1" } })} />
           : <Button title={"🍲 " + s.ideas_product} kind="soft" onPress={() => router.push({ pathname: "/ideas", params: { focus: p.name } })} />}
