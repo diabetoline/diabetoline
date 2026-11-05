@@ -93,7 +93,7 @@ const ro = {
   tab_scan: "Scanează", tab_journal: "Jurnal", tab_more: "Mai mult",
   // home
   scan_big: "Scanează produsul", plate_big: "Poză la farfurie", type_code: "sau tastează codul de bare", check: "Verifică",
-  today: "Azi", nothing_today: "Nimic notat azi. Scanează un produs sau fă o poză la ce mănânci.", last_scans: "Ultimele produse",
+  today: "Azi", nothing_today: "Nimic notat azi. Scanează un produs sau fă o poză la ce mănânci.", last_scans: "Ultimele produse", trend_title: "Evoluția ta", trend_glu: "Glicemia", trend_kg: "Greutatea", trend_glu_hint: "Glicemia de dimineață, ultimele 30 de zile. Banda verde = în interval.", trend_kg_hint: "Greutatea, ultimele 3 luni.", trend_flat: "Stabil.",
   // scanner
   scan_hint: "Îndreaptă camera spre codul de bare", scan_distance: "Ține telefonul la 15–20 cm, cu tot codul în cadru.",
   cam_denied: "Aplicația are nevoie de cameră ca să citească codurile de bare.", cam_allow: "Permite camera", close: "Închide", torch: "Lanternă",
@@ -230,7 +230,7 @@ const en: typeof ro = {
   your_day: "Your day", code_toggle: "Won't read the code? Type it",
   tab_scan: "Scan", tab_journal: "Journal", tab_more: "More",
   scan_big: "Scan a product", plate_big: "Photo of my plate", type_code: "or type the barcode", check: "Check",
-  today: "Today", nothing_today: "Nothing logged today. Scan a product or take a photo of what you eat.", last_scans: "Latest products",
+  today: "Today", nothing_today: "Nothing logged today. Scan a product or take a photo of what you eat.", last_scans: "Latest products", trend_title: "Your progress", trend_glu: "Blood sugar", trend_kg: "Weight", trend_glu_hint: "Morning blood sugar, last 30 days. Green band = in range.", trend_kg_hint: "Weight, last 3 months.", trend_flat: "Steady.",
   scan_hint: "Point the camera at the barcode", scan_distance: "Hold the phone 15–20 cm away, with the whole code in frame.",
   cam_denied: "The app needs the camera to read barcodes.", cam_allow: "Allow camera", close: "Close", torch: "Torch",
   plate_title: "Photo of my plate", plate_hint: "Frame the whole plate and press the button.", plate_saved: "Meal saved to your journal.", take_photo: "Take photo", retake: "Retake", use_photo: "Save meal",
@@ -360,7 +360,7 @@ const de: typeof ro = {
   your_day: "Dein Tag", code_toggle: "Code wird nicht erkannt? Eintippen",
   tab_scan: "Scannen", tab_journal: "Tagebuch", tab_more: "Mehr",
   scan_big: "Produkt scannen", plate_big: "Foto vom Teller", type_code: "oder Barcode eingeben", check: "Prüfen",
-  today: "Heute", nothing_today: "Heute noch nichts eingetragen. Scanne ein Produkt oder fotografiere dein Essen.", last_scans: "Letzte Produkte",
+  today: "Heute", nothing_today: "Heute noch nichts eingetragen. Scanne ein Produkt oder fotografiere dein Essen.", last_scans: "Letzte Produkte", trend_title: "Dein Verlauf", trend_glu: "Blutzucker", trend_kg: "Gewicht", trend_glu_hint: "Nüchternblutzucker, letzte 30 Tage. Grünes Band = im Zielbereich.", trend_kg_hint: "Gewicht, letzte 3 Monate.", trend_flat: "Stabil.",
   scan_hint: "Kamera auf den Barcode richten", scan_distance: "Handy 15–20 cm entfernt halten, der ganze Code im Bild.",
   cam_denied: "Die App braucht die Kamera, um Barcodes zu lesen.", cam_allow: "Kamera erlauben", close: "Schließen", torch: "Licht",
   plate_title: "Foto vom Teller", plate_hint: "Den ganzen Teller ins Bild nehmen und auf den Knopf drücken.", plate_saved: "Mahlzeit im Tagebuch gespeichert.", take_photo: "Foto machen", retake: "Neues Foto", use_photo: "Mahlzeit speichern",
