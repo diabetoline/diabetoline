@@ -1,10 +1,11 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { Product, Verdict, Level } from "./engine/types";
 import type { PlateAnalysis } from "./engine/plate";
 import type { RecoState } from "./recommend";
 import { deviceLang, strings, type Lang, type Strings } from "./i18n";
 import { pushDeletes, pushEntries, syncList } from "./family/sync";
+import { registerParentPush } from "./family/messages";
 import { planReminders, type Plan, type RemindPrefs } from "./reminders";
 import { AppState } from "react-native";
 import { sendNewAlerts } from "./family/alerts";
@@ -98,6 +99,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   // părintele cu consimțământ: jurnalul pleacă pe server la câteva secunde după o modificare,
   // și la fiecare revenire în aplicație (ca să ia ce a pus copilul pe listă între timp)
   const [syncTick, setSyncTick] = useState(0);
+  const pushRegistered = useRef(false);
   useEffect(() => {
     const sub = AppState.addEventListener("change", (st) => { if (st === "active") setSyncTick((n) => n + 1); });
     return () => sub.remove();
@@ -112,6 +114,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         setS((p) => (JSON.stringify(list) === JSON.stringify(p.list ?? []) && !(p.trash ?? []).length ? p : { ...p, list, trash: [] }));
         const since = s.family.lastAlert ?? Date.now() - 3600e3;   // la prima activare nu retrimitem istoricul
         const last = s.family.children.length ? await sendNewAlerts(s, since) : since;
+        // părintele primește mesajele copiilor prin push: token-ul se pune pe legături (o dată pe deschidere e destul)
+        if (s.family.children.length && !pushRegistered.current) { pushRegistered.current = true; registerParentPush(s.family.children.map((c) => c.linkId), s.lang); }
         setS((p) => ({ ...p, family: { ...p.family, lastSync: Date.now(), lastAlert: last } }));
       }).catch(() => {});
     }, 4000);

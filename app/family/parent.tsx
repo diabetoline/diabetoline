@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { addToParentList, fetchParentEntries, fetchParentList, tickParentList, type Entry, type ShopRow } from "../../src/family/sync";
 import { gluClass } from "../../src/engine/days";
 import { useStore } from "../../src/store";
@@ -16,6 +16,7 @@ import { dayKeyLocal } from "../../src/engine/days";
 export default function ParentJournal() {
   const t = useTheme(); const k = useScale();
   const { t: s, s: state } = useStore();
+  const router = useRouter();
   const parent = state.family.parent;
   const [rows, setRows] = useState<Entry[] | null>(null);
   const [err, setErr] = useState("");
@@ -82,6 +83,7 @@ export default function ParentJournal() {
       <Title>{s.fam_parent_of(parent.name)}</Title>
       {rows == null && !err && <ActivityIndicator color={t.accent} size="large" />}
       {err ? <Hint style={{ color: t.bad }}>{err}</Hint> : null}
+      <Button title={"💬 " + s.msg_open} size="xl" onPress={() => router.push({ pathname: "/messages", params: { link: parent.linkId, name: parent.name } })} />
 
       {rows && (
         <Card style={alerts.length ? { borderColor: t.warn, borderWidth: 2 } : undefined}>

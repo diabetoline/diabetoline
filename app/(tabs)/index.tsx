@@ -11,6 +11,7 @@ import { MoveCheckin, WeightCheckin } from "../../src/ui/Checkins";
 import { DayHeader } from "../../src/ui/DayHeader";
 import { RecoCard } from "../../src/ui/RecoCard";
 import { trialDaysLeft } from "../../src/money";
+import { MessageCard } from "../../src/ui/MessageCard";
 import { slotForHour } from "../../src/store";
 
 /**
@@ -112,6 +113,7 @@ export default function Home() {
 
         </View>
         <View style={{ paddingHorizontal: 16, gap: 12 }}>
+        <MessageCard />
         {fresh && (
           <Card style={{ borderColor: t.accent, borderWidth: 2, gap: 10 }}>
             <Text style={{ color: t.ink, fontSize: 20 * k, fontWeight: "800" }}>👉 {s.first_title}</Text>
