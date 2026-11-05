@@ -13,7 +13,9 @@ import { Button, Hint, useScale } from "../src/ui/Primitives";
  * Fără diagnostic: „ce ți-a spus medicul” e doar ce spune omul.
  */
 type Step = "intro" | "who" | "name" | "cond" | "body" | "concern" | "meter" | "plan";
-const STEPS: Step[] = ["intro", "who", "name", "cond", "body", "concern", "meter", "plan"];
+const ALL: Step[] = ["intro", "who", "name", "cond", "body", "concern", "meter", "plan"];
+/** Copilul care urmărește părintele nu are diabet și nu are nevoie de cifre: doar cine e, cum îl cheamă, planul. */
+const CHILD: Step[] = ["intro", "who", "name", "plan"];
 
 export default function Welcome() {
   const t = useTheme(); const k = useScale(); const router = useRouter();
@@ -27,6 +29,7 @@ export default function Welcome() {
   const [weight, setWeight] = useState("");
   const [concerns, setConcerns] = useState<string[]>(state.profile?.concerns ?? []);
   const [meter, setMeter] = useState<boolean | null>(state.profile?.meter ?? null);
+  const STEPS = who === "child" ? CHILD : ALL;
   const step = STEPS[i];
   const last = step === "plan";
   const num = (v: string) => { const n = parseFloat(v.replace(",", ".")); return Number.isFinite(n) && n > 0 ? n : undefined; };
@@ -35,13 +38,15 @@ export default function Welcome() {
 
   const save = () => {
     const profile: Profile = { forWhom: who ?? "me", condition: cond ?? "unsure", age: num(age), heightCm: num(height), concerns, meter: meter ?? undefined };
-    set({ profile, name: name.trim() });
+    // rolul în familie se deduce din răspuns; părintele tot trebuie să accepte explicit pe ecranul Familie
+    const family = who === "child" ? { ...state.family, role: "child" as const } : { ...state.family, role: "parent" as const, consent: false };
+    set({ profile, name: name.trim(), family: state.family.role ? state.family : family });
     const kg = num(weight);
     if (kg && kg >= 30 && kg <= 300 && !(state.weights ?? []).length) addWeight(kg);
   };
   const next = () => {
     if (!canNext) return;
-    if (step === "meter") save();
+    if (STEPS[i + 1] === "plan") save();
     if (last) { router.replace("/paywall"); return; }
     setI(i + 1);
   };
@@ -64,13 +69,17 @@ export default function Welcome() {
   const Title = ({ children }: { children: string }) => <Text style={{ color: t.ink, fontSize: 28 * k, fontWeight: "800", letterSpacing: -0.4, lineHeight: 36 * k }}>{children}</Text>;
 
   const planName = name.trim() || s.q_name_ph;
-  const planLines: { icon: IconName; text: string }[] = [
+  const planLines: { icon: IconName; text: string }[] = who === "child" ? [
+    { icon: "family", text: s.q_plan_family_child },
+    { icon: "barcode", text: s.q_plan_scan },
+    { icon: "report", text: s.q_plan_report },
+  ] : [
     { icon: "barcode", text: s.q_plan_scan },
     { icon: "plate", text: s.q_plan_plate },
     { icon: "drop", text: meter === false ? s.q_plan_glu_nometer : s.q_plan_glu },
     ...(concerns.includes("meds") ? [{ icon: "pill" as IconName, text: s.q_plan_meds }] : []),
     ...(concerns.includes("weight") || num(weight) ? [{ icon: "walk" as IconName, text: s.q_plan_weight }] : []),
-    { icon: "family", text: who === "child" ? s.q_plan_family_child : s.q_plan_family_me },
+    { icon: "family", text: s.q_plan_family_me },
     { icon: "report", text: s.q_plan_report },
   ];
 

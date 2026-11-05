@@ -14,7 +14,12 @@ import { Button, Hint, useScale } from "../src/ui/Primitives";
 export default function Paywall() {
   const t = useTheme(); const k = useScale(); const router = useRouter();
   const { t: s, s: state, set } = useStore();
-  const start = () => { set({ welcomed: true, trialStart: state.trialStart ?? Date.now() }); router.replace("/"); };
+  const start = () => {
+    set({ welcomed: true, trialStart: state.trialStart ?? Date.now() });
+    router.replace("/");
+    // copilul merge direct la „pune codul părintelui”
+    if (state.profile?.forWhom === "child") setTimeout(() => router.push("/family"), 50);
+  };
   const perks = [s.q_plan_scan, s.q_plan_plate, s.q_plan_family_me, s.q_plan_report];
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }}>

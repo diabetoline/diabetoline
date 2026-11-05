@@ -70,7 +70,7 @@ export default function Settings() {
         {upd ? <Text style={{ color: t.muted, fontSize: 14 * k }}>{upd}</Text> : null}
       </Card>
       <Button title={s.first_again} kind="soft" onPress={() => router.push("/welcome")} />
-      <Button title={s.reset} kind="danger" onPress={async () => { await AsyncStorage.clear(); set({ history: [], glucose: [], meals: [], meds: [], medLog: [], walks: [], weights: [], list: [], trash: [], cache: {}, name: "", profile: undefined, trialStart: undefined, welcomed: false }); }} />
+      <Button title={s.reset} kind="danger" onPress={async () => { await AsyncStorage.clear(); set({ history: [], glucose: [], meals: [], meds: [], medLog: [], walks: [], weights: [], list: [], trash: [], cache: {}, name: "", profile: undefined, trialStart: undefined, welcomed: false, family: { role: null, consent: false, children: [] } }); }} />
     </ScrollView>
   );
 }
