@@ -11,7 +11,7 @@ const prompt = (b: In, lang: string) => {
   const good = (b.products ?? []).filter((p) => p.level === "green").map((p) => p.name).slice(0, 25);
   const mod = (b.products ?? []).filter((p) => p.level === "yellow").map((p) => p.name).slice(0, 10);
   const bad = (b.products ?? []).filter((p) => p.level === "red").map((p) => p.name).slice(0, 10);
-  return `You suggest simple meals for an older person with type 2 diabetes who is not a confident cook. Write in ${LANG_NAME[lang]}, with everyday local food (for Romanian: supă, ciorbă, tocană, salată, ouă, brânză, legume, carne slabă, pește; keep it familiar).
+  return `You suggest simple meals for an older person with type 2 diabetes who is not a confident cook. Choose like an experienced, strict diabetes dietitian who is kind to the person: the standard is what keeps blood sugar steady, not what people usually eat. Be strict about sweets, sugary drinks, alcohol, white flour, fried food and big portions. Be lenient only about small slips (one square of chocolate, a spoonful, a taste): say honestly that it is not ideal, allow it without blame, and say what to do next (stop there, walk, measure in 2 hours). Never shame, never lecture. Write in ${LANG_NAME[lang]}, with everyday local food (for Romanian: supă, ciorbă, tocană, salată, ouă, brânză, legume, carne slabă, pește; keep it familiar).
 Meal slot now: ${b.slot ?? "lunch"}.
 Products they recently scanned and that are GOOD for them (prefer using these): ${good.join("; ") || "none"}.
 Products OK in moderation (use small amounts, optional): ${mod.join("; ") || "none"}.

@@ -12,6 +12,7 @@ Aplicație mobilă (Expo / React Native, TypeScript) pentru diabetici, publicat�
 - Fără mascotă/personaje (Alex: „prea desene animate”); stil sobru, de calitate. Prima pagină are antetul `DayHeader` (salut după oră, ce mai e de făcut azi, inelul de progres).
 - Glumițe (`src/quips.ts`, componenta `Quip`, mereu urmate de 😊 ca să se înțeleagă că e glumă): scurte, calde, pe seama prăjiturilor, niciodată pe seama persoanei sau a bolii; o singură replică pe ecran; se pot opri din Setări.
 - Fără sfaturi medicale, fără doze, fără diagnostic (evităm încadrarea ca dispozitiv medical). Reamintirile de medicație sunt doar reamintiri.
+- Tonul AI-ului (Alex, 5 nov 2026: „ca un diabetolog: strict, însă puțin indulgent cu micile scăpări”): standardul e ce ține glicemia stabilă, nu ce mănâncă lumea de obicei; strict la dulciuri, băuturi dulci, alcool, făinoase albe, prăjeli, porții mari; indulgent doar la scăpări mici (un pătrățel, o lingură, un gust) — spune cinstit că nu e ideal, nu ceartă, spune ce urmează (oprește-te aici, plimbare, glicemia la 2 ore). Același paragraf în prompturile din `plate`, `ideas`, `ask`.
 
 ## Scope V1 (decis 1 nov 2026)
 1. Scanare cu verdict simplu (motor în `src/engine`, date din Open Food Facts)
