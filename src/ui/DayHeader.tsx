@@ -5,6 +5,7 @@ import { Icon } from "./Icon";
 import { LinearGradient } from "expo-linear-gradient";
 import Svg, { Circle } from "react-native-svg";
 import { dayKeyLocal, gluClass } from "../engine/days";
+import buildInfo from "../build.json";
 import { useStore } from "../store";
 import { useTheme } from "../theme";
 import { useScale } from "./Primitives";
@@ -60,7 +61,7 @@ export function DayHeader() {
         <View style={{ flex: 1, gap: 4 }}>
           <Text style={{ color: t.ink, fontSize: 20 * k, fontWeight: "700", letterSpacing: -0.2 }}>{hi}{state.name ? `, ${state.name}` : ""}</Text>
           <Text style={{ color: t.ink, opacity: 0.8, fontSize: 15 * k, lineHeight: 21 * k }}>{line}</Text>
-          <Text style={{ color: t.muted, fontSize: 10, opacity: 0.6 }}>v{(process.env.EXPO_PUBLIC_BUILD ?? "dev").slice(0, 7)}</Text>
+          <Text style={{ color: t.muted, fontSize: 10, opacity: 0.6 }}>v{(process.env.EXPO_PUBLIC_BUILD ?? buildInfo.sha).slice(0, 7)}</Text>
         </View>
         <Pressable onPress={() => router.push("/ask")} accessibilityRole="button" accessibilityLabel={s.ask_title} style={({ pressed }) => ({ width: 52, height: 52, borderRadius: 26, backgroundColor: t.accent, alignItems: "center", justifyContent: "center", opacity: pressed ? 0.85 : 1 })}>
           <Icon name="chat" size={26} color={t.accentInk} />

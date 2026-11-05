@@ -3,6 +3,7 @@ import { Stack } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Updates from "expo-updates";
 import { useState } from "react";
+import buildInfo from "../src/build.json";
 import { useStore } from "../src/store";
 import type { Lang } from "../src/i18n";
 import { useTheme } from "../src/theme";
@@ -11,7 +12,7 @@ import { Button, Card, Hint, Label, Title, useScale } from "../src/ui/Primitives
 export default function Settings() {
   const t = useTheme(); const k = useScale();
   const [upd, setUpd] = useState("");
-  const build = (process.env.EXPO_PUBLIC_BUILD ?? "dev").slice(0, 7);
+  const build = (process.env.EXPO_PUBLIC_BUILD ?? buildInfo.sha).slice(0, 7);
   const when = Updates.createdAt ? new Date(Updates.createdAt).toLocaleString() : "—";
   const checkUpdates = async () => {
     setUpd("…");
