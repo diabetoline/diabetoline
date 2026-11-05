@@ -2,8 +2,7 @@ import { useEffect, useRef } from "react";
 import { Animated } from "react-native";
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import * as Speech from "expo-speech";
-import { say } from "../../src/speech";
+import { say, stop as stopSpeech } from "../../src/speech";
 import { giBand } from "../../src/engine/plate";
 import { speechLocale } from "../../src/i18n";
 import { useStore } from "../../src/store";
@@ -19,7 +18,7 @@ export default function MealResult() {
   const t = useTheme(); const k = useScale(); const router = useRouter();
   const { t: s, s: state, removeEntry } = useStore();
   const m = state.meals.find((x) => x.id === id);
-  useEffect(() => () => { Speech.stop(); }, []);
+  useEffect(() => () => { stopSpeech(); }, []);
   const fade = useRef(new Animated.Value(0)).current;
   useEffect(() => { Animated.timing(fade, { toValue: 1, duration: 600, delay: 400, useNativeDriver: true }).start(); }, []);
 
@@ -32,7 +31,7 @@ export default function MealResult() {
   const band = { low: t.ok, mid: t.warn, high: t.bad } as const;
   const bandWord = { low: s.low, mid: s.mid, high: s.high } as const;
   const speak = () => {
-    Speech.stop();
+    stopSpeech();
     say([title, a?.summary, ...(a?.tips ?? [])].filter(Boolean).join(". "), state.lang);
   };
 
@@ -106,7 +105,7 @@ export default function MealResult() {
         )}
 
         <Button title={"✓ " + s.meal_ate} size="xl" onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))} />
-        <Button title={s.meal_looking} kind="ghost" onPress={() => { Speech.stop(); removeEntry("meal", m.id); if (router.canGoBack()) router.back(); else router.replace("/"); }} />
+        <Button title={s.meal_looking} kind="ghost" onPress={() => { stopSpeech(); removeEntry("meal", m.id); if (router.canGoBack()) router.back(); else router.replace("/"); }} />
         {a && <Hint>{s.plate_note}</Hint>}
       </View>
     </ScrollView>

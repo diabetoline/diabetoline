@@ -1,8 +1,7 @@
 import { useRef, useState } from "react";
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View, type ScrollViewInstance } from "react-native";
 import { Stack, useRouter } from "expo-router";
-import * as Speech from "expo-speech";
-import { say } from "../src/speech";
+import { say, stop as stopSpeech } from "../src/speech";
 import { ask } from "../src/api/ask";
 import { journalContext } from "../src/ui/journalContext";
 import { speechLocale } from "../src/i18n";
@@ -24,7 +23,7 @@ export default function Ask() {
 
   const send = async (question: string) => {
     const text = question.trim(); if (!text || busy) return;
-    setQ(""); setBusy(true); Speech.stop();
+    setQ(""); setBusy(true); stopSpeech();
     setMsgs((m) => [...m, { role: "me", text }]);
     const r = await ask({ lang: state.lang, question: text, context: journalContext(state, s), name: state.name || undefined });
     const answer = r.ok ? r.answer : r.error === "not_configured" ? s.ask_off : s.ask_err;
@@ -54,7 +53,7 @@ export default function Ask() {
             {m.emergency && <Text style={{ color: t.bad, fontWeight: "800", fontSize: 16 * k }}>⚠️ {s.ask_emergency}</Text>}
             <Text style={{ color: m.role === "me" ? t.accentInk : t.ink, fontSize: 18 * k, lineHeight: 26 * k }}>{m.text}</Text>
             {m.role === "app" && !m.emergency && (
-              <Pressable onPress={() => { Speech.stop(); say(m.text, state.lang); }} accessibilityRole="button" accessibilityLabel={s.speak} style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+              <Pressable onPress={() => { stopSpeech(); say(m.text, state.lang); }} accessibilityRole="button" accessibilityLabel={s.speak} style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
                 <Text style={{ fontSize: 18 }}>🔊</Text><Text style={{ color: t.accent, fontWeight: "700", fontSize: 15 * k }}>{s.speak}</Text>
               </Pressable>
             )}
