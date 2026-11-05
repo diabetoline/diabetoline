@@ -5,6 +5,8 @@ create table if not exists public.feedback (
   lang text,
   role text,
   build text,
+  email text,
   created_at timestamptz not null default now()
 );
 alter table public.feedback enable row level security; -- fără politici: doar service_role scrie/citește
+alter table public.feedback add column if not exists email text;

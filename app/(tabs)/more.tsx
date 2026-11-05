@@ -12,11 +12,11 @@ import { Icon, type IconName } from "../../src/ui/Icon";
 export default function More() {
   const t = useTheme(); const k = useScale(); const router = useRouter();
   const { t: s, s: state } = useStore();
-  const [fb, setFb] = useState(""); const [fbNote, setFbNote] = useState("");
+  const [fb, setFb] = useState(""); const [fbMail, setFbMail] = useState(""); const [fbNote, setFbNote] = useState("");
   const sendFb = async () => {
     const body = fb.trim(); if (body.length < 3) return;
     try {
-      const r = await fetch(`${process.env.EXPO_PUBLIC_API_URL || "https://curalife.expo.app"}/api/feedback`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ body, lang: state.lang, role: state.family.role ?? state.profile?.forWhom ?? "", build: (process.env.EXPO_PUBLIC_BUILD ?? buildInfo.sha).slice(0, 7) }) });
+      const r = await fetch(`${process.env.EXPO_PUBLIC_API_URL || "https://curalife.expo.app"}/api/feedback`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ body, email: fbMail.trim(), lang: state.lang, role: state.family.role ?? state.profile?.forWhom ?? "", build: (process.env.EXPO_PUBLIC_BUILD ?? buildInfo.sha).slice(0, 7) }) });
       if (!r.ok) throw new Error(); setFb(""); setFbNote(s.fb_ok);
     } catch { setFbNote(s.fb_err); }
   };
@@ -49,6 +49,8 @@ export default function More() {
           <Text style={{ color: t.ink, fontSize: 16 * k, lineHeight: 23 * k }}>{s.fb_text}</Text>
           <TextInput value={fb} onChangeText={(v) => { setFb(v); setFbNote(""); }} placeholder={s.fb_ph} placeholderTextColor={t.muted} multiline maxLength={1000} accessibilityLabel={s.fb_title}
             style={{ borderWidth: 2, borderColor: t.line, borderRadius: 14, padding: 14, minHeight: 90, fontSize: 18 * k, color: t.ink, backgroundColor: t.bg, textAlignVertical: "top" }} />
+          <TextInput value={fbMail} onChangeText={setFbMail} placeholder={s.fb_email} placeholderTextColor={t.muted} keyboardType="email-address" autoCapitalize="none" autoCorrect={false} maxLength={120} accessibilityLabel={s.fb_email}
+            style={{ borderWidth: 2, borderColor: t.line, borderRadius: 14, padding: 14, fontSize: 17 * k, color: t.ink, backgroundColor: t.bg }} />
           <Button title={s.fb_send} onPress={sendFb} disabled={fb.trim().length < 3} />
           {fbNote ? <Hint>{fbNote}</Hint> : null}
         </Card>
