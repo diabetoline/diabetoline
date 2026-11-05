@@ -17,7 +17,7 @@ export interface MealVerdict { level: Level; carbs: number; gl: number }
  * Pragurile pentru o masă întreagă (nu pentru o porție dintr-un produs).
  * Punct de pornire, de validat cu diabetologul, ca și pragurile din verdict.ts.
  */
-export const MEAL_T = { glYellow: 15, glRed: 25, carbsYellow: 45, carbsRed: 75, sweetRed: 12, bigPlate: 400, alcoholRed: 400 };
+export const MEAL_T = { glYellow: 12, glRed: 25, carbsYellow: 45, carbsRed: 75, sweetRed: 12, bigPlate: 400, alcoholRed: 400 };
 
 /** Indicele glicemic implicit când modelul nu dă unul pentru un aliment cu carbohidrați. */
 const GI_FALLBACK = 55;

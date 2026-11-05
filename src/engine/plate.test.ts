@@ -52,3 +52,10 @@ test("un pahar de vin sec lângă o masă bună: cu măsură", () => {
   const foods = [{ name: "pește la grătar", grams: 150, carbs: 0, gi: null }, { name: "salată", grams: 120, carbs: 4, gi: 15, veg: true }, { name: "vin sec", grams: 150, carbs: 1, gi: null, alcohol: true }];
   assert.equal(mealVerdict(foods).level, "yellow");
 });
+
+test("o banană întreagă: cu măsură, nu verde", () => {
+  assert.equal(mealVerdict([{ name: "banană", grams: 120, carbs: 27, gi: 51 }]).level, "yellow");
+});
+test("pui cu salată și o felie de pâine integrală: verde", () => {
+  assert.equal(mealVerdict([{ name: "pui", grams: 150, carbs: 0, gi: null }, { name: "salată", grams: 150, carbs: 4, gi: 15, veg: true }, { name: "pâine integrală", grams: 30, carbs: 12, gi: 55, veg: false }]).level, "green");
+});

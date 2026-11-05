@@ -40,7 +40,7 @@ export function normalize(o: Record<string, any>, lang = "en"): Product {
     || /-(juices|drinks|waters|sodas|milks|nectars|beverages)$/.test(c) && !/foods-and-beverages/.test(c));
   const unit: "g" | "ml" = liquidQty || (liquidCat && !/\d\s*(g|kg)\b/.test(qty)) ? "ml" : "g";
   const servingRaw = Number(o.serving_quantity);
-  const serving = Number.isFinite(servingRaw) && servingRaw > 0 ? servingRaw : undefined;
+  const serving = Number.isFinite(servingRaw) && servingRaw >= 5 && servingRaw <= 600 ? servingRaw : undefined;
 
   const ingText: string = o[`ingredients_text_${lang}`] || o.ingredients_text_en || o.ingredients_text || "";
   const ingredients: string[] = Array.isArray(o.ingredients) && o.ingredients.length
