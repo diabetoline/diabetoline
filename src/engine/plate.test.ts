@@ -40,3 +40,15 @@ test("porție mare fără legume: cu măsură", () => {
 test("verdictul modelului nu poate face o masă grea verde", () => {
   assert.equal(mealVerdict([{ name: "paste", grams: 250, carbs: 75, gi: 55 }], "green").level, "red");
 });
+
+test("o bere (330 ml): cu măsură, nu potrivită", () => {
+  assert.equal(mealVerdict([{ name: "bere blondă", grams: 330, carbs: 11, gi: 66, alcohol: true }]).level, "yellow");
+});
+test("o bere mare (500 ml) sau un cocktail dulce: roșu", () => {
+  assert.equal(mealVerdict([{ name: "bere", grams: 500, carbs: 16, gi: 66, alcohol: true }]).level, "red");
+  assert.equal(mealVerdict([{ name: "cocktail", grams: 200, carbs: 20, gi: 65, alcohol: true, sweet: true }]).level, "red");
+});
+test("un pahar de vin sec lângă o masă bună: cu măsură", () => {
+  const foods = [{ name: "pește la grătar", grams: 150, carbs: 0, gi: null }, { name: "salată", grams: 120, carbs: 4, gi: 15, veg: true }, { name: "vin sec", grams: 150, carbs: 1, gi: null, alcohol: true }];
+  assert.equal(mealVerdict(foods).level, "yellow");
+});
