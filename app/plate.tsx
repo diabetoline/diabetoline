@@ -45,7 +45,7 @@ export default function PlateScreen() {
     const r = await analyzePlate(uri, state.lang);
     setAnalyzing(false);
     if (r.ok) {
-      const v = mealVerdict(r.data.foods);
+      const v = mealVerdict(r.data.foods, r.data.level);
       const id = addMeal({ photoUri: keep(uri), slot: slotForHour(new Date().getHours()), level: v.level, carbs: v.carbs, gl: v.gl,
         name: r.data.foods.map((f) => f.name).slice(0, 3).join(", "), analysis: r.data });
       router.replace({ pathname: "/meal/[id]", params: { id } });

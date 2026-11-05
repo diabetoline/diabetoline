@@ -17,3 +17,26 @@ test("cartofi și friptură: cu măsură", () => {
 test("carbohidrați negativi ignorați", () => {
   assert.equal(mealVerdict([{ name: "x", grams: 10, carbs: -5, gi: 50 }]).carbs, 0);
 });
+
+test("o lingură de dulceață: roșu, chiar dacă are puțini carbohidrați", () => {
+  const v = mealVerdict([{ name: "dulceață de smochine", grams: 30, carbs: 19, gi: 55, sweet: true }]);
+  assert.equal(v.level, "red");
+});
+test("un gust de dulce (sub o porție): galben, nu verde", () => {
+  assert.equal(mealVerdict([{ name: "o bucățică de ciocolată", grams: 10, carbs: 6, gi: 45, sweet: true }]).level, "yellow");
+});
+test("cotlet pane prăjit, fără legume: cu măsură", () => {
+  const v = mealVerdict([{ name: "cotlet pane prăjit", grams: 230, carbs: 22, gi: 55, fried: true, refined: true }]);
+  assert.equal(v.level, "yellow");
+});
+test("cotlet pane cu salată mare lângă: tot cu măsură din cauza modelului", () => {
+  const foods = [{ name: "cotlet pane", grams: 150, carbs: 15, gi: 55, fried: true, refined: true }, { name: "salată", grams: 150, carbs: 4, gi: 15, veg: true }];
+  assert.equal(mealVerdict(foods).level, "green");
+  assert.equal(mealVerdict(foods, "yellow").level, "yellow");
+});
+test("porție mare fără legume: cu măsură", () => {
+  assert.equal(mealVerdict([{ name: "friptură", grams: 450, carbs: 0, gi: null }]).level, "yellow");
+});
+test("verdictul modelului nu poate face o masă grea verde", () => {
+  assert.equal(mealVerdict([{ name: "paste", grams: 250, carbs: 75, gi: 55 }], "green").level, "red");
+});
