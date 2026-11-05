@@ -1,5 +1,5 @@
 import { Pressable, ScrollView, Switch, Text, TextInput, View } from "react-native";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Updates from "expo-updates";
 import { useState } from "react";
@@ -20,6 +20,7 @@ export default function Settings() {
     catch (e) { try { await Updates.reloadAsync(); } catch { setUpd(String((e as Error)?.message ?? e)); } }
   };
   const { t: s, s: state, set } = useStore();
+  const router = useRouter();
   const langs: { v: Lang; l: string }[] = [{ v: "ro", l: "Română" }, { v: "en", l: "English" }, { v: "de", l: "Deutsch" }];
   const Seg = <T extends string>({ value, options, onChange }: { value: T; options: { v: T; l: string }[]; onChange: (v: T) => void }) => (
     <View style={{ flexDirection: "row", gap: 8 }}>
@@ -68,6 +69,7 @@ export default function Settings() {
         <Button title={s.upd_check} kind="soft" onPress={checkUpdates} />
         {upd ? <Text style={{ color: t.muted, fontSize: 14 * k }}>{upd}</Text> : null}
       </Card>
+      <Button title={s.first_again} kind="soft" onPress={() => router.push("/welcome")} />
       <Button title={s.reset} kind="danger" onPress={async () => { await AsyncStorage.clear(); set({ history: [], glucose: [], meals: [], meds: [], medLog: [], cache: {} }); }} />
     </ScrollView>
   );
