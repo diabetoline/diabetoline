@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { Stack, useRouter } from "expo-router";
 import { useStore, type ListItem } from "../src/store";
@@ -12,7 +12,8 @@ import { Button, Card, Hint, Label, Title, useScale } from "../src/ui/Primitives
  */
 export default function ShoppingList() {
   const t = useTheme(); const k = useScale(); const router = useRouter();
-  const { t: s, s: state, addToList, toggleList, removeFromList, set } = useStore();
+  const { t: s, s: state, addToList, toggleList, removeFromList, set, syncNow } = useStore();
+  useEffect(() => { syncNow(); }, []);
   const [text, setText] = useState("");
   const list = state.list ?? [];
   const todo = list.filter((x) => !x.done); const done = list.filter((x) => x.done);

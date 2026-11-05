@@ -57,6 +57,8 @@ const KEY = "dscan.state.v2";
 interface Ctx {
   s: State; t: Strings;
   set: (patch: Partial<State> | ((s: State) => Partial<State>)) => void;
+  /** cere o sincronizare cu serverul acum (ex. la deschiderea listei) */
+  syncNow: () => void;
   recordScan: (p: Product, v: Verdict) => void;
   addUserProduct: (p: Product) => void;
   addGlucose: (e: Omit<GluEntry, "id" | "t"> & { t?: number }) => void;
@@ -93,7 +95,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const sub = AppState.addEventListener("change", (st) => { if (st === "active") run(); });
     return () => { alive = false; clearTimeout(h); sub.remove(); };
   }, [ready, s.welcomed, planKey, s.lang]);
-  // părintele cu consimțământ: jurnalul pleacă pe server la câteva secunde după o modificare
+  // părintele cu consimțământ: jurnalul pleacă pe server la câteva secunde după o modificare,
+  // și la fiecare revenire în aplicație (ca să ia ce a pus copilul pe listă între timp)
+  const [syncTick, setSyncTick] = useState(0);
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (st) => { if (st === "active") setSyncTick((n) => n + 1); });
+    return () => sub.remove();
+  }, []);
   useEffect(() => {
     if (!ready || s.family.role !== "parent" || !s.family.consent) return;
     const h = setTimeout(() => {
@@ -108,11 +116,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       }).catch(() => {});
     }, 4000);
     return () => clearTimeout(h);
-  }, [ready, s.glucose, s.meals, s.medLog, s.walks, s.weights, s.history, s.trash, s.list, s.family.role, s.family.consent]);
+  }, [ready, syncTick, s.glucose, s.meals, s.medLog, s.walks, s.weights, s.history, s.trash, s.list, s.family.role, s.family.consent]);
 
   const api = useMemo<Ctx>(() => ({
     s, t: strings(s.lang),
     set: (patch) => setS((prev) => ({ ...prev, ...(typeof patch === "function" ? patch(prev) : patch) })),
+    syncNow: () => setSyncTick((n) => n + 1),
     recordScan: (p, v) => setS((prev) => ({
       ...prev, cache: { ...prev.cache, [p.code]: p },
       history: [{ code: p.code, name: p.name, level: v.level, t: Date.now() }, ...prev.history.filter((h) => h.code !== p.code)].slice(0, 200),
