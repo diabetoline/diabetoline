@@ -10,6 +10,7 @@ import { Quip } from "../../src/ui/Quip";
 import { MoveCheckin, WeightCheckin } from "../../src/ui/Checkins";
 import { DayHeader } from "../../src/ui/DayHeader";
 import { RecoCard } from "../../src/ui/RecoCard";
+import { trialDaysLeft } from "../../src/money";
 import { slotForHour } from "../../src/store";
 
 /**
@@ -36,6 +37,7 @@ export default function Home() {
     <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }} edges={["top"]}>
       <ScrollView contentContainerStyle={st.wrap}>
         <DayHeader />
+        {trialDaysLeft(state.trialStart) > 0 && <Hint style={{ textAlign: "center" }}>{s.pay_left(trialDaysLeft(state.trialStart))}</Hint>}
         <View style={{ paddingHorizontal: 16, gap: 12 }}>
 
         <View style={{ flexDirection: "row", gap: 12 }}>

@@ -21,3 +21,15 @@ export function money(lei: number, region = deviceRegion(), locale?: string): st
   return `≈ ${fmt(rounded, cur)}`;
 }
 export const ratesDate = rates.date;
+
+/** Prețurile abonamentului (decise 5 nov 2026): un plan, familia inclusă. Afișate în moneda țării telefonului. */
+export const PLAN = { RON: { year: 250, month: 29.99 }, EUR: { year: 49.99, month: 5.99 }, GBP: { year: 44.99, month: 5.49 }, USD: { year: 49.99, month: 5.99 } } as const;
+export function planPrice(kind: "year" | "month", region = deviceRegion()): string {
+  const cur = currencyFor(region);
+  const p = (PLAN as Record<string, { year: number; month: number }>)[cur] ?? PLAN.EUR;
+  const c = cur in PLAN ? cur : "EUR";
+  const txt = new Intl.NumberFormat(getLocales()[0]?.languageTag ?? "ro-RO", { style: "currency", currency: c, minimumFractionDigits: Number.isInteger(p[kind]) ? 0 : 2 }).format(p[kind]);
+  return c === "RON" ? txt.replace("RON", "lei") : txt;
+}
+export const TRIAL_DAYS = 5;
+export function trialDaysLeft(trialStart?: number): number { return trialStart == null ? 0 : Math.max(0, TRIAL_DAYS - Math.floor((Date.now() - trialStart) / 864e5)); }

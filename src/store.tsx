@@ -33,7 +33,13 @@ export interface Family {
 }
 export interface MedLog { id: string; medId: string; time: string; day: string; t: number }
 
+/** Răspunsurile de la prima deschidere (chestionarul scurt). Fără diagnostic: „condition” e ce a spus omul, folosit doar pentru ton și raport. */
+export interface Profile { forWhom: "me" | "parent" | "child"; condition: "t2" | "t1" | "pre" | "unsure"; age?: number; heightCm?: number; concerns: string[]; meter?: boolean }
+
 export interface State {
+  profile?: Profile;
+  /** începutul celor 5 zile de probă cu tot (ținute în aplicație, fără card) */
+  trialStart?: number;
   lang: Lang; langManual?: boolean; humor: boolean; welcomed?: boolean; unit: "mg" | "mmol"; name: string; bigText: boolean;
   history: HistItem[]; glucose: GluEntry[]; meals: MealEntry[]; meds: Med[]; medLog: MedLog[]; walks: Walk[]; weights: Weight[]; list: ListItem[]; family: Family;
   /** ziua (YYYY-MM-DD) în care a răspuns „nu încă” la întrebarea de seară, ca să nu-l mai întrebăm azi */
