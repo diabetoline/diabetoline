@@ -11,7 +11,9 @@ const dark: typeof light = {
   ok: "#5FD394", okBg: "#163527", warn: "#F2B54A", warnBg: "#3A2D12", bad: "#FF8273", badBg: "#3D1D1A",
 };
 export type Theme = typeof light;
-export function useTheme(): Theme { return useColorScheme() === "dark" ? dark : light; }
+// pe web, ?theme=light|dark forțează tema (folosit la capturile pentru magazine)
+const forced = typeof location !== "undefined" ? new URLSearchParams(location.search).get("theme") : null;
+export function useTheme(): Theme { const sys = useColorScheme(); const mode = forced ?? sys; return mode === "dark" ? dark : light; }
 
 export const levelColor = (t: Theme, level: "green" | "yellow" | "red") =>
   level === "green" ? { fg: t.ok, bg: t.okBg } : level === "yellow" ? { fg: t.warn, bg: t.warnBg } : { fg: t.bad, bg: t.badBg };
