@@ -422,9 +422,9 @@ export function deviceLang(): Lang {
 export function strings(lang: Lang): Strings { return STR[lang] ?? ro; }
 /** Politica de confidențialitate, publicată pe diabetoline.com (o versiune pe limbă) */
 export const privacyUrl: Record<Lang, string> = {
-  ro: "https://diabetoline.com/pages/confidentialitate-aplicatie",
-  en: "https://diabetoline.com/pages/app-privacy",
-  de: "https://diabetoline.com/pages/app-datenschutz",
+  ro: "https://curalife.expo.app/api/privacy",
+  en: "https://curalife.expo.app/api/privacy",
+  de: "https://curalife.expo.app/api/privacy",
 };
 /** BCP-47 tag for text-to-speech */
 export const speechLocale: Record<Lang, string> = { ro: "ro-RO", en: "en-US", de: "de-DE" };
