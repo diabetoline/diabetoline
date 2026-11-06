@@ -18,6 +18,8 @@ function audioMod(): AudioMod | null {
   return audio;
 }
 let current: Player | null = null;
+let seq = 0;            // fiecare apel say() primește un număr; cele mai vechi se opresc singure la revenirea din await
+let speakingText = "";  // ce se citește acum (ca a doua apăsare pe același buton să oprească, nu să pornească din nou)
 let serverDown = 0; // nu mai încercăm serverul câteva minute după un eșec
 
 function hash(s: string): string { let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0; return h.toString(36); }
@@ -54,29 +56,36 @@ async function bestVoice(lang: Lang): Promise<string | undefined> {
 }
 
 export function stop() {
+  seq++; speakingText = "";
   Speech.stop();
   if (current) { try { current.pause(); current.remove(); } catch {} current = null; }
 }
 
 /** Citește cu voce tare: vocea naturală dacă se poate, altfel cea de pe telefon. */
 export async function say(text: string, lang: Lang) {
+  const again = speakingText === text;
   try { stop(); } catch {}
+  if (again) return; // a doua apăsare pe același text = oprește
+  const my = seq; speakingText = text;
   try {
     const mod = audioMod();
     if (mod) {
       await mod.setAudioModeAsync?.({ playsInSilentMode: true, interruptionMode: "mixWithOthers" }).catch(() => {});
       const uri = await fetchNatural(text, lang);
+      if (my !== seq) return; // între timp s-a apăsat altceva
       if (uri) {
         const p = mod.createAudioPlayer({ uri });
         current = p;
-        p.addListener("playbackStatusUpdate", (st) => { if (st.didJustFinish && current === p) { try { p.remove(); } catch {} current = null; } });
+        p.addListener("playbackStatusUpdate", (st) => { if (st.didJustFinish && current === p) { try { p.remove(); } catch {} current = null; speakingText = ""; } });
         p.play();
         return;
       }
     }
   } catch { current = null; }
+  if (my !== seq) return;
   try {
     const voice = await bestVoice(lang);
-    Speech.speak(text, { language: speechLocale[lang], voice, rate: 0.92, pitch: 1.0 });
+    if (my !== seq) return;
+    Speech.speak(text, { language: speechLocale[lang], voice, rate: 0.92, pitch: 1.0, onDone: () => { if (my === seq) speakingText = ""; }, onStopped: () => { if (my === seq) speakingText = ""; } });
   } catch { Speech.speak(text, { language: speechLocale[lang] }); }
 }
