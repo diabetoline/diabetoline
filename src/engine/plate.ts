@@ -17,7 +17,7 @@ export interface MealVerdict { level: Level; carbs: number; gl: number }
  * Pragurile pentru o masă întreagă (nu pentru o porție dintr-un produs).
  * Punct de pornire, de validat cu diabetologul, ca și pragurile din verdict.ts.
  */
-export const MEAL_T = { glYellow: 12, glRed: 25, carbsYellow: 45, carbsRed: 75, sweetRed: 12, bigPlate: 400, alcoholRed: 400 };
+export const MEAL_T = { glYellow: 12, glYellowBalanced: 18, glRed: 30, carbsYellow: 45, carbsRed: 75, sweetRed: 12, bigPlate: 400, alcoholRed: 400 };
 
 /** Indicele glicemic implicit când modelul nu dă unul pentru un aliment cu carbohidrați. */
 const GI_FALLBACK = 55;
@@ -44,8 +44,11 @@ export function mealVerdict(foods: PlateFood[], modelLevel?: Level | null): Meal
     if (f.alcohol) { alcoholMl += Math.max(0, f.grams); if (f.sweet) sweetAlcohol = true; }
   }
   carbs = Math.round(carbs); gl = Math.round(gl);
+  // farfurie echilibrată (legume, fără făinoase albe, prăjeli, dulciuri): puțin mai mult loc pentru carbohidrații buni (quinoa, linte, orez brun)
+  const balanced = veg && !refined && !fried && sweetCarbs === 0;
+  const glYellow = balanced ? MEAL_T.glYellowBalanced : MEAL_T.glYellow;
   let level: Level = gl > MEAL_T.glRed || carbs > MEAL_T.carbsRed ? "red"
-    : gl > MEAL_T.glYellow || carbs > MEAL_T.carbsYellow ? "yellow" : "green";
+    : gl > glYellow || carbs > MEAL_T.carbsYellow ? "yellow" : "green";
   // dulciuri cu zahăr: niciodată verde; de la o porție obișnuită în sus, roșu
   if (sweetCarbs > 0) level = worst(level, sweetCarbs >= MEAL_T.sweetRed ? "red" : "yellow");
   // prăjit sau făinoase albe fără legume lângă: cel puțin „cu măsură”

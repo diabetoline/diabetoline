@@ -59,3 +59,20 @@ test("o banană întreagă: cu măsură, nu verde", () => {
 test("pui cu salată și o felie de pâine integrală: verde", () => {
   assert.equal(mealVerdict([{ name: "pui", grams: 150, carbs: 0, gi: null }, { name: "salată", grams: 150, carbs: 4, gi: 15, veg: true }, { name: "pâine integrală", grams: 30, carbs: 12, gi: 55, veg: false }]).level, "green");
 });
+
+test("somon + broccoli + quinoa (farfurie echilibrată): verde", () => {
+  assert.equal(mealVerdict([{ name: "somon", grams: 120, carbs: 0, gi: null }, { name: "broccoli", grams: 100, carbs: 6, gi: 15, veg: true }, { name: "quinoa", grams: 150, carbs: 29, gi: 53 }]).level, "green");
+});
+test("ovăz cu afine, fără legume: cu măsură", () => {
+  assert.equal(mealVerdict([{ name: "ovăz fiert", grams: 200, carbs: 22, gi: 55 }, { name: "afine", grams: 80, carbs: 11, gi: 53 }, { name: "nuci", grams: 15, carbs: 2, gi: null }]).level, "yellow");
+});
+test("șnițel cu salată de cartofi: cu măsură, nu roșu", () => {
+  assert.equal(mealVerdict([{ name: "șnițel", grams: 150, carbs: 20, gi: 60, fried: true, refined: true }, { name: "salată de cartofi", grams: 200, carbs: 25, gi: 60 }]).level, "yellow");
+});
+test("pizza 2 felii mari / tikka cu orez și naan: roșu", () => {
+  assert.equal(mealVerdict([{ name: "pizza", grams: 240, carbs: 60, gi: 60, refined: true }]).level, "red");
+  assert.equal(mealVerdict([{ name: "tikka", grams: 250, carbs: 12, gi: 35 }, { name: "orez alb", grams: 150, carbs: 42, gi: 73, refined: true }, { name: "naan", grams: 90, carbs: 45, gi: 71, refined: true }]).level, "red");
+});
+test("supă de linte cu salată: verde", () => {
+  assert.equal(mealVerdict([{ name: "supă de linte", grams: 350, carbs: 28, gi: 30 }, { name: "salată", grams: 100, carbs: 4, gi: 15, veg: true }]).level, "green");
+});
