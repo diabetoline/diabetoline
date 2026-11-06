@@ -23,5 +23,5 @@ export async function POST(request: Request): Promise<Response> {
       }) });
     } catch {}
   }
-  return Response.json({ ok: !error });
+  return Response.json({ ok: !error, reason: error?.message });
 }
