@@ -5,7 +5,7 @@ import { gluClass } from "../engine/days";
 const esc = (x: string) => x.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c] as string));
 
 /** HTML-ul raportului: A4, lizibil printat alb-negru. */
-export function reportHtml(r: ReportData, s: Strings, opts: { name: string; unit: "mg" | "mmol"; locale: string }): string {
+export function reportHtml(r: ReportData, s: Strings, opts: { name: string; unit: "mg" | "mmol"; locale: string; profile?: { condition: "t2" | "t1" | "pre" | "unsure"; age?: number; heightCm?: number } }): string {
   const u = (v: number) => (opts.unit === "mg" ? String(Math.round(v)) : (v / 18).toFixed(1));
   const unitLbl = opts.unit === "mg" ? "mg/dL" : "mmol/L";
   const date = (t: number) => new Date(t).toLocaleDateString(opts.locale, { day: "2-digit", month: "2-digit", year: "numeric" });
@@ -38,6 +38,7 @@ export function reportHtml(r: ReportData, s: Strings, opts: { name: string; unit
   </style></head><body>
     <h1>Diabetoline · ${esc(s.rep_title)}</h1>
     <div class="meta">${esc(s.rep_patient)}: <b>${esc(opts.name || "—")}</b> &nbsp;·&nbsp; ${esc(s.rep_period)}: ${date(r.from)} – ${date(r.to)} (${r.days} ${esc(s.rep_days.toLowerCase())})</div>
+    ${opts.profile ? `<div class="meta">${esc(s.rep_profile)}: ${[s[`q_cond_${opts.profile.condition}`], opts.profile.age ? `${opts.profile.age} ${esc(s.rep_years)}` : "", opts.profile.heightCm ? `${opts.profile.heightCm} cm` : ""].filter(Boolean).map(esc).join(" · ")} <span style="color:#5B6B78">(${esc(s.rep_profile_note)})</span></div>` : ""}
 
     <h2>${esc(s.rep_glu)} · ${g.count} ${esc(s.rep_readings)}</h2>
     <div class="grid">

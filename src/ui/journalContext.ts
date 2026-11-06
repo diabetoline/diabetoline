@@ -8,6 +8,11 @@ export function journalContext(s: State, t: Strings): string {
   const u = (v: number) => (s.unit === "mg" ? `${Math.round(v)} mg/dL` : `${(v / 18).toFixed(1)} mmol/L`);
   const when = (x: number) => new Date(x).toLocaleString(undefined, { weekday: "short", hour: "2-digit", minute: "2-digit" });
   const lines: string[] = [];
+  const pr = s.profile;
+  if (pr) {
+    const cond = { t2: "type 2 diabetes", t1: "type 1 diabetes", pre: "prediabetes", unsure: "unsure" }[pr.condition];
+    lines.push(`profile (self-reported, not a diagnosis): ${cond}${pr.age ? `, age ${pr.age}` : ""}${pr.heightCm ? `, height ${pr.heightCm} cm` : ""}${pr.meter === false ? ", no glucose meter at home" : ""}`);
+  }
   for (const g of s.glucose.filter((x) => x.t >= since).slice(-20)) lines.push(`glucose ${u(g.v)} (${t.ctx[g.ctx]}, ${gluClass(g.v, g.ctx)}) ${when(g.t)}`);
   for (const m of s.meals.filter((x) => x.t >= since).slice(-15)) lines.push(`meal ${m.name ?? m.slot}${m.level ? ` [${m.level}]` : ""}${m.carbs != null ? ` ${m.carbs} g carbs` : ""} ${when(m.t)}`);
   for (const w of (s.walks ?? []).filter((x) => x.t >= since)) lines.push(`walk ${w.min} min ${when(w.t)}`);

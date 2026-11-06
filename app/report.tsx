@@ -23,7 +23,7 @@ export default function Report() {
   const make = async () => {
     setBusy(true); setErr("");
     try {
-      const html = reportHtml(r, s, { name: state.name, unit: state.unit, locale: LOCALE[state.lang] });
+      const html = reportHtml(r, s, { name: state.name, unit: state.unit, locale: LOCALE[state.lang], profile: state.profile });
       const { uri } = await Print.printToFileAsync({ html });
       if (await Sharing.isAvailableAsync()) await Sharing.shareAsync(uri, { mimeType: "application/pdf", UTI: "com.adobe.pdf", dialogTitle: s.rep_share });
       else await Print.printAsync({ uri });

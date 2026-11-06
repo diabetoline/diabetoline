@@ -41,6 +41,8 @@ export interface State {
   profile?: Profile;
   /** începutul celor 5 zile de probă cu tot (ținute în aplicație, fără card) */
   trialStart?: number;
+  /** cererea de recenzie: de câte ori am întrebat și de când putem întreba din nou */
+  review?: { asked: number; next: number; done?: boolean };
   lang: Lang; langManual?: boolean; humor: boolean; welcomed?: boolean; unit: "mg" | "mmol"; name: string; bigText: boolean;
   history: HistItem[]; glucose: GluEntry[]; meals: MealEntry[]; meds: Med[]; medLog: MedLog[]; walks: Walk[]; weights: Weight[]; list: ListItem[]; family: Family;
   /** ziua (YYYY-MM-DD) în care a răspuns „nu încă” la întrebarea de seară, ca să nu-l mai întrebăm azi */
