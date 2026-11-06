@@ -10,3 +10,6 @@ create table if not exists public.feedback (
 );
 alter table public.feedback enable row level security; -- fără politici: doar service_role scrie/citește
 alter table public.feedback add column if not exists email text;
+-- rolul serverului (service_role) nu primește automat drepturi în acest proiect (vezi și 0006)
+grant all on public.feedback to service_role;
+grant all on public.messages to service_role;
