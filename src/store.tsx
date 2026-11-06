@@ -7,6 +7,7 @@ import { deviceLang, strings, type Lang, type Strings } from "./i18n";
 import { pushDeletes, pushEntries, syncList } from "./family/sync";
 import { registerParentPush } from "./family/messages";
 import { planReminders, type Plan, type RemindPrefs } from "./reminders";
+import { dayKeyLocal } from "./engine/days";
 import { AppState } from "react-native";
 import { sendNewAlerts } from "./family/alerts";
 
@@ -41,6 +42,10 @@ export interface State {
   profile?: Profile;
   /** începutul celor 5 zile de probă cu tot (ținute în aplicație, fără card) */
   trialStart?: number;
+  /** abonament activ (setat de RevenueCat; până atunci nefolosit) */
+  entitled?: boolean;
+  /** scanările de azi, pentru limita de 5 pe zi la gratuit */
+  scans?: { day: string; n: number };
   /** cererea de recenzie: de câte ori am întrebat și de când putem întreba din nou */
   review?: { asked: number; next: number; done?: boolean };
   lang: Lang; langManual?: boolean; humor: boolean; welcomed?: boolean; unit: "mg" | "mmol"; name: string; bigText: boolean;
@@ -62,6 +67,8 @@ interface Ctx {
   set: (patch: Partial<State> | ((s: State) => Partial<State>)) => void;
   /** cere o sincronizare cu serverul acum (ex. la deschiderea listei) */
   syncNow: () => void;
+  /** o scanare în plus azi (limita de la gratuit) */
+  countScan: () => void;
   recordScan: (p: Product, v: Verdict) => void;
   addUserProduct: (p: Product) => void;
   addGlucose: (e: Omit<GluEntry, "id" | "t"> & { t?: number }) => void;
@@ -128,6 +135,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     s, t: strings(s.lang),
     set: (patch) => setS((prev) => ({ ...prev, ...(typeof patch === "function" ? patch(prev) : patch) })),
     syncNow: () => setSyncTick((n) => n + 1),
+    countScan: () => setS((prev) => { const day = dayKeyLocal(Date.now()); return { ...prev, scans: { day, n: (prev.scans?.day === day ? prev.scans.n : 0) + 1 } }; }),
     recordScan: (p, v) => setS((prev) => ({
       ...prev, cache: { ...prev.cache, [p.code]: p },
       history: [{ code: p.code, name: p.name, level: v.level, t: Date.now() }, ...prev.history.filter((h) => h.code !== p.code)].slice(0, 200),

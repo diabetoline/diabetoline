@@ -3,6 +3,7 @@ import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput,
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { Stack, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { allowed, useGate } from "../src/access";
 import { useStore } from "../src/store";
 import { useTheme } from "../src/theme";
 import { Button, Hint } from "../src/ui/Primitives";
@@ -11,20 +12,22 @@ export default function ScanScreen() {
   const t = useTheme(); const router = useRouter();
   const ins = useSafeAreaInsets();
   const close = () => { if (router.canGoBack()) router.back(); else router.replace("/"); };
-  const { t: s } = useStore();
+  const { t: s, s: state, countScan } = useStore();
+  const gate = useGate(state);
   const [perm, requestPerm] = useCameraPermissions();
   const [torch, setTorch] = useState(false);
   const done = useRef(false);
   const [typing, setTyping] = useState(false);
   const [code, setCode] = useState("");
-  const submit = () => { const c = code.replace(/\D/g, ""); if (c.length >= 6) router.replace({ pathname: "/product/[code]", params: { code: c } }); };
+  const go = (c: string) => { if (!gate("scan")) return; countScan(); router.replace({ pathname: "/product/[code]", params: { code: c } }); };
+  const submit = () => { const c = code.replace(/\D/g, ""); if (c.length >= 6) go(c); };
 
   const onScan = ({ data }: { data: string }) => {
     if (done.current) return;
     const clean = data.replace(/\D/g, "");
     if (clean.length < 6) return;
     done.current = true;
-    router.replace({ pathname: "/product/[code]", params: { code: clean } });
+    go(clean);
   };
 
   return (

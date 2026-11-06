@@ -1,10 +1,11 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View, type ScrollViewInstance } from "react-native";
 import { Stack, useRouter } from "expo-router";
 import { say, stop as stopSpeech } from "../src/speech";
 import { ask } from "../src/api/ask";
 import { journalContext } from "../src/ui/journalContext";
 import { speechLocale } from "../src/i18n";
+import { useGate } from "../src/access";
 import { useStore } from "../src/store";
 import { useTheme } from "../src/theme";
 import { Icon } from "../src/ui/Icon";
@@ -16,6 +17,8 @@ type Msg = { role: "me" | "app"; text: string; emergency?: boolean };
 export default function Ask() {
   const t = useTheme(); const k = useScale(); const router = useRouter();
   const { t: s, s: state } = useStore();
+  const gate = useGate(state);
+  useEffect(() => { gate("ask"); }, []);
   const [q, setQ] = useState("");
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [busy, setBusy] = useState(false);

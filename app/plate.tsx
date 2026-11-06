@@ -1,9 +1,10 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { ActivityIndicator, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { Stack, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { File, Paths } from "expo-file-system";
+import { useGate } from "../src/access";
 import { slotForHour, useStore, type MealEntry } from "../src/store";
 import { useTheme } from "../src/theme";
 import { Button, Hint } from "../src/ui/Primitives";
@@ -18,6 +19,8 @@ export default function PlateScreen() {
   const ins = useSafeAreaInsets();
   const close = () => { if (router.canGoBack()) router.back(); else router.replace("/"); };
   const { t: s, s: state, addMeal } = useStore();
+  const gate = useGate(state);
+  useEffect(() => { gate("plate"); }, []);
   const [perm, requestPerm] = useCameraPermissions();
   const cam = useRef<CameraView>(null);
   const [shot, setShot] = useState<string | null>(null);

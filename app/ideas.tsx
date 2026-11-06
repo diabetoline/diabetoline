@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { fetchIdeas, type Idea } from "../src/api/ideas";
+import { useGate } from "../src/access";
 import { slotForHour, useStore } from "../src/store";
 import { useTheme } from "../src/theme";
 import { Button, Card, Hint, Label, Title, useScale } from "../src/ui/Primitives";
@@ -13,6 +14,8 @@ export default function Ideas() {
   const t = useTheme(); const k = useScale(); const router = useRouter();
   const { focus, lighter } = useLocalSearchParams<{ focus?: string; lighter?: string }>();
   const { t: s, s: state, addMeal, addToList } = useStore();
+  const gate = useGate(state);
+  useEffect(() => { gate("ideas"); }, []);
   const [listed, setListed] = useState<number | null>(null);
   const slot = slotForHour(new Date().getHours());
   const [ideas, setIdeas] = useState<Idea[] | null>(null);

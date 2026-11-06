@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { planPrice } from "../src/money";
+import { planPrice, trialDaysLeft } from "../src/money";
 import { useStore } from "../src/store";
 import { useTheme } from "../src/theme";
 import { Icon } from "../src/ui/Icon";
@@ -14,6 +14,9 @@ import { Button, Hint, useScale } from "../src/ui/Primitives";
 export default function Paywall() {
   const t = useTheme(); const k = useScale(); const router = useRouter();
   const { t: s, s: state, set } = useStore();
+  const { from } = useLocalSearchParams<{ from?: string }>();
+  // deschis dintr-o funcție blocată (după probă): titlu diferit și „Rămân pe gratuit” în loc de „Începe proba”
+  const locked = !!from && state.trialStart != null && trialDaysLeft(state.trialStart) === 0 && !state.entitled;
   const start = () => {
     set({ welcomed: true, trialStart: state.trialStart ?? Date.now() });
     router.replace("/");
@@ -28,8 +31,8 @@ export default function Paywall() {
         <View style={{ alignItems: "center" }}>
           <View style={{ width: 96, height: 96, borderRadius: 30, backgroundColor: t.accentSoft, alignItems: "center", justifyContent: "center" }}><Icon name="care" size={54} color={t.accent} strokeWidth={1.8} /></View>
         </View>
-        <Text style={{ color: t.ink, fontSize: 28 * k, fontWeight: "800", textAlign: "center", letterSpacing: -0.4 }}>{s.pay_title}</Text>
-        <Text style={{ color: t.muted, fontSize: 18 * k, textAlign: "center" }}>{s.pay_sub}</Text>
+        <Text style={{ color: t.ink, fontSize: 28 * k, fontWeight: "800", textAlign: "center", letterSpacing: -0.4 }}>{locked ? s.pay_locked_title : s.pay_title}</Text>
+        <Text style={{ color: t.muted, fontSize: 18 * k, textAlign: "center" }}>{locked ? s.pay_locked_sub : s.pay_sub}</Text>
         <View style={{ backgroundColor: t.surface, borderRadius: 20, padding: 18, gap: 10, borderWidth: 1, borderColor: t.line }}>
           {perks.map((p, j) => <Text key={j} style={{ color: t.ink, fontSize: 16 * k, lineHeight: 23 * k }}>✓ {p}</Text>)}
         </View>
@@ -37,8 +40,17 @@ export default function Paywall() {
           <Text style={{ color: t.ink, fontSize: 24 * k, fontWeight: "800" }}>{s.pay_year(planPrice("year"))}</Text>
           <Text style={{ color: t.muted, fontSize: 15 * k }}>{s.pay_month(planPrice("month"))} · {s.pay_family}</Text>
         </View>
-        <Button title={s.pay_trial} size="xl" onPress={start} />
-        <Button title={`${s.pay_now} · ${s.pay_soon}`} kind="ghost" disabled onPress={() => {}} />
+        {locked ? (
+          <>
+            <Button title={`${s.pay_now} · ${s.pay_soon}`} size="xl" disabled onPress={() => {}} />
+            <Button title={s.pay_stay_free} kind="ghost" onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))} />
+          </>
+        ) : (
+          <>
+            <Button title={s.pay_trial} size="xl" onPress={start} />
+            <Button title={`${s.pay_now} · ${s.pay_soon}`} kind="ghost" disabled onPress={() => {}} />
+          </>
+        )}
         <Hint style={{ textAlign: "center" }}>{s.pay_free_note}</Hint>
       </View>
     </SafeAreaView>

@@ -3,6 +3,7 @@ import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 
 import { Stack, useRouter } from "expo-router";
 import { claimCode, createCode, deleteServerData, myLinks, pushEntries, revokeLink } from "../src/family/sync";
 import { registerChildPush } from "../src/family/alerts";
+import { useGate } from "../src/access";
 import { useStore } from "../src/store";
 import { useTheme } from "../src/theme";
 import { Button, Card, Hint, Label, Title, useScale } from "../src/ui/Primitives";
@@ -14,6 +15,8 @@ import { Button, Card, Hint, Label, Title, useScale } from "../src/ui/Primitives
 export default function Family() {
   const t = useTheme(); const k = useScale(); const router = useRouter();
   const { t: s, s: state, set } = useStore();
+  const gate = useGate(state);
+  useEffect(() => { gate("family"); }, []);
   const fam = state.family;
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");

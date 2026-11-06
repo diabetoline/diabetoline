@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { Stack } from "expo-router";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 import { buildReport } from "../src/engine/report";
 import { reportHtml } from "../src/report/html";
+import { useGate } from "../src/access";
 import { useStore } from "../src/store";
 import { useTheme } from "../src/theme";
 import { Button, Card, Hint, Title, useScale } from "../src/ui/Primitives";
@@ -15,6 +16,8 @@ const LOCALE = { ro: "ro-RO", en: "en-GB", de: "de-DE" } as const;
 export default function Report() {
   const t = useTheme(); const k = useScale();
   const { t: s, s: state } = useStore();
+  const gate = useGate(state);
+  useEffect(() => { gate("report"); }, []);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const r = buildReport({ glucose: state.glucose, meals: state.meals, walks: state.walks ?? [], meds: state.meds, medLog: state.medLog, weights: state.weights ?? [] });
