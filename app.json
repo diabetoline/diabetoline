@@ -11,7 +11,10 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.curalife.diabetoline",
       "infoPlist": {
-        "NSCameraUsageDescription": "Camera is used to scan product barcodes.",
+        "NSCameraUsageDescription": "Camera is used to scan product barcodes and to photograph your plate or a nutrition label.",
+        "NSPhotoLibraryUsageDescription": "Lets you pick a photo of your plate or a label from your library.",
+        "NSMicrophoneUsageDescription": "Lets you ask the assistant a question by voice.",
+        "NSSpeechRecognitionUsageDescription": "Turns your spoken question into text for the assistant.",
         "ITSAppUsesNonExemptEncryption": false
       }
     },

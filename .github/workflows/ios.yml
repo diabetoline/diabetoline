@@ -1,0 +1,45 @@
+name: Build iOS (TestFlight / App Store)
+# Pornire manuală. Certificatele și profilul de provizionare sunt ținute de EAS (credentialsSource: remote):
+# prima dată se generează pe expo.dev → proiect → Credentials → iOS, cu o cheie App Store Connect API (Alex o încarcă acolo, nu în repo).
+# Rezultatul: un .ipa; cu „submit = true” e trimis automat în TestFlight (are nevoie de aceeași cheie ASC salvată în EAS Submit).
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: "production = App Store/TestFlight · preview = instalare ad-hoc"
+        default: production
+        type: choice
+        options: [production, preview]
+      submit:
+        description: "Trimite în TestFlight după build"
+        default: true
+        type: boolean
+env:
+  EXPO_PUBLIC_API_URL: https://curalife.expo.app
+  EXPO_PUBLIC_BUILD: ${{ github.sha }}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - run: npm ci
+      - name: Codul de versiune în aplicație
+        run: printf '{ "sha": "%s" }\n' "${{ github.sha }}" > src/build.json
+      - name: Build .ipa pe EAS
+        run: eas build --platform ios --profile ${{ inputs.profile || 'production' }} --non-interactive --json > build.json; cat build.json
+      - name: Motivul erorii (dacă a picat)
+        if: failure()
+        run: eas build:list --platform ios --limit 1 --json --non-interactive | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>{const b=JSON.parse(d)[0];console.log(b.status, b.error||"", b.logFiles||"", b.buildDetailsPageUrl||"")})'
+      - name: Linkul de descărcare
+        run: |
+          echo "## Fișierul (${{ inputs.profile || 'production' }})" >> "$GITHUB_STEP_SUMMARY"
+          node -e 'const b=require("./build.json");const x=Array.isArray(b)?b[0]:b;console.log(x.artifacts?.buildUrl||x.artifacts?.applicationArchiveUrl||JSON.stringify(x))' >> "$GITHUB_STEP_SUMMARY"
+      - name: TestFlight
+        if: ${{ inputs.submit && (inputs.profile || 'production') == 'production' }}
+        run: eas submit --platform ios --latest --non-interactive
