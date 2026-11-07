@@ -13,8 +13,13 @@ const API = process.env.EXPO_PUBLIC_API_URL || "https://curalife.expo.app";
 type Player = { play: () => void; pause: () => void; remove: () => void; addListener: (ev: string, cb: (s: { didJustFinish?: boolean }) => void) => { remove: () => void } };
 type AudioMod = { createAudioPlayer: (src: { uri: string }) => Player; setAudioModeAsync?: (m: Record<string, unknown>) => Promise<void> };
 let audio: AudioMod | null | undefined;
+/** Modulul nativ există în build-ul instalat? Un `require` pe un modul lipsă e eroare fatală în React Native, nu excepție — deci verificăm înainte. */
+export function hasNativeModule(name: string): boolean {
+  try { return Boolean((globalThis as { expo?: { modules?: Record<string, unknown> } }).expo?.modules?.[name]); } catch { return false; }
+}
 function audioMod(): AudioMod | null {
   if (audio !== undefined) return audio;
+  if (!hasNativeModule("ExpoAudio")) { audio = null; return audio; }
   try { audio = require("expo-audio") as AudioMod; } catch { audio = null; }
   return audio;
 }

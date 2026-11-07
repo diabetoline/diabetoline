@@ -2,6 +2,7 @@ import { Pressable, ScrollView, Switch, Text, TextInput, View } from "react-nati
 import { Stack, useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Updates from "expo-updates";
+import Constants from "expo-constants";
 import { useState } from "react";
 import buildInfo from "../src/build.json";
 import { useStore } from "../src/store";
@@ -66,6 +67,7 @@ export default function Settings() {
       <Card>
         <Label>{s.upd_version}</Label>
         <Text style={{ color: t.ink, fontSize: 16 * k }}>{build} · {when}</Text>
+        <Text style={{ color: t.muted, fontSize: 14 * k }}>Build {Constants.expoConfig?.android?.versionCode ?? Constants.expoConfig?.ios?.buildNumber ?? "?"} · {Constants.nativeBuildVersion ?? ""}{(globalThis as { expo?: { modules?: Record<string, unknown> } }).expo?.modules?.ExpoAudio ? " · voce naturală" : " · voce telefon"}</Text>
         <Button title={s.upd_check} kind="soft" onPress={checkUpdates} />
         {upd ? <Text style={{ color: t.muted, fontSize: 14 * k }}>{upd}</Text> : null}
       </Card>

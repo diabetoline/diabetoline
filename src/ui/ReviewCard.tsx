@@ -1,5 +1,6 @@
 import { Linking, Platform, Text, View } from "react-native";
 import { useStore } from "../store";
+import { hasNativeModule } from "../speech";
 import { useTheme } from "../theme";
 import { Button, Card, useScale } from "./Primitives";
 
@@ -22,6 +23,7 @@ export function ReviewCard() {
   const yes = async () => {
     set({ review: { asked: rv.asked + 1, next: Date.now() + 365 * DAY, done: true } });
     try {
+      if (!hasNativeModule("ExpoStoreReview")) throw new Error("no module");
       const SR = require("expo-store-review") as { isAvailableAsync: () => Promise<boolean>; requestReview: () => Promise<void> };
       if (await SR.isAvailableAsync()) { await SR.requestReview(); return; }
     } catch {}
