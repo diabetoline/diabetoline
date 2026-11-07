@@ -3,6 +3,10 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StoreProvider } from "../src/store";
 import { useTheme } from "../src/theme";
+import { ErrorScreen } from "../src/ui/ErrorScreen";
+
+/** Expo Router îl folosește în locul ecranului alb când o rută crapă. */
+export { ErrorScreen as ErrorBoundary };
 
 export default function Root() {
   const t = useTheme();

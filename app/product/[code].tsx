@@ -91,7 +91,7 @@ export default function ProductScreen() {
   const claimText = p.claims.map((x) => s.claim[x] ?? x).join(", ");
   const summary = v.labelTrap ? s.trap(claimText) : s.summary[v.level];
   const reasons = v.reasons.map((r) => s.reason[r]?.(v) ?? r);
-  const speak = () => { stopSpeech(); say(`${label}. ${p.name}. ${summary} ${reasons.slice(0, 2).join(" ")}`, state.lang); };
+  const speak = () => { try { say(`${label}. ${p.name}. ${summary} ${reasons.slice(0, 2).join(" ")}`, state.lang).catch(() => {}); } catch {} };
 
   return (
     <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>

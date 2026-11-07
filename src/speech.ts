@@ -2,6 +2,7 @@ import * as Speech from "expo-speech";
 import { File, Paths } from "expo-file-system";
 import type { Lang } from "./i18n";
 import { speechLocale } from "./i18n";
+import { reportError } from "./ui/ErrorScreen";
 
 const API = process.env.EXPO_PUBLIC_API_URL || "https://curalife.expo.app";
 
@@ -81,7 +82,7 @@ export async function say(text: string, lang: Lang) {
         return;
       }
     }
-  } catch { current = null; }
+  } catch (e) { current = null; reportError("speech.natural", e); }
   if (my !== seq) return;
   try {
     const voice = await bestVoice(lang);
