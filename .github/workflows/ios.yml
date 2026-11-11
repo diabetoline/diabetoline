@@ -17,6 +17,13 @@ on:
 env:
   EXPO_PUBLIC_API_URL: https://curalife.expo.app
   EXPO_PUBLIC_BUILD: ${{ github.sha }}
+  # Cheia App Store Connect API (secretele GitHub ASC_*): EAS generează singur certificatul, profilul și cheia de push,
+  # și trimite în TestFlight. Cheia nu e în repo.
+  EXPO_ASC_API_KEY_PATH: ${{ github.workspace }}/asc-key.p8
+  EXPO_ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+  EXPO_ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+  EXPO_APPLE_TEAM_ID: ZPGCFQ3TK5
+  EXPO_APPLE_TEAM_TYPE: COMPANY_OR_ORGANIZATION
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -29,6 +36,9 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
       - run: npm ci
+      - name: Cheia App Store Connect
+        run: printf '%s\n' "$ASC_API_KEY" > "$EXPO_ASC_API_KEY_PATH"
+        env: { ASC_API_KEY: "${{ secrets.ASC_API_KEY }}" }
       - name: Codul de versiune în aplicație
         run: printf '{ "sha": "%s" }\n' "${{ github.sha }}" > src/build.json
       - name: Build .ipa pe EAS
