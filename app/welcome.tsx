@@ -17,6 +17,24 @@ const ALL: Step[] = ["intro", "who", "name", "cond", "body", "concern", "meter",
 /** Copilul care urmărește părintele nu are diabet și nu are nevoie de cifre: doar cine e, cum îl cheamă, planul. */
 const CHILD: Step[] = ["intro", "who", "name", "plan"];
 
+/** Componentele de mai jos stau în afara ecranului: definite înăuntru, ar fi recreate la fiecare literă și
+ * câmpul de text ar pierde focusul (tastatura dispărea după fiecare cifră pe iOS, 11 nov 2026). */
+type Th = ReturnType<typeof useTheme>;
+const Opt = ({ label, on, onPress, t, k }: { label: string; on: boolean; onPress: () => void; t: Th; k: number }) => (
+  <Pressable onPress={onPress} accessibilityRole="button" accessibilityState={{ selected: on }}
+    style={{ borderWidth: 2, borderColor: on ? t.accent : t.line, backgroundColor: on ? t.accentSoft : t.surface, borderRadius: 16, padding: 18 }}>
+    <Text style={{ color: t.ink, fontSize: 19 * k, fontWeight: on ? "700" : "500" }}>{on ? "● " : "○ "}{label}</Text>
+  </Pressable>
+);
+const Field = ({ label, value, onChange, ph, t, k }: { label: string; value: string; onChange: (v: string) => void; ph: string; t: Th; k: number }) => (
+  <View style={{ gap: 6 }}>
+    <Text style={{ color: t.muted, fontSize: 15 * k, fontWeight: "700" }}>{label}</Text>
+    <TextInput value={value} onChangeText={onChange} keyboardType="number-pad" placeholder={ph} placeholderTextColor={t.muted} accessibilityLabel={label}
+      style={{ borderWidth: 2, borderColor: t.line, borderRadius: 14, padding: 14, fontSize: 24 * k, fontWeight: "700", color: t.ink, backgroundColor: t.surface }} />
+  </View>
+);
+const Title = ({ children, t, k }: { children: string; t: Th; k: number }) => <Text style={{ color: t.ink, fontSize: 28 * k, fontWeight: "800", letterSpacing: -0.4, lineHeight: 36 * k }}>{children}</Text>;
+
 export default function Welcome() {
   const t = useTheme(); const k = useScale(); const router = useRouter();
   const { t: s, s: state, set, addWeight } = useStore();
@@ -53,21 +71,6 @@ export default function Welcome() {
   const back = () => setI(Math.max(0, i - 1));
   const toggle = (c: string) => setConcerns((cs) => (cs.includes(c) ? cs.filter((x) => x !== c) : [...cs, c]));
 
-  const Opt = ({ label, on, onPress }: { label: string; on: boolean; onPress: () => void }) => (
-    <Pressable onPress={onPress} accessibilityRole="button" accessibilityState={{ selected: on }}
-      style={{ borderWidth: 2, borderColor: on ? t.accent : t.line, backgroundColor: on ? t.accentSoft : t.surface, borderRadius: 16, padding: 18 }}>
-      <Text style={{ color: t.ink, fontSize: 19 * k, fontWeight: on ? "700" : "500" }}>{on ? "● " : "○ "}{label}</Text>
-    </Pressable>
-  );
-  const Field = ({ label, value, onChange, ph }: { label: string; value: string; onChange: (v: string) => void; ph: string }) => (
-    <View style={{ gap: 6 }}>
-      <Text style={{ color: t.muted, fontSize: 15 * k, fontWeight: "700" }}>{label}</Text>
-      <TextInput value={value} onChangeText={onChange} keyboardType="number-pad" placeholder={ph} placeholderTextColor={t.muted} accessibilityLabel={label}
-        style={{ borderWidth: 2, borderColor: t.line, borderRadius: 14, padding: 14, fontSize: 24 * k, fontWeight: "700", color: t.ink, backgroundColor: t.surface }} />
-    </View>
-  );
-  const Title = ({ children }: { children: string }) => <Text style={{ color: t.ink, fontSize: 28 * k, fontWeight: "800", letterSpacing: -0.4, lineHeight: 36 * k }}>{children}</Text>;
-
   const planName = name.trim() || s.q_name_ph;
   const planLines: { icon: IconName; text: string }[] = who === "child" ? [
     { icon: "family", text: s.q_plan_family_child },
@@ -102,25 +105,25 @@ export default function Welcome() {
               <Text style={{ color: t.muted, fontSize: 19 * k, textAlign: "center" }}>{s.q_intro_text}</Text>
             </View>
           )}
-          {step === "who" && (<><Title>{s.q_who}</Title>
-            <Opt label={s.q_who_me} on={who === "me"} onPress={() => setWho("me")} />
-            <Opt label={s.q_who_parent} on={who === "parent"} onPress={() => setWho("parent")} />
-            <Opt label={s.q_who_child} on={who === "child"} onPress={() => setWho("child")} /></>)}
-          {step === "name" && (<><Title>{who === "me" || who === "child" ? s.q_name : s.q_name_parent}</Title>
+          {step === "who" && (<><Title t={t} k={k}>{s.q_who}</Title>
+            <Opt t={t} k={k} label={s.q_who_me} on={who === "me"} onPress={() => setWho("me")} />
+            <Opt t={t} k={k} label={s.q_who_parent} on={who === "parent"} onPress={() => setWho("parent")} />
+            <Opt t={t} k={k} label={s.q_who_child} on={who === "child"} onPress={() => setWho("child")} /></>)}
+          {step === "name" && (<><Title t={t} k={k}>{who === "me" || who === "child" ? s.q_name : s.q_name_parent}</Title>
             <TextInput value={name} onChangeText={setName} placeholder={s.q_name_ph} placeholderTextColor={t.muted} autoFocus autoCapitalize="words" returnKeyType="done" onSubmitEditing={next} accessibilityLabel={s.q_name}
               style={{ borderWidth: 2, borderColor: name ? t.accent : t.line, borderRadius: 16, padding: 18, fontSize: 26 * k, fontWeight: "700", color: t.ink, backgroundColor: t.surface }} /></>)}
-          {step === "cond" && (<><Title>{s.q_cond}</Title>
-            {(["t2", "pre", "t1", "unsure"] as const).map((c) => <Opt key={c} label={s[`q_cond_${c}`]} on={cond === c} onPress={() => setCond(c)} />)}</>)}
-          {step === "body" && (<><Title>{s.q_body}</Title><Hint>{s.q_body_hint}</Hint>
-            <Field label={s.q_age} value={age} onChange={setAge} ph="65" />
-            <Field label={s.q_height} value={height} onChange={setHeight} ph="170" />
-            <Field label={s.q_weight} value={weight} onChange={setWeight} ph="80" /></>)}
-          {step === "concern" && (<><Title>{s.q_concern}</Title><Hint>{s.q_concern_hint}</Hint>
-            {([["food", s.q_c_food], ["glu", s.q_c_glu], ["meds", s.q_c_meds], ["weight", s.q_c_weight], ["family", s.q_c_family]] as const).map(([c, l]) => <Opt key={c} label={l} on={concerns.includes(c)} onPress={() => toggle(c)} />)}</>)}
-          {step === "meter" && (<><Title>{s.q_meter}</Title>
-            <Opt label={s.q_yes} on={meter === true} onPress={() => setMeter(true)} />
-            <Opt label={s.q_no} on={meter === false} onPress={() => setMeter(false)} /></>)}
-          {step === "plan" && (<><Title>{s.q_plan_title(planName)}</Title>
+          {step === "cond" && (<><Title t={t} k={k}>{s.q_cond}</Title>
+            {(["t2", "pre", "t1", "unsure"] as const).map((c) => <Opt key={c} t={t} k={k} label={s[`q_cond_${c}`]} on={cond === c} onPress={() => setCond(c)} />)}</>)}
+          {step === "body" && (<><Title t={t} k={k}>{s.q_body}</Title><Hint>{s.q_body_hint}</Hint>
+            <Field t={t} k={k} label={s.q_age} value={age} onChange={setAge} ph="65" />
+            <Field t={t} k={k} label={s.q_height} value={height} onChange={setHeight} ph="170" />
+            <Field t={t} k={k} label={s.q_weight} value={weight} onChange={setWeight} ph="80" /></>)}
+          {step === "concern" && (<><Title t={t} k={k}>{s.q_concern}</Title><Hint>{s.q_concern_hint}</Hint>
+            {([["food", s.q_c_food], ["glu", s.q_c_glu], ["meds", s.q_c_meds], ["weight", s.q_c_weight], ["family", s.q_c_family]] as const).map(([c, l]) => <Opt key={c} t={t} k={k} label={l} on={concerns.includes(c)} onPress={() => toggle(c)} />)}</>)}
+          {step === "meter" && (<><Title t={t} k={k}>{s.q_meter}</Title>
+            <Opt t={t} k={k} label={s.q_yes} on={meter === true} onPress={() => setMeter(true)} />
+            <Opt t={t} k={k} label={s.q_no} on={meter === false} onPress={() => setMeter(false)} /></>)}
+          {step === "plan" && (<><Title t={t} k={k}>{s.q_plan_title(planName)}</Title>
             <View style={{ backgroundColor: t.surface, borderRadius: 20, padding: 18, gap: 16, borderWidth: 1, borderColor: t.line }}>
               {planLines.map((l, j) => (
                 <View key={j} style={{ flexDirection: "row", gap: 14, alignItems: "center" }}>
