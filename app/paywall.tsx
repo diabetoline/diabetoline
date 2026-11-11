@@ -2,6 +2,7 @@ import { Text, View } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { planPrice, trialDaysLeft } from "../src/money";
+import { PAYMENTS_LIVE } from "../src/access";
 import { useStore } from "../src/store";
 import { useTheme } from "../src/theme";
 import { Icon } from "../src/ui/Icon";
@@ -36,19 +37,21 @@ export default function Paywall() {
         <View style={{ backgroundColor: t.surface, borderRadius: 20, padding: 18, gap: 10, borderWidth: 1, borderColor: t.line }}>
           {perks.map((p, j) => <Text key={j} style={{ color: t.ink, fontSize: 16 * k, lineHeight: 23 * k }}>✓ {p}</Text>)}
         </View>
-        <View style={{ alignItems: "center", gap: 4 }}>
-          <Text style={{ color: t.ink, fontSize: 24 * k, fontWeight: "800" }}>{s.pay_year(planPrice("year"))}</Text>
-          <Text style={{ color: t.muted, fontSize: 15 * k }}>{s.pay_month(planPrice("month"))} · {s.pay_family}</Text>
-        </View>
+        {PAYMENTS_LIVE && (
+          <View style={{ alignItems: "center", gap: 4 }}>
+            <Text style={{ color: t.ink, fontSize: 24 * k, fontWeight: "800" }}>{s.pay_year(planPrice("year"))}</Text>
+            <Text style={{ color: t.muted, fontSize: 15 * k }}>{s.pay_month(planPrice("month"))} · {s.pay_family}</Text>
+          </View>
+        )}
         {locked ? (
           <>
-            <Button title={`${s.pay_now} · ${s.pay_soon}`} size="xl" disabled onPress={() => {}} />
-            <Button title={s.pay_stay_free} kind="ghost" onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))} />
+            {PAYMENTS_LIVE && <Button title={s.pay_now} size="xl" onPress={() => {}} />}
+            <Button title={s.pay_stay_free} kind={PAYMENTS_LIVE ? "ghost" : undefined} size={PAYMENTS_LIVE ? undefined : "xl"} onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))} />
           </>
         ) : (
           <>
             <Button title={s.pay_trial} size="xl" onPress={start} />
-            <Button title={`${s.pay_now} · ${s.pay_soon}`} kind="ghost" disabled onPress={() => {}} />
+            {PAYMENTS_LIVE && <Button title={s.pay_now} kind="ghost" onPress={() => {}} />}
           </>
         )}
         <Hint style={{ textAlign: "center" }}>{s.pay_free_note}</Hint>

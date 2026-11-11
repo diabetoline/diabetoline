@@ -9,6 +9,11 @@ import type { State } from "./store";
  * ENFORCE rămâne false până pornim plățile: logica și ecranele sunt gata, dar nimeni nu e blocat încă.
  */
 export const ENFORCE = false;
+/**
+ * Prețurile și butonul de plată apar abia când plata prin magazin merge (RevenueCat). Până atunci Apple ar respinge
+ * un buton care nu face nimic (ghidul 2.1) și pomenirea unui abonament care nu se cumpără prin ei (3.1.1).
+ */
+export const PAYMENTS_LIVE = false;
 export const FREE_SCANS_PER_DAY = 5;
 export type Tier = "trial" | "paid" | "free";
 export type Feature = "scan" | "plate" | "ideas" | "ask" | "alternatives" | "family" | "report";
