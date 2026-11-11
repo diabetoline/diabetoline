@@ -40,7 +40,7 @@ jobs:
         run: printf '%s\n' "$ASC_API_KEY" > "$EXPO_ASC_API_KEY_PATH"
         env: { ASC_API_KEY: "${{ secrets.ASC_API_KEY }}" }
       - name: Codul de versiune în aplicație
-        run: printf '{ "sha": "%s" }\n' "${{ github.sha }}" > src/build.json
+        run: echo "{ \"sha\": \"${{ github.sha }}\" }" > src/build.json
       - name: Build .ipa pe EAS
         run: eas build --platform ios --profile ${{ inputs.profile || 'production' }} --non-interactive --json > build.json; cat build.json
       - name: Motivul erorii (dacă a picat)
