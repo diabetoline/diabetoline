@@ -9,7 +9,7 @@ import { Button, Card, useScale } from "./Primitives";
  * „Nu acum” = 30 de zile pauză; întrebăm de cel mult 2 ori în total. Folosește fereastra nativă de rating dacă există.
  */
 const DAY = 864e5;
-const STORE = Platform.select({ ios: "https://apps.apple.com/app/id0000000000?action=write-review", default: "market://details?id=com.curalife.diabetoline" })!;
+const STORE = Platform.select({ ios: "https://apps.apple.com/app/id6833492663?action=write-review", default: "market://details?id=com.curalife.diabetoline" })!;
 
 export function ReviewCard() {
   const t = useTheme(); const k = useScale();
