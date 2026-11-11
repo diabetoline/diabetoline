@@ -50,7 +50,7 @@ jobs:
           sudo apt-get install -y -qq expect > /dev/null
           expect <<'EXP'
           set timeout -1
-          spawn eas build --platform ios --profile ${{ inputs.profile || 'production' }}
+          spawn env -u CI -u GITHUB_ACTIONS -u CONTINUOUS_INTEGRATION -u BUILD_NUMBER -u RUN_ID EAS_BUILD_NO_EXPO_GO_WARNING=true eas build --platform ios --profile ${{ inputs.profile || 'production' }}
           expect {
             -re {\(Y/n\)|\(y/N\)} { send "\r"; exp_continue }
             -re {›\s*$} { send "\r"; exp_continue }
