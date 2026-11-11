@@ -44,12 +44,9 @@ jobs:
         run: |
           echo "{ \"sha\": \"${{ github.sha }}\" }" > src/build.json
       - name: Build .ipa pe EAS
-        # Prima dată EAS trebuie să creeze certificatul, profilul și cheia de push; în modul --non-interactive refuză.
-        # Rulăm interactiv și răspundem cu Enter (toate propunerile sunt „da, generează”), cu cheia ASC din variabile.
-        run: |
-          # un Enter la 5 secunde (nu continuu: `yes` umple logul și GitHub oprește mașina)
-          (for i in $(seq 1 720); do echo; sleep 5; done) | script -qefc "env -u CI -u GITHUB_ACTIONS -u CONTINUOUS_INTEGRATION -u BUILD_NUMBER -u RUN_ID EAS_BUILD_NO_EXPO_GO_WARNING=true eas build --platform ios --profile ${{ inputs.profile || 'production' }}" /dev/null
-          eas build:list --platform ios --limit 1 --json --non-interactive > build.json
+        # Certificatul și profilul sunt pe EAS (create pe 11 nov 2026 cu cheia ASC). Cheia de push (APNs) nu se poate
+        # genera cu cheia API — Alex o încarcă pe expo.dev → Credentials → iOS → Push Key.
+        run: eas build --platform ios --profile ${{ inputs.profile || 'production' }} --non-interactive --json > build.json; cat build.json
       - name: Motivul erorii (dacă a picat)
         if: failure()
         run: eas build:list --platform ios --limit 1 --json --non-interactive | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>{const a=JSON.parse(d);const b=Array.isArray(a)?a[0]:a;if(!b){console.log("fără build pe EAS");return}console.log(b.status, b.error||"", b.logFiles||"", b.buildDetailsPageUrl||"")})'
