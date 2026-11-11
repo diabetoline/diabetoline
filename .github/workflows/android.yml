@@ -53,7 +53,7 @@ jobs:
           echo "::add-mask::$KS_PASS"; echo "::add-mask::$KEY_PASS"; rm -f .env.eas
       - name: Codul de versiune în aplicație (EAS nu primește variabilele din GitHub)
         run: |
-          printf '{ "sha": "%s" }\n' "${{ github.sha }}" > src/build.json
+          echo "{ \"sha\": \"${{ github.sha }}\" }" > src/build.json
       - name: Build .aab pe EAS
         run: eas build --platform android --profile ${{ inputs.profile || 'production' }} --non-interactive --json > build.json; cat build.json
       - name: Motivul erorii (dacă a picat)
