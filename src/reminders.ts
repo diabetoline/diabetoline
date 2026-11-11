@@ -19,7 +19,15 @@ export const REMIND_DEFAULT: RemindPrefs = { glucose: true, move: true, medFollo
 const at = (day: Date, h: number, m = 0) => { const d = new Date(day); d.setHours(h, m, 0, 0); return d; };
 const tomorrow = (d: Date) => { const x = new Date(d); x.setDate(x.getDate() + 1); return x; };
 
-export async function planReminders(s: State, t: Strings): Promise<Plan> {
+/** Planificările se fac pe rând: două în paralel s-ar anula una pe alta doar parțial. */
+let queue: Promise<unknown> = Promise.resolve();
+export function planReminders(s: State, t: Strings): Promise<Plan> {
+  const next = queue.then(() => planNow(s, t));
+  queue = next.catch(() => {});
+  return next;
+}
+
+async function planNow(s: State, t: Strings): Promise<Plan> {
   const prefs = { ...REMIND_DEFAULT, ...(s.remind ?? {}) };
   const prev: Plan = s.plan ?? { ids: [], gluIgnored: 0, medFollow: {} };
   // Android 13+: permisiunea se cere explicit (o singură dată, sistemul nu mai întreabă dacă a fost refuzată); plus canalul de notificări
@@ -27,8 +35,17 @@ export async function planReminders(s: State, t: Strings): Promise<Plan> {
   if (!perm.granted && perm.canAskAgain) perm = await Notifications.requestPermissionsAsync();
   if (!perm.granted) return prev;
   if (Platform.OS === "android") await Notifications.setNotificationChannelAsync("reminders", { name: t.rem_title, importance: Notifications.AndroidImportance.DEFAULT, sound: "default" }).catch(() => {});
-  // curățăm tot ce am programat noi înainte (nu și reamintirile fixe de medicamente)
-  for (const id of [...prev.ids, ...Object.values(prev.medFollow)]) { try { await Notifications.cancelScheduledNotificationAsync(id); } catch {} }
+  // curățăm TOT ce am programat noi înainte, după tip (nu doar id-urile din plan: două planificări în paralel lăsau
+  // notificări orfane — 4–5 „Ai făcut mișcare?” la 19:00 pe iOS, 11 nov 2026). Reamintirile fixe de medicamente
+  // (fără `kind`) și cele ale copilului rămân.
+  const ours = new Set(["glucose", "move", "med"]);
+  try {
+    for (const n of await Notifications.getAllScheduledNotificationsAsync()) {
+      if (ours.has(String((n.content.data as { kind?: string } | null)?.kind))) { try { await Notifications.cancelScheduledNotificationAsync(n.identifier); } catch {} }
+    }
+  } catch {
+    for (const id of [...prev.ids, ...Object.values(prev.medFollow)]) { try { await Notifications.cancelScheduledNotificationAsync(id); } catch {} }
+  }
   const ids: string[] = []; const medFollow: Record<string, string> = {};
   const now = new Date(); const today = dayKeyLocal(now.getTime());
   const yesterday = dayKeyLocal(now.getTime() - 864e5);
