@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, Switch, Text, TextInput, View } from "react-native";
+import { Alert, Linking, Pressable, ScrollView, Switch, Text, TextInput, View } from "react-native";
 import { Stack, useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Updates from "expo-updates";
@@ -6,6 +6,8 @@ import Constants from "expo-constants";
 import { useState } from "react";
 import buildInfo from "../src/build.json";
 import { useStore } from "../src/store";
+import { PAYMENTS_LIVE } from "../src/access";
+import { manageUrl, restore } from "../src/billing";
 import type { Lang } from "../src/i18n";
 import { useTheme } from "../src/theme";
 import { Button, Card, Hint, Label, Title, useScale } from "../src/ui/Primitives";
@@ -71,6 +73,15 @@ export default function Settings() {
         <Button title={s.upd_check} kind="soft" onPress={checkUpdates} />
         {upd ? <Text style={{ color: t.muted, fontSize: 14 * k }}>{upd}</Text> : null}
       </Card>
+      {PAYMENTS_LIVE && (
+        <Card style={{ gap: 10 }}>
+          <Text style={{ color: t.ink, fontSize: 17 * k, fontWeight: "700" }}>{state.entitled ? s.pay_active : s.pay_title}</Text>
+          {state.entitled
+            ? <Button title={s.pay_manage} kind="soft" onPress={() => Linking.openURL(manageUrl())} />
+            : <Button title={s.pay_buy_year} kind="soft" onPress={() => router.push("/paywall")} />}
+          <Button title={s.pay_restore} kind="ghost" onPress={async () => { const ok = await restore(); if (ok) set({ entitled: true }); Alert.alert(ok ? s.pay_active : s.pay_restore_none); }} />
+        </Card>
+      )}
       <Button title={s.first_again} kind="soft" onPress={() => router.push("/welcome")} />
       <Button title={s.reset} kind="danger" onPress={async () => { await AsyncStorage.clear(); set({ history: [], glucose: [], meals: [], meds: [], medLog: [], walks: [], weights: [], list: [], trash: [], cache: {}, name: "", profile: undefined, trialStart: undefined, welcomed: false, family: { role: null, consent: false, children: [] } }); }} />
     </ScrollView>

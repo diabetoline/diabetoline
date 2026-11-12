@@ -6,6 +6,7 @@ import type { RecoState } from "./recommend";
 import { deviceLang, strings, type Lang, type Strings } from "./i18n";
 import { pushDeletes, pushEntries, syncList } from "./family/sync";
 import { registerParentPush } from "./family/messages";
+import { initBilling } from "./billing";
 import { planReminders, type Plan, type RemindPrefs } from "./reminders";
 import { dayKeyLocal } from "./engine/days";
 import { AppState } from "react-native";
@@ -114,6 +115,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const sub = AppState.addEventListener("change", (st) => { if (st === "active") setSyncTick((n) => n + 1); });
     return () => sub.remove();
   }, []);
+  // abonamentul (RevenueCat): `entitled` e oglinda entitlement-ului „pro”
+  useEffect(() => { if (ready) initBilling((v) => setS((p) => (p.entitled === v ? p : { ...p, entitled: v }))); }, [ready]);
   useEffect(() => {
     if (!ready || s.family.role !== "parent" || !s.family.consent) return;
     const h = setTimeout(() => {

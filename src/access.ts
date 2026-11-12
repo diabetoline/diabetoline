@@ -8,12 +8,14 @@ import type { State } from "./store";
  * Gratuit: 5 scanări pe zi, glicemia, medicamentele, reamintirile, calendarul. Restul cere abonament.
  * ENFORCE rămâne false până pornim plățile: logica și ecranele sunt gata, dar nimeni nu e blocat încă.
  */
-export const ENFORCE = false;
+import { billingAvailable } from "./billing";
 /**
- * Prețurile și butonul de plată apar abia când plata prin magazin merge (RevenueCat). Până atunci Apple ar respinge
- * un buton care nu face nimic (ghidul 2.1) și pomenirea unui abonament care nu se cumpără prin ei (3.1.1).
+ * Plata e „live” doar în build-urile care au RevenueCat (modulul nativ + cheia publică). Acolo prețurile și butoanele
+ * de cumpărare apar, iar după probă funcțiile plătite se blochează. În build-urile mai vechi nimic nu se blochează
+ * și paywall-ul arată doar proba (Apple respinge butoane inactive, ghidul 2.1/3.1.1).
  */
-export const PAYMENTS_LIVE = false;
+export const PAYMENTS_LIVE = billingAvailable();
+export const ENFORCE = PAYMENTS_LIVE;
 export const FREE_SCANS_PER_DAY = 5;
 export type Tier = "trial" | "paid" | "free";
 export type Feature = "scan" | "plate" | "ideas" | "ask" | "alternatives" | "family" | "report";
