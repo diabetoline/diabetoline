@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from "react-native";
-import { Stack, useRouter } from "expo-router";
+import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useStore, type Profile } from "../src/store";
 import { useTheme } from "../src/theme";
@@ -88,7 +88,6 @@ export default function Welcome() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }}>
-      <Stack.Screen options={{ headerShown: false }} />
       <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 16, paddingTop: 8, height: 48 }}>
         {i > 0 && !last ? <Pressable onPress={back} hitSlop={12} accessibilityRole="button"><Text style={{ color: t.muted, fontSize: 17 * k, fontWeight: "600" }}>‹ {s.w_next === "Next" ? "Back" : s.w_next === "Weiter" ? "Zurück" : "Înapoi"}</Text></Pressable> : <View />}
         <View style={{ flex: 1 }} />
@@ -96,8 +95,9 @@ export default function Welcome() {
           {STEPS.map((_, j) => <View key={j} style={{ width: j === i ? 18 : 7, height: 7, borderRadius: 4, backgroundColor: j <= i ? t.accent : t.line }} />)}
         </View>
       </View>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <ScrollView contentContainerStyle={{ padding: 24, gap: 16, flexGrow: 1, justifyContent: step === "intro" ? "center" : "flex-start" }} keyboardShouldPersistTaps="handled">
+      {/* fără KeyboardAvoidingView și fără Stack.Screen în interior: pe iOS, într-un ecran modal, ambele făceau tastatura
+          numerică să dispară după fiecare cifră (11–12 nov 2026); antetul e ascuns din _layout, tastatura e tratată de ScrollView */}
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24, gap: 16, flexGrow: 1, justifyContent: step === "intro" ? "center" : "flex-start" }} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
           {step === "intro" && (
             <View style={{ alignItems: "center", gap: 24 }}>
               <View style={{ width: 120, height: 120, borderRadius: 38, backgroundColor: t.accentSoft, alignItems: "center", justifyContent: "center" }}><Icon name="care" size={66} color={t.accent} strokeWidth={1.8} /></View>
@@ -134,7 +134,6 @@ export default function Welcome() {
             </View>
             <Hint>{s.q_plan_pre}</Hint></>)}
         </ScrollView>
-      </KeyboardAvoidingView>
       <View style={{ padding: 20 }}>
         <Button title={last ? s.w_start : s.w_next} size="xl" disabled={!canNext} onPress={next} />
       </View>
