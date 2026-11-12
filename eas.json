@@ -14,7 +14,8 @@
         "credentialsSource": "remote"
       },
       "channel": "preview",
-      "credentialsSource": "local"
+      "credentialsSource": "local",
+      "environment": "preview"
     },
     "production": {
       "autoIncrement": true,
@@ -25,7 +26,8 @@
       },
       "ios": {
         "credentialsSource": "remote"
-      }
+      },
+      "environment": "production"
     }
   },
   "submit": {
