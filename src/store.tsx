@@ -16,7 +16,8 @@ export interface HistItem { code: string; name: string; level: Level; t: number 
 export type GluCtx = "fasting" | "pre" | "post2h" | "evening" | "other";
 export interface GluEntry { id: string; v: number; ctx: GluCtx; note: string; t: number }
 export interface MealEntry { id: string; t: number; photoUri?: string; code?: string; name?: string; level?: Level; slot: "breakfast" | "lunch" | "dinner" | "snack"; analysis?: PlateAnalysis; carbs?: number; gl?: number }
-export interface Med { id: string; name: string; times: string[]; notifIds?: string[] }
+/** `name` e eticheta afișată peste tot (jurnal, raport, familie); la insulină include unitățile („Insulină Lantus · 12 U”). */
+export interface Med { id: string; name: string; times: string[]; notifIds?: string[]; kind?: "pill" | "insulin"; units?: number }
 export interface Walk { id: string; t: number; min: number }
 export interface Weight { id: string; t: number; kg: number }
 /** Un rând de pe lista de cumpărături. `code`/`level` vin de la produsele scanate; `by` spune cine l-a pus (părintele sau copilul, prin contul de familie). */

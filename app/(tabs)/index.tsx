@@ -13,6 +13,7 @@ import { RecoCard } from "../../src/ui/RecoCard";
 import { trialDaysLeft } from "../../src/money";
 import { MessageCard } from "../../src/ui/MessageCard";
 import { ReviewCard } from "../../src/ui/ReviewCard";
+import { tipOfDay } from "../../src/tips";
 import { slotForHour } from "../../src/store";
 
 /**
@@ -88,6 +89,12 @@ export default function Home() {
         {!fresh && <MoveCheckin />}
         {!fresh && <WeightCheckin />}
         {!fresh && <RecoCard placement="home" />}
+        {!fresh && (
+          <Card style={{ gap: 4, borderLeftWidth: 4, borderLeftColor: t.accent }}>
+            <Label>💡 {s.tip_title}</Label>
+            <Text style={{ color: t.ink, fontSize: 16 * k, lineHeight: 23 * k }}>{tipOfDay(state.lang)}</Text>
+          </Card>
+        )}
 
         {hasDay && (
           <Card>
