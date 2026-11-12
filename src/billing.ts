@@ -5,7 +5,7 @@
  *   (sunt chei publice, pot sta în aplicație). Fără ele, sau fără modulul nativ (build-uri de dinainte de 1.1),
  *   plata e „indisponibilă”: paywall-ul arată doar proba gratuită și nimeni nu e blocat.
  * - Produsele: `diabetoline_yearly` și `diabetoline_monthly` (același ID în ambele magazine), în offering-ul
- *   „default”, cu entitlement-ul `pro`. Prețurile le afișăm exact cum le dă magazinul (moneda și formatul țării).
+ *   „default”, cu entitlement-ul din RevenueCat (orice entitlement activ = abonat). Prețurile le afișăm exact cum le dă magazinul (moneda și formatul țării).
  * - `state.entitled` e oglinda entitlement-ului `pro`; se actualizează la pornire, după cumpărare/restaurare
  *   și când RevenueCat anunță o schimbare (reînnoire, anulare, expirare).
  */
@@ -34,7 +34,8 @@ function purchases(): Purchases | null {
 /** true când build-ul are modulul nativ și cheia: paywall-ul poate vinde. */
 export function billingAvailable(): boolean { return purchases() !== null; }
 
-function isPro(info: { entitlements: { active: Record<string, unknown> } }): boolean { return !!info.entitlements.active.pro; }
+// Un singur plan → orice entitlement activ înseamnă abonat (în RevenueCat se cheamă `curalife_development_srl_pro`, creat de vrăjitor; `pro` ar fi și el acceptat).
+function isPro(info: { entitlements: { active: Record<string, unknown> } }): boolean { return Object.keys(info.entitlements.active).length > 0; }
 
 /** La pornire: citește starea abonamentului și ascultă schimbările. */
 export function initBilling(onEntitled: (v: boolean) => void): void {
