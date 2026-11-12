@@ -97,7 +97,7 @@ export default function Welcome() {
       </View>
       {/* fără KeyboardAvoidingView și fără Stack.Screen în interior: pe iOS, într-un ecran modal, ambele făceau tastatura
           numerică să dispară după fiecare cifră (11–12 nov 2026); antetul e ascuns din _layout, tastatura e tratată de ScrollView */}
-        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24, gap: 16, flexGrow: 1, justifyContent: step === "intro" ? "center" : "flex-start" }} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24, gap: 16, flexGrow: 1, justifyContent: step === "intro" ? "center" : "flex-start" }} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" automaticallyAdjustKeyboardInsets>
           {step === "intro" && (
             <View style={{ alignItems: "center", gap: 24 }}>
               <View style={{ width: 120, height: 120, borderRadius: 38, backgroundColor: t.accentSoft, alignItems: "center", justifyContent: "center" }}><Icon name="care" size={66} color={t.accent} strokeWidth={1.8} /></View>
@@ -133,10 +133,11 @@ export default function Welcome() {
               ))}
             </View>
             <Hint>{s.q_plan_pre}</Hint></>)}
+          {/* butonul e în zona derulabilă, ca tastatura să nu-l acopere (iOS, 12 nov 2026) */}
+          <View style={{ marginTop: "auto", paddingTop: 20 }}>
+            <Button title={last ? s.w_start : s.w_next} size="xl" disabled={!canNext} onPress={next} />
+          </View>
         </ScrollView>
-      <View style={{ padding: 20 }}>
-        <Button title={last ? s.w_start : s.w_next} size="xl" disabled={!canNext} onPress={next} />
-      </View>
     </SafeAreaView>
   );
 }
