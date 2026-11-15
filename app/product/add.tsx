@@ -4,6 +4,7 @@ import { CameraView, useCameraPermissions } from "expo-camera";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { readLabel, type LabelError } from "../../src/api/label";
+import { lastDetail } from "../../src/api/vision";
 import { estimateGi } from "../../src/engine/gi";
 import { findClaims } from "../../src/engine/hiddenSugar";
 import type { Product } from "../../src/engine/types";
@@ -95,6 +96,7 @@ export default function AddProduct() {
       <Stack.Screen options={{ title: "" }} />
       <Card>
         <Text style={{ color: t.ink, fontWeight: "800", fontSize: 20 }}>{err === "not_configured" ? s.label_off : err === "unrecognized" ? s.label_fail : s.network}</Text>
+        {err === "network" && !!lastDetail && <Text style={{ color: t.muted, fontSize: 13 }}>{lastDetail}</Text>}
         {err !== "not_configured" && <Button title={s.retake} onPress={() => { setShot(null); setStep("camera"); }} />}
         <Button title={s.back} kind="ghost" onPress={close} />
       </Card>

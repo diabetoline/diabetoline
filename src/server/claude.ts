@@ -33,8 +33,8 @@ export async function askVision(image: string, prompt: string, maxTokens = 800):
         ] }],
       }),
     });
-  } catch { return { ok: false, status: 502, reason: "upstream" }; }
-  if (!res.ok) return { ok: false, status: 502, reason: "upstream" };
+  } catch (e) { return { ok: false, status: 502, reason: `upstream: ${String((e as Error)?.message ?? e).slice(0, 80)}` }; }
+  if (!res.ok) return { ok: false, status: 502, reason: `upstream ${res.status} ${(await res.text().catch(() => "")).slice(0, 160)}` };
   const data = (await res.json()) as { content?: { type: string; text?: string }[] };
   const text = (data.content ?? []).filter((c) => c.type === "text").map((c) => c.text ?? "").join("");
   const m = text.match(/\{[\s\S]*\}/);
