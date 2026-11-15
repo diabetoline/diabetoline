@@ -8,7 +8,7 @@ const URL = process.env.SUPABASE_URL ?? "https://boxyorzzmvjezaspestt.supabase.c
 export const EVENT_NAMES = new Set([
   "app_install", "app_open", "welcome_done", "trial_start", "paywall_view", "purchase", "restore", "stay_free",
   "scan_result", "scan_notfound", "glucose_logged", "plate_result", "ask_used", "ideas_used", "report_made",
-  "family_linked", "family_code", "med_added", "list_added", "reco_tap", "reco_dismiss", "feedback_sent", "data_wiped",
+  "family_linked", "family_code", "med_added", "list_added", "reco_tap", "reco_dismiss", "feedback_sent", "data_wiped", "shop_mode", "shop_trip", "basics_pick",
 ]);
 const short = (v: unknown, n: number) => (typeof v === "string" ? v.slice(0, n) : null);
 

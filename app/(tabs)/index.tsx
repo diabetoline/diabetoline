@@ -44,7 +44,7 @@ export default function Home() {
         <View style={{ paddingHorizontal: 16, gap: 12 }}>
 
         <View style={{ flexDirection: "row", gap: 12 }}>
-          <Tile t={t} k={k} icon="barcode" title={s.tile_scan} to="/scan" bg={t.accent} fg={t.accentInk} big />
+          <Tile t={t} k={k} icon="barcode" title={s.tile_scan} to="/scan" bg={t.accent} fg={t.accentInk} big badge={(state.list ?? []).filter((x) => !x.done).length || undefined} />
           <Tile t={t} k={k} icon="plate" title={s.tile_plate} to="/plate" bg={t.accent} fg={t.accentInk} big />
         </View>
         <View style={{ flexDirection: "row", gap: 12 }}>

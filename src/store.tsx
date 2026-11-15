@@ -23,6 +23,7 @@ export interface Med { id: string; name: string; times: string[]; notifIds?: str
 export interface Walk { id: string; t: number; min: number }
 export interface Weight { id: string; t: number; kg: number }
 /** Un rând de pe lista de cumpărături. `code`/`level` vin de la produsele scanate; `by` spune cine l-a pus (părintele sau copilul, prin contul de familie). */
+export interface Trip { id: string; t: number; items: { code: string; name: string; level: Level }[] }
 export interface ListItem { id: string; name: string; code?: string; level?: Level; done: boolean; t: number; by?: "me" | "child" | "parent" }
 /** Contul de familie: rolul pe acest telefon și legăturile. */
 export interface Family {
@@ -54,6 +55,8 @@ export interface State {
   review?: { asked: number; next: number; done?: boolean };
   lang: Lang; langManual?: boolean; humor: boolean; welcomed?: boolean; unit: "mg" | "mmol"; name: string; bigText: boolean;
   history: HistItem[]; glucose: GluEntry[]; meals: MealEntry[]; meds: Med[]; medLog: MedLog[]; walks: Walk[]; weights: Weight[]; list: ListItem[]; family: Family;
+  /** vizitele la cumpărături (modul de scanare în lanț): ce a scanat, cu verdictele */
+  trips?: Trip[];
   /** ziua (YYYY-MM-DD) în care a răspuns „nu încă” la întrebarea de seară, ca să nu-l mai întrebăm azi */
   moveAskedDay?: string; moveNotifId?: string;
   reco?: RecoState;
@@ -83,6 +86,7 @@ interface Ctx {
   /** Șterge o notare din jurnal (și de pe server, la următoarea sincronizare). */
   /** Lista de cumpărături: pune, bifează, scoate. */
   addToList: (it: Omit<ListItem, "id" | "t" | "done"> & { id?: string }) => void;
+  addTrip: (items: { code: string; name: string; level: Level }[]) => void;
   toggleList: (id: string) => void;
   removeFromList: (id: string) => void;
   removeEntry: (kind: "glucose" | "meal" | "walk" | "weight" | "med", id: string) => void;
@@ -156,6 +160,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     addMeal: (m) => { const id = String(Date.now()); if (m.photoUri) track("plate_result", { level: m.level ?? "none" }); setS((prev) => ({ ...prev, meals: [...prev.meals, { ...m, id, t: m.t ?? Date.now() }] })); return id; },
     addWeight: (kg) => setS((prev) => ({ ...prev, weights: [...(prev.weights ?? []), { id: String(Date.now()), t: Date.now(), kg }] })),
     addWalk: (min) => setS((prev) => ({ ...prev, walks: [...(prev.walks ?? []), { id: String(Date.now()), t: Date.now(), min }] })),
+    addTrip: (items) => setS((prev) => ({ ...prev, trips: [...(prev.trips ?? []), { id: String(Date.now()), t: Date.now(), items: items.map((i) => ({ code: i.code, name: i.name, level: i.level })) }].slice(-60) })),
     addToList: (it) => setS((prev) => {
       const list = prev.list ?? [];
       // același produs scanat nu intră de două ori; dacă era bifat, îl readucem pe listă

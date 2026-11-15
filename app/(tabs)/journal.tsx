@@ -11,8 +11,8 @@ import { Icon } from "../../src/ui/Icon";
 import { WeightCheckin } from "../../src/ui/Checkins";
 import { Trend } from "../../src/ui/Trend";
 
-import type { GluEntry, MealEntry, MedLog, Walk, Weight } from "../../src/store";
-type Item = { t: number; kind: "glu"; data: GluEntry } | { t: number; kind: "meal"; data: MealEntry } | { t: number; kind: "med"; data: MedLog } | { t: number; kind: "walk"; data: Walk } | { t: number; kind: "weight"; data: Weight };
+import type { GluEntry, MealEntry, MedLog, Walk, Weight, Trip } from "../../src/store";
+type Item = { t: number; kind: "glu"; data: GluEntry } | { t: number; kind: "meal"; data: MealEntry } | { t: number; kind: "med"; data: MedLog } | { t: number; kind: "walk"; data: Walk } | { t: number; kind: "weight"; data: Weight } | { t: number; kind: "trip"; data: Trip };
 
 export default function Journal() {
   const t = useTheme(); const k = useScale(); const router = useRouter();
@@ -42,6 +42,7 @@ export default function Journal() {
     ...state.medLog.map((l) => ({ t: l.t, kind: "med" as const, data: l })),
     ...(state.walks ?? []).map((w) => ({ t: w.t, kind: "walk" as const, data: w })),
     ...(state.weights ?? []).map((w) => ({ t: w.t, kind: "weight" as const, data: w })),
+    ...(state.trips ?? []).map((w) => ({ t: w.t, kind: "trip" as const, data: w })),
   ].sort((a, b) => b.t - a.t).slice(0, 100);
   const days = new Map<string, Item[]>();
   items.forEach((it) => { const d = dayKey(it.t); if (!days.has(d)) days.set(d, []); days.get(d)!.push(it); });
@@ -107,6 +108,13 @@ export default function Journal() {
                   <Text style={{ flex: 1, color: t.ink, fontSize: 16 * k }}>{s.wt_entry(w.kg)}</Text>
                   <Text style={{ color: t.muted, fontSize: 14 * k }}>{time}</Text>
                   <Del onPress={() => ask("weight", w.id)} />
+                </View>); }
+              if (it.kind === "trip") { const w = it.data; return (
+                <View key={w.id} style={{ flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 6 }}>
+                  <Text style={{ fontSize: 22 }}>🛒</Text>
+                  <Text style={{ flex: 1, color: t.ink, fontSize: 16 * k }}>{s.trip_entry(w.items.length)}</Text>
+                  <View style={{ flexDirection: "row", gap: 3 }}>{w.items.slice(0, 8).map((i) => <View key={i.code} style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: levelColor(t, i.level).fg }} />)}</View>
+                  <Text style={{ color: t.muted, fontSize: 14 * k }}>{time}</Text>
                 </View>); }
               if (it.kind === "walk") { const w = it.data; return (
                 <View key={w.id} style={{ flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 6 }}>
