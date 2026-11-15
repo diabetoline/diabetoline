@@ -25,7 +25,7 @@ const num = (x: unknown) => (typeof x === "number" && Number.isFinite(x) && x >=
 export async function POST(request: Request): Promise<Response> {
   const body = await readImageBody(request);
   if (!body) return Response.json({ ok: false, reason: "bad_request" }, { status: 400 });
-  const r = await askVision(body.image, PROMPT, 3000);
+  const r = await askVision(body.image, PROMPT, 3000, true, "label");
   if (!r.ok) return Response.json({ ok: false, reason: r.reason }, { status: r.status });
   const o = r.json as Out;
   if (!o.ok) return Response.json({ ok: false, reason: o.reason ?? "no_table" }, { status: 422 });
