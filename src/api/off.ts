@@ -40,7 +40,12 @@ export function normalize(o: Record<string, any>, lang = "en"): Product {
     || /-(juices|drinks|waters|sodas|milks|nectars|beverages)$/.test(c) && !/foods-and-beverages/.test(c));
   const unit: "g" | "ml" = liquidQty || (liquidCat && !/\d\s*(g|kg)\b/.test(qty)) ? "ml" : "g";
   const servingRaw = Number(o.serving_quantity);
-  const serving = Number.isFinite(servingRaw) && servingRaw >= 5 && servingRaw <= 600 ? servingRaw : undefined;
+  // porția declarată e ignorată când e tot pachetul (sosul de stridii „200 ml”, 15 nov 2026) sau e prea mare pentru categorie
+  const pkgQty = Number((qty.match(/(\d+(?:[.,]\d+)?)\s*(g|ml|kg|l)\b/) ?? [])[1]?.replace(",", ".")) * (/\d\s*(kg|l)\b/.test(qty) ? 1000 : 1);
+  const catStr = cats0.join(" ");
+  const wholePack = unit === "g" && Number.isFinite(pkgQty) && pkgQty > 0 && Math.abs(servingRaw - pkgQty) < 1 && pkgQty > 60; // la băuturi doza/sticla chiar e porția
+  const tooBig = /sauces|condiments|spreads|jams|honey|syrups|dressings|ketchup|mustard|mayonnaise/.test(catStr) && servingRaw > 50;
+  const serving = Number.isFinite(servingRaw) && servingRaw >= 5 && servingRaw <= 600 && !wholePack && !tooBig ? servingRaw : undefined;
 
   const ingText: string = o[`ingredients_text_${lang}`] || o.ingredients_text_en || o.ingredients_text || "";
   const ingredients: string[] = Array.isArray(o.ingredients) && o.ingredients.length

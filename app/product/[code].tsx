@@ -109,15 +109,17 @@ export default function ProductScreen() {
       </View>
 
       <View style={{ padding: 16, gap: 12 }}>
-        <Button title={ate ? "✓ " + s.ate_this : s.ate_this} kind="soft" size="xl" disabled={ate} onPress={() => { addMeal({ code: p.code, name: p.name, level: v.level, slot: slotForHour(new Date().getHours()) }); setAte(true); }} />
-        {ate && v.level !== "green" && <AfterMeal level={v.level} walkMinutes={v.walkMinutes} />}
+        {/* la cumpărături întrebarea e „îl iau?” (Alex, 15 nov 2026): la verde/galben butonul mare e lista; „Am mâncat asta” rămâne, secundar, pentru scanările de acasă */}
         {v.level !== "red" && (
-          <Button title={onList ? "✓ " + s.list_added : "🛒 " + s.list_add} kind={onList ? "ghost" : "soft"} onPress={() => (onList ? removeFromList(onList.id) : addToList({ name: p.name, code: p.code, level: v.level, by: "me" }))} />
+          <Button title={onList ? "✓ " + s.list_added : "🛒 " + s.list_add} size="xl" kind={onList ? "ghost" : undefined} onPress={() => (onList ? removeFromList(onList.id) : addToList({ name: p.name, code: p.code, level: v.level, by: "me" }))} />
         )}
+        {v.level === "red" && <Button title={"🥗 " + s.ideas_lighter} size="xl" onPress={() => router.push({ pathname: "/ideas", params: { focus: p.name, lighter: "1" } })} />}
         <View style={{ flexDirection: "row", gap: 10 }}>
-          <View style={{ flex: 1 }}><Button title={s.log_after} kind="ghost" onPress={() => router.push({ pathname: "/glucose/new", params: { after: p.name } })} /></View>
-          <View style={{ flex: 1 }}><Button title={s.scan_again} kind="ghost" onPress={() => router.replace("/scan")} /></View>
+          <View style={{ flex: 1 }}><Button title={ate ? "✓ " + s.ate_this : s.ate_this} kind="soft" disabled={ate} onPress={() => { addMeal({ code: p.code, name: p.name, level: v.level, slot: slotForHour(new Date().getHours()) }); setAte(true); }} /></View>
+          <View style={{ flex: 1 }}><Button title={s.scan_again} kind="soft" onPress={() => router.replace("/scan")} /></View>
         </View>
+        {ate && v.level !== "green" && <AfterMeal level={v.level} walkMinutes={v.walkMinutes} />}
+        {ate && <Button title={s.log_after} kind="ghost" onPress={() => router.push({ pathname: "/glucose/new", params: { after: p.name } })} />}
 
         {(() => { const alt = v.level !== "green" ? pastaAlternative(p.categories, p.name) : undefined; const mine = findPartner(p.code, p.name, p.brand);
           if (mine) return (
@@ -134,9 +136,7 @@ export default function ProductScreen() {
             </Card>);
           return null; })()}
         {v.level !== "green" && !p.incomplete && <GreenAlternatives product={p} />}
-        {v.level === "red"
-          ? <Button title={"🥗 " + s.ideas_lighter} kind="soft" onPress={() => router.push({ pathname: "/ideas", params: { focus: p.name, lighter: "1" } })} />
-          : <Button title={"🍲 " + s.ideas_product} kind="soft" onPress={() => router.push({ pathname: "/ideas", params: { focus: p.name } })} />}
+        {v.level !== "red" && <Button title={"🍲 " + s.ideas_product} kind="soft" onPress={() => router.push({ pathname: "/ideas", params: { focus: p.name } })} />}
         {(
           <Card>
             <View>{reasons.map((r, i) => <Text key={i} style={{ color: t.ink, fontSize: 17 * k, lineHeight: 25 * k }}>• {r}</Text>)}</View>

@@ -5,6 +5,8 @@ import { findHiddenSugars } from "./hiddenSugar";
 export function assumedServing(p: Product): number {
   // produsele adăugate din poză n-au categorii: le deducem din nume (ro/en/de), ca porția obișnuită să fie realistă
   const cats = p.categories.length ? p.categories.join(" ") : categoriesFromName(p.name);
+  // sosurile și dressingurile lichide (sos de stridii, soia, oțet) se măsoară cu lingura, nu cu sticla
+  if (/sauces|condiments|dressings|vinegar|soy|ketchup|mustard|mayonnaise|syrups/.test(cats)) return 15;
   if (p.unit === "ml") return /sodas|juice|drinks|beverage|milks/.test(cats) ? 250 : 200;
   if (/breads/.test(cats)) return 50;
   if (/cereals|muesli|granola|oats/.test(cats)) return 40;
