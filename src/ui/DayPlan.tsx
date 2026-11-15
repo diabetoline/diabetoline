@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { dayKeyLocal, gluClass } from "../engine/days";
 import { useStore } from "../store";
@@ -45,16 +45,17 @@ export function DayPlan() {
   const gluOut = glu.some((g) => gluClass(g.v, g.ctx) !== "ok");
   if (!open) return (
     <Pressable onPress={() => setOpen(true)} accessibilityRole="button" accessibilityLabel={`${s.plan_title}: ${s.day_progress(done, rows.length)}`}
-      style={({ pressed }) => ({ backgroundColor: t.surface, borderColor: t.line, borderWidth: 1, borderRadius: 18, paddingHorizontal: 14, paddingVertical: 10, flexDirection: "row", alignItems: "center", gap: 10, opacity: pressed ? 0.8 : 1 })}>
-      <Text style={{ color: t.ink, fontSize: 16 * k, fontWeight: "800" }}>📋 {s.plan_title}</Text>
-      <View style={{ flex: 1, flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
+      style={({ pressed }) => ({ backgroundColor: t.surface, borderColor: t.line, borderWidth: 1, borderRadius: 18, paddingLeft: 14, paddingRight: 8, paddingVertical: 9, flexDirection: "row", alignItems: "center", gap: 8, opacity: pressed ? 0.8 : 1 })}>
+      <Text style={{ color: t.ink, fontSize: 15 * k, fontWeight: "800" }}>{s.plan_title}</Text>
+      {/* un singur rând oricâte limbi/mărimi de text: bifele derulează orizontal dacă nu încap */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flex: 1 }} contentContainerStyle={{ gap: 6, alignItems: "center" }}>
         {rows.map((r) => (
-          <View key={r.key} style={{ flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999, backgroundColor: r.ok ? t.accentSoft : t.badBg, borderWidth: 1, borderColor: r.ok ? t.ok : t.bad }}>
-            <Text style={{ color: r.ok ? t.ok : t.bad, fontSize: 13 * k, fontWeight: "800" }}>{r.ok ? "✓" : "✗"} {r.short}</Text>
-          </View>
+          <Pressable key={r.key} onPress={() => setOpen(true)} style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999, backgroundColor: r.ok ? t.accentSoft : t.badBg, borderWidth: 1, borderColor: r.ok ? t.ok : t.bad }}>
+            <Text style={{ color: r.ok ? t.ok : t.bad, fontSize: 12.5 * k, fontWeight: "800" }} numberOfLines={1}>{r.ok ? "✓" : "✗"} {r.short}</Text>
+          </Pressable>
         ))}
-      </View>
-      <Text style={{ color: t.muted, fontSize: 22 }}>⌄</Text>
+      </ScrollView>
+      <Text style={{ color: t.muted, fontSize: 20 }}>⌄</Text>
     </Pressable>
   );
   return (
