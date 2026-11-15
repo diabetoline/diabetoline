@@ -30,15 +30,15 @@ export function DayPlan() {
   const unit = state.unit === "mg" ? "mg/dL" : "mmol/L";
   const last = glu[glu.length - 1];
 
-  type Row = { key: string; icon: IconName; tint: string; title: string; sub: string; ok: boolean; onPress: () => void };
+  type Row = { key: string; icon: IconName; tint: string; title: string; short: string; sub: string; ok: boolean; onPress: () => void };
   const rows: Row[] = [
-    { key: "glu", icon: "drop", tint: t.brandRed, title: s.plan_glu, ok: glu.length > 0,
+    { key: "glu", icon: "drop", tint: t.brandRed, title: s.plan_glu, short: s.plan_glu, ok: glu.length > 0,
       sub: last ? s.plan_glu_done(`${last.v} ${unit}`, hm(last.t), glu.length) : s.plan_glu_todo, onPress: () => router.push("/glucose/new") },
-    { key: "meal", icon: "plate", tint: t.accent, title: s.plan_meal, ok: meals.length > 0,
+    { key: "meal", icon: "plate", tint: t.accent, title: s.plan_meal, short: s.plan_meal_short, ok: meals.length > 0,
       sub: meals.length ? s.plan_meal_done(meals.length) : s.plan_meal_todo, onPress: () => router.push("/plate") },
-    { key: "move", icon: "walk", tint: t.accent, title: s.plan_move, ok: walk > 0,
+    { key: "move", icon: "walk", tint: t.accent, title: s.plan_move, short: s.plan_move, ok: walk > 0,
       sub: walk ? s.plan_move_done(walk) : s.plan_move_todo, onPress: () => setMoveOpen((v) => !v) },
-    ...(state.meds.length ? [{ key: "meds", icon: "pill" as IconName, tint: t.warn, title: s.plan_meds, ok: medsDue.length > 0 && medsTaken === medsDue.length,
+    ...(state.meds.length ? [{ key: "meds", icon: "pill" as IconName, tint: t.warn, title: s.plan_meds, short: s.plan_meds, ok: medsDue.length > 0 && medsTaken === medsDue.length,
       sub: medsDue.length ? s.plan_meds_done(medsTaken, medsDue.length) : s.plan_meds_later(medsTotal), onPress: () => router.push("/meds") }] : []),
   ];
   const done = rows.filter((r) => r.ok).length;
@@ -49,8 +49,8 @@ export function DayPlan() {
       <Text style={{ color: t.ink, fontSize: 16 * k, fontWeight: "800" }}>📋 {s.plan_title}</Text>
       <View style={{ flex: 1, flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
         {rows.map((r) => (
-          <View key={r.key} style={{ flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999, backgroundColor: r.ok ? t.accentSoft : t.bg, borderWidth: 1, borderColor: r.ok ? t.ok : t.line }}>
-            <Text style={{ color: r.ok ? t.ok : t.muted, fontSize: 13 * k, fontWeight: "800" }}>{r.ok ? "✓" : "○"} {r.title}</Text>
+          <View key={r.key} style={{ flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999, backgroundColor: r.ok ? t.accentSoft : t.badBg, borderWidth: 1, borderColor: r.ok ? t.ok : t.bad }}>
+            <Text style={{ color: r.ok ? t.ok : t.bad, fontSize: 13 * k, fontWeight: "800" }}>{r.ok ? "✓" : "✗"} {r.short}</Text>
           </View>
         ))}
       </View>
