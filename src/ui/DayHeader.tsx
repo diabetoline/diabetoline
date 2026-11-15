@@ -27,7 +27,7 @@ export function DayHeader() {
   const steps = p.steps; const done = p.done;
   const todo = steps.filter((x) => !x.ok).map((x) => labels[x.key]);
   const anyOut = p.anyOut;
-  const line = p.nothing ? s.day_empty : todo.length === 0 && !anyOut ? s.day_all_good : s.day_todo(todo.join(", "));
+  const line = p.nothing ? s.day_empty : todo.length === 0 ? (anyOut ? s.day_out : s.day_all_good) : s.day_todo(todo.join(", "));
   const ring = anyOut ? t.warn : t.ok;
 
   const R = 30, C = 2 * Math.PI * R, pct = steps.length ? done / steps.length : 0;
