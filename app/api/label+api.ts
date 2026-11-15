@@ -9,6 +9,7 @@ import { askVision, readImageBody } from "../../src/server/claude";
 const PROMPT = `You read food packaging photos. Extract the nutrition table values PER 100 g or PER 100 ml (never per serving; if only per-serving values are printed, convert them using the serving size).
 Reply with ONLY a JSON object, no prose:
 {"ok":true,"name":string|null,"brand":string|null,"unit":"g"|"ml","carbs100":number|null,"sugars100":number|null,"fiber100":number|null,"protein100":number|null,"serving":number|null,"ingredients":string|null}
+"ingredients": the ingredient list in the language printed first, at most 300 characters, no translations.
 "carbs100" is total carbohydrates (not "of which sugars"). Use null for anything not legible. Numbers use a dot as decimal separator.
 If the photo shows no nutrition table, reply {"ok":false,"reason":"no_table"}.`;
 
@@ -23,7 +24,7 @@ const num = (x: unknown) => (typeof x === "number" && Number.isFinite(x) && x >=
 export async function POST(request: Request): Promise<Response> {
   const body = await readImageBody(request);
   if (!body) return Response.json({ ok: false, reason: "bad_request" }, { status: 400 });
-  const r = await askVision(body.image, PROMPT, 600);
+  const r = await askVision(body.image, PROMPT, 3000);
   if (!r.ok) return Response.json({ ok: false, reason: r.reason }, { status: r.status });
   const o = r.json as Out;
   if (!o.ok) return Response.json({ ok: false, reason: o.reason ?? "no_table" }, { status: 422 });

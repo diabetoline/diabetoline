@@ -17,7 +17,7 @@ export async function readImageBody(request: Request): Promise<{ image: string; 
 }
 
 /** Trimite poza și instrucțiunea; întoarce obiectul JSON din răspuns. */
-export async function askVision(image: string, prompt: string, maxTokens = 800): Promise<VisionResult> {
+export async function askVision(image: string, prompt: string, maxTokens = 800, retry = true): Promise<VisionResult> {
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) return { ok: false, status: 503, reason: "not_configured" };
   let res: Response;
@@ -38,9 +38,12 @@ export async function askVision(image: string, prompt: string, maxTokens = 800):
   const data = (await res.json()) as { content?: { type: string; text?: string }[] };
   const text = (data.content ?? []).filter((c) => c.type === "text").map((c) => c.text ?? "").join("");
   const m = text.match(/\{[\s\S]*\}/);
+  const stop = (data as { stop_reason?: string }).stop_reason ?? "?";
+  // răspuns tăiat la limită (15 nov 2026, eticheta cu ingrediente lungi): o singură reîncercare cu limită dublă
+  if (stop === "max_tokens" && retry) return askVision(image, prompt + "\nBe brief: output only the JSON, no explanation.", maxTokens * 2, false);
   if (!m) return { ok: false, status: 422, reason: `unreadable: ${text.slice(0, 120)}` };
   try { return { ok: true, json: JSON.parse(m[0]) as Record<string, unknown> }; }
-  catch { return { ok: false, status: 422, reason: `unreadable: truncated? ${text.length} chars, stop=${(data as { stop_reason?: string }).stop_reason ?? "?"}` }; }
+  catch { return { ok: false, status: 422, reason: `unreadable: truncated? ${text.length} chars, stop=${stop}` }; }
 }
 
 /** Apel doar cu text; întoarce textul brut al răspunsului. */
