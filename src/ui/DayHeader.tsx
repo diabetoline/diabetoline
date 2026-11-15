@@ -4,7 +4,7 @@ import { deviceLang, type Lang } from "../i18n";
 import { Icon } from "./Icon";
 import { LinearGradient } from "expo-linear-gradient";
 import Svg, { Circle } from "react-native-svg";
-import { dayProgress } from "../engine/dayplan";
+import { dayProgress } from "../dayplan";
 import { useStore } from "../store";
 import { useTheme } from "../theme";
 import { useScale } from "./Primitives";

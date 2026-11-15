@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
-import { dayProgress } from "../engine/dayplan";
+import { dayProgress } from "../dayplan";
 import { useStore } from "../store";
 import { useTheme } from "../theme";
 import { Icon, type IconName } from "./Icon";

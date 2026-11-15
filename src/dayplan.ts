@@ -1,5 +1,5 @@
-import { dayKeyLocal, gluClass } from "./days";
-import type { State } from "../store";
+import { dayKeyLocal, gluClass } from "./engine/days";
+import type { State } from "./store";
 
 /** Pașii zilei, aceiași în antet (inelul), în lista „Azi” și în rezumatul de seară — o singură sursă de adevăr. */
 export interface DayStep { key: "glu" | "meal" | "move" | "meds"; ok: boolean }
