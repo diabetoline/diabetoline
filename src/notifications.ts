@@ -25,6 +25,7 @@ export function routeFor(data: Record<string, unknown> | null | undefined): stri
   const kind = String(data?.kind ?? "");
   if (kind === "glucose" || kind === "glucose_check") return "/glucose/new";
   if (kind === "med" || (!kind && data?.medId)) return "/meds";
+  if (kind === "summary") return "/journal";
   if (kind === "message") return data?.linkId ? `/messages?link=${data.linkId}` : "/family";
   if (["alert", "high", "low", "heavy", "quiet", "noglu"].includes(kind)) return "/family/parent";
   return null; // mișcarea: prima pagină, unde e cardul „Ai făcut mișcare azi?”

@@ -3,6 +3,7 @@ import { Platform } from "react-native";
 import { dayKeyLocal } from "./engine/days";
 import type { Strings } from "./i18n";
 import type { State } from "./store";
+import { daySummary } from "./summary";
 
 /**
  * Reamintiri blânde pentru părinte, toate locale (merg fără internet). Regula: să nu enerveze.
@@ -13,8 +14,8 @@ import type { State } from "./store";
  * Totul se replanifică la fiecare deschidere a aplicației și la fiecare notare; nimic nu se repetă pe spate.
  */
 export interface Plan { ids: string[]; gluIgnored: number; lastGluAt?: number; medFollow: Record<string, string> }
-export interface RemindPrefs { glucose: boolean; move: boolean; medFollow: boolean }
-export const REMIND_DEFAULT: RemindPrefs = { glucose: true, move: true, medFollow: true };
+export interface RemindPrefs { glucose: boolean; move: boolean; medFollow: boolean; summary: boolean }
+export const REMIND_DEFAULT: RemindPrefs = { glucose: true, move: true, medFollow: true, summary: true };
 
 const at = (day: Date, h: number, m = 0) => { const d = new Date(day); d.setHours(h, m, 0, 0); return d; };
 const tomorrow = (d: Date) => { const x = new Date(d); x.setDate(x.getDate() + 1); return x; };
@@ -38,7 +39,7 @@ async function planNow(s: State, t: Strings): Promise<Plan> {
   // curățăm TOT ce am programat noi înainte, după tip (nu doar id-urile din plan: două planificări în paralel lăsau
   // notificări orfane — 4–5 „Ai făcut mișcare?” la 19:00 pe iOS, 11 nov 2026). Reamintirile fixe de medicamente
   // (fără `kind`) și cele ale copilului rămân.
-  const ours = new Set(["glucose", "move", "med"]);
+  const ours = new Set(["glucose", "move", "med", "summary"]);
   try {
     for (const n of await Notifications.getAllScheduledNotificationsAsync()) {
       if (ours.has(String((n.content.data as { kind?: string } | null)?.kind))) { try { await Notifications.cancelScheduledNotificationAsync(n.identifier); } catch {} }
@@ -85,6 +86,11 @@ async function planNow(s: State, t: Strings): Promise<Plan> {
       const id = await Notifications.scheduleNotificationAsync({ content: { title: t.rem_med_title, body: t.rem_med_body(m.name), data: { kind: "med", medId: m.id, time } }, trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: follow, channelId: "reminders" } });
       medFollow[`${m.id}|${time}`] = id;
     }
+  }
+  // rezumatul zilei (Alex, 15 nov 2026): la 21:00, scurt și pozitiv, cu ce e notat până la ultima deschidere; nimic dacă n-a notat nimic
+  if (prefs.summary) {
+    const sum = daySummary(s, t);
+    if (sum) await schedule(at(now, 21), sum.title, sum.body, "summary");
   }
   return { ids, gluIgnored, lastGluAt, medFollow };
 }
