@@ -107,6 +107,7 @@ export default function ProductScreen() {
           <Button title={onList ? "✓ " + s.list_added : "🛒 " + s.list_add} size="xl" kind={onList ? "ghost" : undefined} onPress={() => (onList ? removeFromList(onList.id) : addToList({ name: p.name, code: p.code, level: v.level, by: "me" }))} />
         )}
         {v.level === "red" && <Button title={"🥗 " + s.ideas_lighter} size="xl" onPress={() => router.push({ pathname: "/ideas", params: { focus: p.name, lighter: "1" } })} />}
+        {v.level === "red" && <Button title={onList ? "✓ " + s.list_added : "🛒 " + s.list_add_anyway} kind="ghost" onPress={() => (onList ? removeFromList(onList.id) : addToList({ name: p.name, code: p.code, level: v.level, by: "me" }))} />}
         <View style={{ flexDirection: "row", gap: 10 }}>
           <View style={{ flex: 1 }}><Button title={ate ? "✓ " + s.ate_this : s.ate_this} kind="soft" disabled={ate} onPress={() => { addMeal({ code: p.code, name: p.name, level: v.level, slot: slotForHour(new Date().getHours()) }); setAte(true); }} /></View>
           <View style={{ flex: 1 }}><Button title={s.scan_again} kind="soft" onPress={() => router.replace("/scan")} /></View>

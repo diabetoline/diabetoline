@@ -131,7 +131,7 @@ export default function ScanScreen() {
                 <Text style={{ color: t.ink, fontSize: 16, lineHeight: 22 }}>{s.summary[cur.v.level]} {s.shop_carbs(cur.v.carbs, cur.v.serving, cur.p.unit)}</Text>
                 {compare && <Text style={{ color: t.ink, fontSize: 16, fontWeight: "700" }}>{compare}</Text>}
                 <View style={{ flexDirection: "row", gap: 8 }}>
-                  {cur.v.level !== "red" && <View style={{ flex: 1 }}><Button title={onList ? "✓ " + s.list_added : "🛒 " + s.list_add} kind={onList ? "ghost" : undefined} onPress={() => { if (!onList) { addToList({ name: cur.p.name, code: cur.p.code, level: cur.v.level, by: "me" }); track("list_added", { from: "shop" }); } }} /></View>}
+                  <View style={{ flex: 1 }}><Button title={onList ? "✓ " + s.list_added : "🛒 " + (cur.v.level === "red" ? s.list_add_anyway : s.list_add)} kind={onList ? "ghost" : cur.v.level === "red" ? "ghost" : undefined} onPress={() => { if (!onList) { addToList({ name: cur.p.name, code: cur.p.code, level: cur.v.level, by: "me" }); track("list_added", { from: "shop", level: cur.v.level }); } }} /></View>
                   <View style={{ flex: 1 }}><Button title={s.shop_details} kind="soft" onPress={() => router.push({ pathname: "/product/[code]", params: { code: cur.p.code } })} /></View>
                 </View>
                 <Text style={[st.hint2, { color: t.muted }]}>{s.shop_next}</Text>
