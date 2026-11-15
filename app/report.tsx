@@ -7,6 +7,7 @@ import { buildReport } from "../src/engine/report";
 import { reportHtml } from "../src/report/html";
 import { useGate } from "../src/access";
 import { useStore } from "../src/store";
+import { track, resetAnalytics } from "../src/analytics";
 import { useTheme } from "../src/theme";
 import { Button, Card, Hint, Title, useScale } from "../src/ui/Primitives";
 
@@ -27,7 +28,7 @@ export default function Report() {
     setBusy(true); setErr("");
     try {
       const html = reportHtml(r, s, { name: state.name, unit: state.unit, locale: LOCALE[state.lang], profile: state.profile });
-      const { uri } = await Print.printToFileAsync({ html });
+      const { uri } = await Print.printToFileAsync({ html }); track("report_made");
       if (await Sharing.isAvailableAsync()) await Sharing.shareAsync(uri, { mimeType: "application/pdf", UTI: "com.adobe.pdf", dialogTitle: s.rep_share });
       else await Print.printAsync({ uri });
     } catch (e) { setErr(String(e)); }

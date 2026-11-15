@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { Stack, useRouter } from "expo-router";
 import { claimCode, createCode, deleteServerData, myLinks, pushEntries, revokeLink } from "../src/family/sync";
+import { track } from "../src/analytics";
 import { registerChildPush } from "../src/family/alerts";
 import { useGate } from "../src/access";
 import { useStore } from "../src/store";
@@ -69,7 +70,7 @@ export default function Family() {
           <Label>{s.fam_code_title}</Label>
           {code ? <Text style={{ color: t.accent, fontSize: 48 * k, fontWeight: "800", textAlign: "center", letterSpacing: 6, fontVariant: ["tabular-nums"] }}>{code}</Text> : null}
           <Hint>{s.fam_code_hint}</Hint>
-          <Button title={code ? s.fam_code_new : s.fam_code_title} size="xl" disabled={busy} onPress={() => run(async () => { const r = await createCode(state.name); setCode(r.code); })} />
+          <Button title={code ? s.fam_code_new : s.fam_code_title} size="xl" disabled={busy} onPress={() => run(async () => { const r = await createCode(state.name); setCode(r.code); track("family_code"); })} />
         </Card>
         <Card>
           <Label>{s.fam_children}</Label>
@@ -94,7 +95,7 @@ export default function Family() {
           <TextInput value={input} onChangeText={setInput} keyboardType="number-pad" maxLength={6} placeholder="123456" placeholderTextColor={t.muted} accessibilityLabel={s.fam_enter_code}
             style={{ borderWidth: 2, borderColor: input.length === 6 ? t.ok : t.line, borderRadius: 14, padding: 16, fontSize: 36 * k, fontWeight: "800", color: t.ink, textAlign: "center", letterSpacing: 6, backgroundColor: t.bg, fontVariant: ["tabular-nums"] }} />
           <Button title={s.fam_link} size="xl" disabled={busy || input.length !== 6} onPress={() => run(async () => {
-            try { const r = await claimCode(input, childName); setFam({ parent: { linkId: r.linkId, parentId: r.parentId, name: r.parentName || "—" } }); setMsg(s.fam_linked(r.parentName || "—")); registerChildPush(r.linkId, state.lang).then((ok) => { if (!ok) setMsg((m) => m + " " + s.fam_push_off); }); }
+            try { const r = await claimCode(input, childName); track("family_linked", { role: "child" }); setFam({ parent: { linkId: r.linkId, parentId: r.parentId, name: r.parentName || "—" } }); setMsg(s.fam_linked(r.parentName || "—")); registerChildPush(r.linkId, state.lang).then((ok) => { if (!ok) setMsg((m) => m + " " + s.fam_push_off); }); }
             catch { setMsg(s.fam_bad_code); }
           })} />
           <Button title={s.back} kind="ghost" onPress={() => setFam({ role: null })} />

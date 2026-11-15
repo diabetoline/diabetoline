@@ -6,6 +6,7 @@ import { trialDaysLeft } from "../src/money";
 import { PAYMENTS_LIVE } from "../src/access";
 import { fetchPlans, purchase, restore, type Plan } from "../src/billing";
 import { useStore } from "../src/store";
+import { track } from "../src/analytics";
 import { useTheme } from "../src/theme";
 import { Icon } from "../src/ui/Icon";
 import { Button, Hint, useScale } from "../src/ui/Primitives";
@@ -20,7 +21,9 @@ export default function Paywall() {
   const { from } = useLocalSearchParams<{ from?: string }>();
   // deschis dintr-o funcție blocată (după probă): titlu diferit și „Rămân pe gratuit” în loc de „Începe proba”
   const locked = !!from && state.trialStart != null && trialDaysLeft(state.trialStart) === 0 && !state.entitled;
+  useEffect(() => { track("paywall_view", { from: from ?? "welcome", locked }); }, []);
   const start = () => {
+    if (!state.trialStart) track("trial_start");
     set({ welcomed: true, trialStart: state.trialStart ?? Date.now() });
     router.replace("/");
     // copilul merge direct la „pune codul părintelui”
@@ -34,11 +37,11 @@ export default function Paywall() {
   const done = () => { set({ entitled: true, welcomed: true }); router.replace("/"); };
   const buy = async (p: Plan) => {
     setBusy(true); const r = await purchase(p); setBusy(false);
-    if (r.ok) done(); else if (!r.cancelled) Alert.alert(s.pay_fail);
+    if (r.ok) { track("purchase", { plan: p.id, from: from ?? "welcome" }); done(); } else if (!r.cancelled) Alert.alert(s.pay_fail);
   };
   const doRestore = async () => {
     setBusy(true); const ok = await restore(); setBusy(false);
-    if (ok) done(); else Alert.alert(s.pay_restore_none);
+    if (ok) { track("restore"); done(); } else Alert.alert(s.pay_restore_none);
   };
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }}>
@@ -62,7 +65,7 @@ export default function Paywall() {
           <>
             {year && <Button title={s.pay_buy_year} size="xl" disabled={busy} onPress={() => buy(year)} />}
             {month && <Button title={s.pay_buy_month} kind="soft" disabled={busy} onPress={() => buy(month)} />}
-            <Button title={s.pay_stay_free} kind={year ? "ghost" : undefined} size={year ? undefined : "xl"} onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))} />
+            <Button title={s.pay_stay_free} kind={year ? "ghost" : undefined} size={year ? undefined : "xl"} onPress={() => { track("stay_free", { from: from ?? "" }); router.canGoBack() ? router.back() : router.replace("/"); }} />
           </>
         ) : (
           <>

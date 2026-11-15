@@ -7,6 +7,7 @@ import { journalContext } from "../src/ui/journalContext";
 import { speechLocale } from "../src/i18n";
 import { useGate } from "../src/access";
 import { useStore } from "../src/store";
+import { track, resetAnalytics } from "../src/analytics";
 import { useTheme } from "../src/theme";
 import { Icon } from "../src/ui/Icon";
 import { Button, Card, Hint, Title, useScale } from "../src/ui/Primitives";
@@ -29,6 +30,7 @@ export default function Ask() {
     setQ(""); setBusy(true); stopSpeech();
     setMsgs((m) => [...m, { role: "me", text }]);
     const r = await ask({ lang: state.lang, question: text, context: journalContext(state, s), name: state.name || undefined });
+    track("ask_used", { ok: r.ok });
     const answer = r.ok ? r.answer : r.error === "not_configured" ? s.ask_off : s.ask_err;
     setMsgs((m) => [...m, { role: "app", text: answer, emergency: r.ok && r.emergency }]);
     setBusy(false);

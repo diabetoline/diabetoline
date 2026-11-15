@@ -10,6 +10,7 @@ import { initBilling } from "./billing";
 import { planReminders, type Plan, type RemindPrefs } from "./reminders";
 import { dayKeyLocal } from "./engine/days";
 import { AppState } from "react-native";
+import { startAnalytics, track } from "./analytics";
 import { sendNewAlerts } from "./family/alerts";
 
 export interface HistItem { code: string; name: string; level: Level; t: number }
@@ -97,6 +98,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     AsyncStorage.getItem(KEY).then((raw) => { if (raw) { const saved = JSON.parse(raw); setS({ ...initial, ...saved, lang: saved.langManual ? saved.lang : deviceLang() }); } }).catch(() => {}).finally(() => setReady(true));
   }, []);
   useEffect(() => { if (ready) AsyncStorage.setItem(KEY, JSON.stringify(s)).catch(() => {}); }, [s, ready]);
+  // evenimente anonime de utilizare (src/analytics.ts): pornire + app_open la fiecare revenire
+  useEffect(() => startAnalytics(), []);
   // reamintirile se replanifică la deschidere și după fiecare notare (cu o mică întârziere, ca să nu le facem de 10 ori)
   const latest = useRef(s); latest.current = s; // planificarea folosește mereu starea curentă, nu una veche
   const planKey = JSON.stringify([s.glucose.length, s.walks?.length, s.medLog.length, s.meds, s.moveAskedDay, s.remind]);
@@ -141,13 +144,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     set: (patch) => setS((prev) => ({ ...prev, ...(typeof patch === "function" ? patch(prev) : patch) })),
     syncNow: () => setSyncTick((n) => n + 1),
     countScan: () => setS((prev) => { const day = dayKeyLocal(Date.now()); return { ...prev, scans: { day, n: (prev.scans?.day === day ? prev.scans.n : 0) + 1 } }; }),
-    recordScan: (p, v) => setS((prev) => ({
+    recordScan: (p, v) => { track("scan_result", { level: v.level, src: p.source ?? "off" }); setS((prev) => ({
       ...prev, cache: { ...prev.cache, [p.code]: p },
       history: [{ code: p.code, name: p.name, level: v.level, t: Date.now() }, ...prev.history.filter((h) => h.code !== p.code)].slice(0, 200),
-    })),
+    })); },
     addUserProduct: (p) => setS((prev) => ({ ...prev, cache: { ...prev.cache, [p.code]: p } })),
-    addGlucose: (e) => setS((prev) => ({ ...prev, glucose: [...prev.glucose, { ...e, id: String(Date.now()), t: e.t ?? Date.now() }] })),
-    addMeal: (m) => { const id = String(Date.now()); setS((prev) => ({ ...prev, meals: [...prev.meals, { ...m, id, t: m.t ?? Date.now() }] })); return id; },
+    addGlucose: (e) => { track("glucose_logged", { ctx: e.ctx }); setS((prev) => ({ ...prev, glucose: [...prev.glucose, { ...e, id: String(Date.now()), t: e.t ?? Date.now() }] })); },
+    addMeal: (m) => { const id = String(Date.now()); if (m.photoUri) track("plate_result", { level: m.level ?? "none" }); setS((prev) => ({ ...prev, meals: [...prev.meals, { ...m, id, t: m.t ?? Date.now() }] })); return id; },
     addWeight: (kg) => setS((prev) => ({ ...prev, weights: [...(prev.weights ?? []), { id: String(Date.now()), t: Date.now(), kg }] })),
     addWalk: (min) => setS((prev) => ({ ...prev, walks: [...(prev.walks ?? []), { id: String(Date.now()), t: Date.now(), min }] })),
     addToList: (it) => setS((prev) => {

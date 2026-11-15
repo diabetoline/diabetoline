@@ -6,6 +6,7 @@ import { fetchProduct, NotFound } from "../../src/api/off";
 import { analyze, giLevel, glLevel } from "../../src/engine/verdict";
 import type { Product, Verdict } from "../../src/engine/types";
 import { slotForHour, useStore } from "../../src/store";
+import { track } from "../../src/analytics";
 import { speechLocale } from "../../src/i18n";
 import { levelColor, useTheme } from "../../src/theme";
 import { Button, Card, Hint, Label, useScale } from "../../src/ui/Primitives";
@@ -45,7 +46,7 @@ export default function ProductScreen() {
       } catch (e) {
         if (!alive) return;
         if (p) return;
-        setErr(e instanceof NotFound ? "notfound" : "network");
+        setErr(e instanceof NotFound ? "notfound" : "network"); if (e instanceof NotFound) track("scan_notfound");
       }
     })();
     return () => { alive = false; stopSpeech(); };

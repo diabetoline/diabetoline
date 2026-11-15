@@ -6,6 +6,7 @@ import Constants from "expo-constants";
 import { useState } from "react";
 import buildInfo from "../src/build.json";
 import { useStore } from "../src/store";
+import { track, resetAnalytics } from "../src/analytics";
 import { PAYMENTS_LIVE } from "../src/access";
 import { manageUrl, restore } from "../src/billing";
 import type { Lang } from "../src/i18n";
@@ -82,7 +83,7 @@ export default function Settings() {
         </Card>
       )}
       <Button title={s.first_again} kind="soft" onPress={() => router.push("/welcome")} />
-      <Button title={s.reset} kind="danger" onPress={async () => { await AsyncStorage.clear(); set({ history: [], glucose: [], meals: [], meds: [], medLog: [], walks: [], weights: [], list: [], trash: [], cache: {}, name: "", profile: undefined, trialStart: undefined, welcomed: false, family: { role: null, consent: false, children: [] } }); }} />
+      <Button title={s.reset} kind="danger" onPress={async () => { await resetAnalytics(); await AsyncStorage.clear(); set({ history: [], glucose: [], meals: [], meds: [], medLog: [], walks: [], weights: [], list: [], trash: [], cache: {}, name: "", profile: undefined, trialStart: undefined, welcomed: false, family: { role: null, consent: false, children: [] } }); }} />
     </ScrollView>
   );
 }

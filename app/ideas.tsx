@@ -4,6 +4,7 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { fetchIdeas, type Idea } from "../src/api/ideas";
 import { useGate } from "../src/access";
 import { slotForHour, useStore } from "../src/store";
+import { track, resetAnalytics } from "../src/analytics";
 import { useTheme } from "../src/theme";
 import { Button, Card, Hint, Label, Title, useScale } from "../src/ui/Primitives";
 import { Quip } from "../src/ui/Quip";
@@ -30,6 +31,7 @@ export default function Ideas() {
     const recentMeals = state.meals.slice(-8).map((m) => m.name).filter((x): x is string => !!x);
     const list = (state.list ?? []).filter((x) => !x.done).map((x) => x.name);
     const r = await fetchIdeas({ lang: state.lang, slot, products, recentMeals, focus: focus || undefined, lighter: lighter === "1", list });
+    track("ideas_used", { ok: r.ok });
     setLoading(false);
     if (r.ok) setIdeas(r.ideas); else setErr(r.error === "not_configured" ? s.ideas_off : s.ideas_err);
   };

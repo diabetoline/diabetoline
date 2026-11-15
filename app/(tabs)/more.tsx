@@ -4,6 +4,7 @@ import buildInfo from "../../src/build.json";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useStore } from "../../src/store";
+import { track } from "../../src/analytics";
 import { privacyUrl } from "../../src/i18n";
 import { useTheme } from "../../src/theme";
 import { Button, Card, Hint, Label, Title, useScale } from "../../src/ui/Primitives";
@@ -16,6 +17,7 @@ export default function More() {
   const sendFb = async () => {
     const body = fb.trim(); if (body.length < 3) return;
     try {
+      track("feedback_sent");
       const r = await fetch(`${process.env.EXPO_PUBLIC_API_URL || "https://curalife.expo.app"}/api/feedback`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ body, email: fbMail.trim(), lang: state.lang, role: state.family.role ?? state.profile?.forWhom ?? "", build: (process.env.EXPO_PUBLIC_BUILD ?? buildInfo.sha).slice(0, 7) }) });
       if (!r.ok) throw new Error(); setFb(""); setFbNote(s.fb_ok);
     } catch { setFbNote(s.fb_err); }

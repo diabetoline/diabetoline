@@ -1,5 +1,5 @@
-name: Alerte de inactivitate (zilnic)
-# O dată pe zi, serverul verifică părinții cu cont de familie și trimite copilului o alertă dacă părintele n-a mai notat nimic.
+name: Alerte de inactivitate + raport zilnic
+# O dată pe zi: (1) părinții inactivi → alertă la copil; (2) raportul de utilizare pe email către Alex (/api/watch, migrarea 0009).
 on:
   schedule:
     - cron: "0 17 * * *"   # 19:00 ora României (iarna)
@@ -9,3 +9,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: curl -sS -X POST https://curalife.expo.app/api/nudge
+      - run: curl -sS -X POST https://curalife.expo.app/api/watch

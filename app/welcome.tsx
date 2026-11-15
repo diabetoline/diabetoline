@@ -3,6 +3,7 @@ import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useStore, type Profile } from "../src/store";
+import { track } from "../src/analytics";
 import { useTheme } from "../src/theme";
 import { Icon, type IconName } from "../src/ui/Icon";
 import { Button, Hint, useScale } from "../src/ui/Primitives";
@@ -65,7 +66,7 @@ export default function Welcome() {
   const next = () => {
     if (!canNext) return;
     if (STEPS[i + 1] === "plan") save();
-    if (last) { router.replace("/paywall"); return; }
+    if (last) { track("welcome_done", { who: who ?? "me", cond: cond ?? "unsure" }); router.replace("/paywall"); return; }
     setI(i + 1);
   };
   const back = () => setI(Math.max(0, i - 1));
