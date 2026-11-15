@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { Alert, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { Stack, useRouter } from "expo-router";
 import { useStore, type ListItem } from "../src/store";
 import { levelColor, useTheme } from "../src/theme";
@@ -55,6 +55,11 @@ export default function ShoppingList() {
         <Card>
           <Label>{s.list_to_buy} · {s.list_count(todo.length)}</Label>
           {todo.map((it) => <Row key={it.id} it={it} />)}
+          {/* la ieșirea din magazin (Alex, 15 nov 2026): un buton care golește lista, nu bifă cu bifă */}
+          <Button title={s.list_all_bought} size="xl" onPress={() => Alert.alert(s.list_all_bought, s.list_all_bought_q(list.length), [
+            { text: s.cancel, style: "cancel" },
+            { text: s.list_all_bought, onPress: () => set((p) => ({ list: [], trash: [...(p.trash ?? []), ...(p.list ?? []).map((x) => "l" + x.id)] })) },
+          ])} />
         </Card>
       )}
       {done.length > 0 && (
