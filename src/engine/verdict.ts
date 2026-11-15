@@ -3,7 +3,8 @@ import { findHiddenSugars } from "./hiddenSugar";
 
 /** Default serving when the label declares none, by unit and category. */
 export function assumedServing(p: Product): number {
-  const cats = p.categories.join(" ");
+  // produsele adăugate din poză n-au categorii: le deducem din nume (ro/en/de), ca porția obișnuită să fie realistă
+  const cats = p.categories.length ? p.categories.join(" ") : categoriesFromName(p.name);
   if (p.unit === "ml") return /sodas|juice|drinks|beverage|milks/.test(cats) ? 250 : 200;
   if (/breads/.test(cats)) return 50;
   if (/cereals|muesli|granola|oats/.test(cats)) return 40;
@@ -11,6 +12,7 @@ export function assumedServing(p: Product): number {
   if (/chocolates|biscuits|cookies|candies|bars/.test(cats)) return 25;
   if (/sauces|ketchup|spreads|jams|honey/.test(cats)) return 15;
   if (/seeds|nuts|chia|flax|sesame|almonds|walnuts|peanut/.test(cats)) return 30;
+  if (/snacks|chips|crisps|crackers|popcorn/.test(cats)) return 30;
   if (/bran|oat-bran|wheat-bran|psyllium|fibre-mix|fiber/.test(cats)) return 30;
   if (/pastas|rices|grains|legumes/.test(cats)) return 75; // dry weight
   if (/pizzas|ready-meals|lasagne/.test(cats)) return 300;
@@ -41,13 +43,30 @@ const DAIRY_DRINK = /milks|dairy-drinks|plant-based-milks|kefir|drinking-yogurt|
 /** Categorii cu porții declarate adesea „de marketing” (o napolitană, un pătrățel). */
 const FLOORED = /chocolates|biscuits|cookies|wafers|cakes|pastries|breads|cereals|muesli|granola|spreads|jams|honey|crisps|snacks|candies|bars|crackers/i;
 
+/** Categorii OFF aproximate din numele produsului, pentru produsele fără categorii (adăugate din poză). */
+export function categoriesFromName(name: string): string {
+  const n = name.toLowerCase();
+  const out: string[] = [];
+  if (/semin|seeds|samen|kerne|nuci|nuts|nüsse|alune|arahide|peanut|erdn|migdal|almond|mandel|fistic|pistac|caju|cashew|chia|in\b|flax|lein|susan|sesam/.test(n)) out.push("seeds nuts");
+  if (/pâine|paine|bread|brot|chifl|baghet|lipie|covrig|franzel/.test(n)) out.push("breads");
+  if (/cereal|musli|müsli|muesli|granola|fulgi|ovăz|ovaz|oats|hafer|flakes/.test(n)) out.push("cereals");
+  if (/iaurt|yog|joghurt|budinc|pudding|dessert/.test(n)) out.push("yogurts");
+  if (/ciocolat|chocolat|schokol|biscuit|biscui|cookie|keks|bombo|candy|napolitan|waffel|baton|bar\b|riegel|prăjitur|prajitur|cake|kuchen/.test(n)) out.push("chocolates biscuits");
+  if (/sos|sauce|ketchup|maionez|mayo|gem\b|dulcea|jam|marmel|miere|honey|honig|crem[aă] de|spread|aufstrich|nutella/.test(n)) out.push("sauces spreads");
+  if (/paste|pasta|spaghet|penne|fusilli|macaroane|nudel|orez|rice|reis|bulgur|quinoa|couscous|cuscus|linte|lentil|linsen|fasole|beans|bohnen|năut|naut|chickpea|kichererb/.test(n)) out.push("pastas rices grains legumes");
+  if (/pizza|lasagn|lasagne|ready|gata|fertig/.test(n)) out.push("pizzas ready-meals");
+  if (/chips|chipsuri|snack|sticks|cracker|covrigei|pufuleți|pufuleti|popcorn/.test(n)) out.push("snacks chips");
+  if (/suc\b|juice|saft|nectar|cola|limonad|lemonade|băutur|bautur|drink|getränk|lapte|milk|milch/.test(n)) out.push("juice drinks milks");
+  return out.join(" ");
+}
+
 export function isAlcohol(p: Product): boolean {
   return ALCOHOL.test(p.categories.join(" ")) || ALCOHOL_NAME.test(p.name);
 }
 
 export function analyze(p: Product): Verdict {
   const usual = assumedServing(p);
-  const cats = p.categories.join(" ");
+  const cats = p.categories.length ? p.categories.join(" ") : categoriesFromName(p.name);
   const floor = FLOORED.test(cats) ? T.servingFloor * usual : 0;
   const serving = p.serving == null ? usual : Math.max(p.serving, floor);
   const k = serving / 100;

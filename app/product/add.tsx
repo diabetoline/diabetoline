@@ -51,7 +51,7 @@ export default function AddProduct() {
 
   const save = () => {
     const c = num(carbs), su = num(sugars), f = num(fiber);
-    const nm = name.trim() || code;
+    const nm = name.trim() || `${s.product_fallback} ${code.slice(-4)}`;
     const gi = estimateGi({ categories: [], carbs100: c, fiber100: f, sugars100: su, name: nm });
     const ing = ingredients.split(/[,;()]/).map((x) => x.trim()).filter(Boolean);
     const p: Product = { code, name: nm, brand: brand.trim() || undefined, carbs100: c, sugars100: su, fiber100: f,
