@@ -1,0 +1,20 @@
+name: Pachet offline de produse
+# Cele mai scanate ~5.000 de produse pe țară din Open Food Facts → public/pack/<ȚARĂ>.json (servit de EAS Hosting).
+# Rulează de două ori pe lună și manual; commit-ul pornește publicarea serverului (update.yml).
+on:
+  schedule:
+    - cron: "0 3 1,15 * *"
+  workflow_dispatch: {}
+permissions: { contents: write }
+jobs:
+  pack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          mkdir -p public/pack
+          for cc in RO DE GB US AT HU; do python3 scripts/pack.py $cc 5000 || echo "fără $cc"; done
+          ls -la public/pack
+          git config user.name "pack-bot"; git config user.email "noreply@diabetoline.com"
+          git add public/pack && git commit -m "Pachet offline de produse ($(date -u +%F))" || echo "nimic nou"
+          git push

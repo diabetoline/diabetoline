@@ -5,6 +5,7 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { readLabel, type LabelError } from "../../src/api/label";
 import { lastDetail } from "../../src/api/vision";
+import { shareProduct } from "../../src/api/lookup";
 import { estimateGi } from "../../src/engine/gi";
 import { findClaims } from "../../src/engine/hiddenSugar";
 import type { Product } from "../../src/engine/types";
@@ -57,7 +58,7 @@ export default function AddProduct() {
     const p: Product = { code, name: nm, brand: brand.trim() || undefined, carbs100: c, sugars100: su, fiber100: f,
       serving: num(serving) > 0 ? num(serving) : undefined, unit, ingredients: ing, categories: [], claims: findClaims(nm),
       gi: gi.gi, giSource: gi.source, source: "user" };
-    addUserProduct(p);
+    addUserProduct(p); shareProduct(p, state.lang);
     router.replace({ pathname: "/product/[code]", params: { code } });
   };
 

@@ -11,6 +11,7 @@ import { planReminders, type Plan, type RemindPrefs } from "./reminders";
 import { dayKeyLocal } from "./engine/days";
 import { AppState } from "react-native";
 import { startAnalytics, track } from "./analytics";
+import { refreshPack } from "./api/pack";
 import { sendNewAlerts } from "./family/alerts";
 
 export interface HistItem { code: string; name: string; level: Level; t: number }
@@ -100,6 +101,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => { if (ready) AsyncStorage.setItem(KEY, JSON.stringify(s)).catch(() => {}); }, [s, ready]);
   // evenimente anonime de utilizare (src/analytics.ts): pornire + app_open la fiecare revenire
   useEffect(() => startAnalytics(), []);
+  // pachetul offline al țării (produsele populare), reîmprospătat la 14 zile
+  useEffect(() => { if (ready) void refreshPack(); }, [ready]);
   // reamintirile se replanifică la deschidere și după fiecare notare (cu o mică întârziere, ca să nu le facem de 10 ori)
   const latest = useRef(s); latest.current = s; // planificarea folosește mereu starea curentă, nu una veche
   const planKey = JSON.stringify([s.glucose.length, s.walks?.length, s.medLog.length, s.meds, s.moveAskedDay, s.remind]);

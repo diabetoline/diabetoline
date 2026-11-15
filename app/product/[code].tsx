@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { say, stop as stopSpeech } from "../../src/speech";
-import { fetchProduct, NotFound } from "../../src/api/off";
 import { analyze, giLevel, glLevel } from "../../src/engine/verdict";
 import type { Product, Verdict } from "../../src/engine/types";
 import { slotForHour, useStore } from "../../src/store";
+import { lookupProduct } from "../../src/api/lookup";
 import { track } from "../../src/analytics";
 import { speechLocale } from "../../src/i18n";
 import { levelColor, useTheme } from "../../src/theme";
@@ -14,7 +14,7 @@ import { GreenAlternatives } from "../../src/ui/GreenAlternatives";
 import { AfterMeal } from "../../src/ui/AfterMeal";
 import { Quip } from "../../src/ui/Quip";
 import { VerdictBadge } from "../../src/ui/VerdictBadge";
-import { findOther, findPartner, partnerAsProduct, pastaAlternative, productUrl } from "../../src/partner";
+import { findOther, findPartner, pastaAlternative, productUrl } from "../../src/partner";
 import catalog from "../../src/catalog.json";
 import { Linking } from "react-native";
 import { money } from "../../src/money";
@@ -35,19 +35,12 @@ export default function ProductScreen() {
   useEffect(() => {
     let alive = true;
     if (p?.source === "user") { recordScan(p, analyze(p)); return; }
-    const partner = findPartner(code);
-    if (partner) { const prod = partnerAsProduct(partner, code); const verdict = analyze(prod); setP(prod); setV(verdict); recordScan(prod, verdict); return; }
     (async () => {
-      try {
-        const prod = await fetchProduct(code, state.lang);
-        if (!alive) return;
-        const verdict = analyze(prod);
-        setP(prod); setV(verdict); setErr(null); recordScan(prod, verdict);
-      } catch (e) {
-        if (!alive) return;
-        if (p) return;
-        setErr(e instanceof NotFound ? "notfound" : "network"); if (e instanceof NotFound) track("scan_notfound");
-      }
+      const r = await lookupProduct(code, state.cache, state.lang);
+      if (!alive) return;
+      if (r.ok) { const verdict = analyze(r.product); setP(r.product); setV(verdict); setErr(null); recordScan(r.product, verdict); return; }
+      if (p) return;
+      setErr(r.error); if (r.error === "notfound") track("scan_notfound");
     })();
     return () => { alive = false; stopSpeech(); };
   }, [code]);
