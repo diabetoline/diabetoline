@@ -6,7 +6,7 @@ import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
  */
 const API = process.env.EXPO_PUBLIC_API_URL || "https://curalife.expo.app";
 
-export type VisionError = "not_configured" | "unrecognized" | "network";
+export type VisionError = "not_configured" | "unrecognized" | "packaging" | "network";
 /** ultimul detaliu tehnic, pentru mesajul de pe ecran */
 export let lastDetail = "";
 
@@ -28,6 +28,7 @@ export async function postImage<T>(path: string, photoUri: string, lang: string,
     const body = (await res.json().catch(() => ({}))) as { ok?: boolean; reason?: string } & T;
     if (body.ok) return { ok: true, data: body };
     if (body.reason === "not_configured" || res.status === 404 || res.status === 503) return { ok: false, error: "not_configured" };
+    if (body.reason === "packaging") return { ok: false, error: "packaging" };
     if (body.reason && unrecognized.includes(body.reason)) return { ok: false, error: "unrecognized" };
     lastDetail = `HTTP ${res.status} ${body.reason ?? ""}`;
     return { ok: false, error: "network" };

@@ -18,6 +18,7 @@ Never mention insulin, doses, medication changes, diagnoses or medical treatment
 Food names also in ${LANG_NAME[lang]}, short and everyday.
 Reply with ONLY JSON:
 {"ok":true,"foods":[{"name":string,"grams":number,"carbs":number,"gi":number|null,"sweet":boolean,"fried":boolean,"refined":boolean,"veg":boolean,"alcohol":boolean,"x":number,"y":number}],"level":"green"|"yellow"|"red","summary":string,"tips":[string]}
+If the photo mainly shows a PACKAGE, a label, a nutrition table, a barcode or a shop shelf (packaged products, not food served to eat), reply {"ok":false,"reason":"packaging"} — do not guess a serving from a package.
 Only if the photo shows no food and no drink at all, reply {"ok":false,"reason":"no_food"}.`;
 
 const n = (x: unknown, max: number) => (typeof x === "number" && Number.isFinite(x) && x >= 0 && x <= max ? Math.round(x) : null);
@@ -28,7 +29,7 @@ export async function POST(request: Request): Promise<Response> {
   const r = await askVision(body.image, prompt(body.lang), 6000, true, "plate");
   if (!r.ok) return Response.json({ ok: false, reason: r.reason }, { status: r.status });
   const o = r.json as { ok?: boolean; reason?: string; foods?: unknown; summary?: unknown; tips?: unknown; level?: unknown };
-  if (!o.ok) return Response.json({ ok: false, reason: o.reason === "no_food" ? "no_food" : "unreadable" }, { status: 422 });
+  if (!o.ok) return Response.json({ ok: false, reason: o.reason === "no_food" || o.reason === "packaging" ? o.reason : "unreadable" }, { status: 422 });
 
   const foods = (Array.isArray(o.foods) ? o.foods : []).slice(0, 12).flatMap((f) => {
     const x = f as Record<string, unknown>;

@@ -29,6 +29,7 @@ export default function PlateScreen() {
   const [how, setHow] = useState<Level | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [unrecognized, setUnrecognized] = useState(false);
+  const [packaging, setPackaging] = useState(false); // poză la un ambalaj: trimitem la scanare, nu ghicim o porție
   const [failMsg, setFailMsg] = useState("");
 
   /** Copiază poza în folderul aplicației, ca să rămână în jurnal. */
@@ -56,6 +57,7 @@ export default function PlateScreen() {
     }
     // fără analiză (server oprit, fără internet, nimic recunoscut): omul spune cum a fost masa
     setUnrecognized(true);
+    if (r.error === "packaging") { setPackaging(true); return; }
     setFailMsg(r.error === "unrecognized" ? s.plate_fail : r.error === "not_configured" ? s.plate_off : `${s.network} (${lastDetail})`);
   };
   const save = () => {
@@ -86,6 +88,12 @@ export default function PlateScreen() {
           <View style={st.bottom}>
             {analyzing ? (
               <View style={{ alignItems: "center", gap: 10, paddingVertical: 8 }}><ActivityIndicator color="#fff" size="large" /><Text style={st.how}>{s.plate_analyzing}</Text>{state.humor && <Text style={st.hint}>{quip(state.lang, "plate_wait", shot ?? "")} 😊</Text>}</View>
+            ) : shot && packaging ? (
+              <View style={{ gap: 10 }}>
+                <Text style={st.how}>{s.plate_packaging}</Text>
+                <Button title={s.plate_scan_btn} size="xl" onPress={() => router.replace("/scan")} />
+                <Button title={s.retake} kind="ghost" onPress={() => { setShot(null); setPackaging(false); }} />
+              </View>
             ) : shot ? (
               <>
                 {unrecognized && <Text style={st.hint}>{failMsg}</Text>}
@@ -107,7 +115,7 @@ export default function PlateScreen() {
                   ))}
                 </View>
                 <Button title={s.use_photo} size="xl" onPress={save} disabled={!how} />
-                <Button title={s.retake} kind="ghost" onPress={() => { setShot(null); setUnrecognized(false); }} />
+                <Button title={s.retake} kind="ghost" onPress={() => { setShot(null); setUnrecognized(false); setPackaging(false); }} />
               </>
             ) : (
               <>
