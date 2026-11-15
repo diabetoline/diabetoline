@@ -93,7 +93,7 @@ export default function AddProduct() {
 
   if (step === "error") return (
     <View style={{ flex: 1, padding: 16, gap: 12 }}>
-      <Stack.Screen options={{ title: "" }} />
+      <Stack.Screen options={{ title: "", headerShown: true }} />
       <Card>
         <Text style={{ color: t.ink, fontWeight: "800", fontSize: 20 }}>{err === "not_configured" ? s.label_off : err === "unrecognized" ? s.label_fail : s.network}</Text>
         {err === "network" && !!lastDetail && <Text style={{ color: t.muted, fontSize: 13 }}>{lastDetail}</Text>}
