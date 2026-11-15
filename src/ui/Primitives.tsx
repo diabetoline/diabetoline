@@ -29,17 +29,19 @@ export function Title({ children }: { children: React.ReactNode }) {
 export function Button({ title, onPress, kind = "primary", disabled, size = "md", icon }: { title: string; onPress: () => void; kind?: "primary" | "soft" | "ghost" | "danger"; disabled?: boolean; size?: "sm" | "md" | "xl"; icon?: string }) {
   const t = useTheme(); const k = useScale();
   const bg = kind === "primary" ? t.accent : kind === "soft" ? t.accentSoft : kind === "danger" ? t.badBg : "transparent";
-  const fg = kind === "primary" ? t.accentInk : kind === "danger" ? t.bad : t.ink;
+  // butoanele secundare se văd clar (Alex, 15 nov 2026): „soft” are contur și text verde, „ghost” contur mai închis
+  const fg = kind === "primary" ? t.accentInk : kind === "danger" ? t.bad : kind === "soft" ? t.accent : t.ink;
+  const border = kind === "ghost" ? t.muted : kind === "soft" ? t.accent : bg;
   const pad = size === "xl" ? 22 : size === "sm" ? 10 : 16;
   const fs = (size === "xl" ? 22 : size === "sm" ? 15 : 18) * k;
   return (
     <Pressable onPress={onPress} disabled={disabled} accessibilityRole="button"
-      style={({ pressed }) => [st.btn, { backgroundColor: bg, borderColor: kind === "ghost" ? t.line : bg, paddingVertical: pad, opacity: disabled ? 0.5 : pressed ? 0.85 : 1 }]}>
+      style={({ pressed }) => [st.btn, { backgroundColor: bg, borderColor: border, paddingVertical: pad, opacity: disabled ? 0.5 : pressed ? 0.85 : 1 }]}>
       {icon ? <Text style={{ fontSize: fs * 1.3, marginRight: 10 }}>{icon}</Text> : null}
       <Text style={{ color: fg, fontWeight: "700", fontSize: fs }}>{title}</Text>
     </Pressable>
   );
 }
 const st = StyleSheet.create({
-  btn: { borderRadius: 16, paddingHorizontal: 18, alignItems: "center", justifyContent: "center", borderWidth: 1, flexDirection: "row", minHeight: 52 },
+  btn: { borderRadius: 16, paddingHorizontal: 18, alignItems: "center", justifyContent: "center", borderWidth: 1.5, flexDirection: "row", minHeight: 52 },
 });
