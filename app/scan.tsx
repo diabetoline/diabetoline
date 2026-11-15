@@ -25,6 +25,7 @@ export default function ScanScreen() {
   const t = useTheme(); const router = useRouter();
   const ins = useSafeAreaInsets();
   const { t: s, s: state, countScan, recordScan, addToList, addTrip } = useStore();
+  const openList = (state.list ?? []).filter((x) => !x.done).length;
   const gate = useGate(state);
   const [perm, requestPerm] = useCameraPermissions();
   const [torch, setTorch] = useState(false);
@@ -112,6 +113,10 @@ export default function ScanScreen() {
             <View style={{ flexDirection: "row", gap: 6, alignItems: "center", flex: 1, justifyContent: "center", flexWrap: "wrap" }}>
               {hits.slice(-8).map((h) => <View key={h.code} style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: levelColor(t, h.level).fg, borderWidth: 2, borderColor: "#fff" }} />)}
             </View>
+            {/* scurtătură la listă (Alex, 15 nov 2026): 🛒 cu numărul produselor de luat */}
+            <Pressable onPress={() => router.push("/list")} hitSlop={10} style={({ pressed }) => [st.pill, { marginRight: 8 }, pressed && { opacity: 0.6 }]} accessibilityRole="button" accessibilityLabel={s.list_title}>
+              <Text style={st.pillTxt}>🛒{openList ? ` ${openList}` : ""}</Text>
+            </Pressable>
             <Pressable onPress={() => setTorch((v) => !v)} style={[st.round, torch && { backgroundColor: "#fff" }]} accessibilityRole="button" accessibilityLabel={s.torch}><Text style={[st.roundTxt, torch && { color: "#000" }]}>🔦</Text></Pressable>
           </View>
           <View style={st.frameWrap} pointerEvents="none">
