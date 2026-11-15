@@ -2,9 +2,9 @@ import * as Notifications from "expo-notifications";
 import type { Med } from "./store";
 import type { Strings } from "./i18n";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Platform } from "react-native";
-import { router } from "expo-router";
+import { router, useRootNavigationState } from "expo-router";
 
 /**
  * Toate notificările locale și push ale aplicației trec pe aici. Fișierul e importat din `app/_layout.tsx`,
@@ -33,17 +33,25 @@ export function routeFor(data: Record<string, unknown> | null | undefined): stri
 let handled: string | null = null;
 /** În `_layout`: apăsarea pe o notificare (aplicația deschisă, în fundal sau închisă) duce la ecranul potrivit. */
 export function useNotificationTaps() {
+  // la pornire „la rece” navigatorul nu e gata imediat: ținem ruta și o deschidem când `rootState.key` există
+  const rootState = useRootNavigationState();
+  const [pending, setPending] = useState<string | null>(null);
   useEffect(() => {
     const go = (r: Notifications.NotificationResponse | null) => {
       if (!r || r.notification.request.identifier === handled) return;
       handled = r.notification.request.identifier;
       const to = routeFor(r.notification.request.content.data as Record<string, unknown>);
-      if (to) setTimeout(() => { try { router.push(to as never); } catch {} }, 400);
+      if (to) setPending(to);
     };
     Notifications.getLastNotificationResponseAsync().then(go).catch(() => {});
     const sub = Notifications.addNotificationResponseReceivedListener(go);
     return () => sub.remove();
   }, []);
+  useEffect(() => {
+    if (!pending || !rootState?.key) return;
+    const to = pending; setPending(null);
+    setTimeout(() => { try { router.push(to as never); } catch {} }, 300);
+  }, [pending, rootState?.key]);
 }
 
 export async function ensurePermission(): Promise<boolean> {
