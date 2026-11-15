@@ -11,6 +11,7 @@ Reply with ONLY a JSON object, no prose:
 {"ok":true,"name":string|null,"brand":string|null,"unit":"g"|"ml","carbs100":number|null,"sugars100":number|null,"fiber100":number|null,"protein100":number|null,"serving":number|null,"ingredients":string|null}
 "ingredients": the ingredient list in the language printed first, at most 300 characters, no translations.
 "carbs100" is total carbohydrates (not "of which sugars"). Use null for anything not legible. Numbers use a dot as decimal separator.
+Read row by row, in the printed order, and match each value to ITS OWN row even when the numbers are right-aligned on a different line than the label: Fat → saturates → Carbohydrate → of which sugars → Fibre → Protein → Salt. Labels in other languages: Romanian "Glucide" = carbohydrate, "din care zaharuri" = sugars, "Fibre" = fibre, "Proteine" = protein, "Sare" = salt; German "Kohlenhydrate", "davon Zucker", "Ballaststoffe", "Eiweiß", "Salz". Sugars can never exceed carbohydrates. Also return "fat100":number|null and "salt100":number|null so the rows can be cross-checked.
 If the photo shows no nutrition table, reply {"ok":false,"reason":"no_table"}.`;
 
 type Out = {
@@ -29,13 +30,16 @@ export async function POST(request: Request): Promise<Response> {
   const o = r.json as Out;
   if (!o.ok) return Response.json({ ok: false, reason: o.reason ?? "no_table" }, { status: 422 });
   if (num(o.carbs100) == null && num(o.sugars100) == null) return Response.json({ ok: false, reason: "no_table" }, { status: 422 });
+  // zaharurile nu pot depăși carbohidrații: dacă modelul le-a încurcat rândurile, le punem la loc
+  let carbs = num(o.carbs100), sugars = num(o.sugars100);
+  if (carbs != null && sugars != null && sugars > carbs) { const t = carbs; carbs = sugars; sugars = t; }
 
   return Response.json({
     ok: true,
     name: typeof o.name === "string" ? o.name.slice(0, 120) : null,
     brand: typeof o.brand === "string" ? o.brand.slice(0, 60) : null,
     unit: o.unit === "ml" ? "ml" : "g",
-    carbs100: num(o.carbs100), sugars100: num(o.sugars100), fiber100: num(o.fiber100), protein100: num(o.protein100),
+    carbs100: carbs, sugars100: sugars, fiber100: num(o.fiber100), protein100: num(o.protein100),
     serving: typeof o.serving === "number" && o.serving > 0 && o.serving < 2000 ? Math.round(o.serving) : null,
     ingredients: typeof o.ingredients === "string" ? o.ingredients.slice(0, 2000) : null,
   });
