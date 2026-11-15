@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
-import { dayKeyLocal } from "../engine/days";
+import { dayKeyLocal, gluClass } from "../engine/days";
 import { useStore } from "../store";
 import { useTheme } from "../theme";
 import { Icon, type IconName } from "./Icon";
@@ -16,6 +16,8 @@ export function DayPlan() {
   const t = useTheme(); const k = useScale(); const router = useRouter();
   const { t: s, s: state, addWalk } = useStore();
   const [moveOpen, setMoveOpen] = useState(false);
+  // strâns implicit (Alex, 15 nov 2026: „e prea mare”): un rând cu bifele; apăsarea îl desface
+  const [open, setOpen] = useState(false);
   const today = dayKeyLocal(Date.now());
   const glu = state.glucose.filter((g) => dayKeyLocal(g.t) === today).sort((a, b) => a.t - b.t);
   const meals = state.meals.filter((m) => dayKeyLocal(m.t) === today);
@@ -40,12 +42,27 @@ export function DayPlan() {
       sub: medsDue.length ? s.plan_meds_done(medsTaken, medsDue.length) : s.plan_meds_later(medsTotal), onPress: () => router.push("/meds") }] : []),
   ];
   const done = rows.filter((r) => r.ok).length;
+  const gluOut = glu.some((g) => gluClass(g.v, g.ctx) !== "ok");
+  if (!open) return (
+    <Pressable onPress={() => setOpen(true)} accessibilityRole="button" accessibilityLabel={`${s.plan_title}: ${s.day_progress(done, rows.length)}`}
+      style={({ pressed }) => ({ backgroundColor: t.surface, borderColor: t.line, borderWidth: 1, borderRadius: 18, paddingHorizontal: 14, paddingVertical: 10, flexDirection: "row", alignItems: "center", gap: 10, opacity: pressed ? 0.8 : 1 })}>
+      <Text style={{ color: t.ink, fontSize: 16 * k, fontWeight: "800" }}>📋 {s.plan_title}</Text>
+      <View style={{ flex: 1, flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
+        {rows.map((r) => (
+          <View key={r.key} style={{ flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999, backgroundColor: r.ok ? t.accentSoft : t.bg, borderWidth: 1, borderColor: r.ok ? t.ok : t.line }}>
+            <Text style={{ color: r.ok ? t.ok : t.muted, fontSize: 13 * k, fontWeight: "800" }}>{r.ok ? "✓" : "○"} {r.title}</Text>
+          </View>
+        ))}
+      </View>
+      <Text style={{ color: t.muted, fontSize: 22 }}>⌄</Text>
+    </Pressable>
+  );
   return (
     <Card style={{ gap: 4, paddingVertical: 12 }}>
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+      <Pressable onPress={() => setOpen(false)} accessibilityRole="button" style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
         <Label>📋 {s.plan_title}</Label>
-        <Text style={{ color: done === rows.length ? t.ok : t.muted, fontSize: 14 * k, fontWeight: "800", marginBottom: 6 }}>{done === rows.length ? `✓ ${s.plan_all_done}` : s.day_progress(done, rows.length)}</Text>
-      </View>
+        <Text style={{ color: done === rows.length ? t.ok : t.muted, fontSize: 14 * k, fontWeight: "800", marginBottom: 6 }}>{done === rows.length ? `✓ ${s.plan_all_done}` : s.day_progress(done, rows.length)}  ⌃</Text>
+      </Pressable>
       {rows.map((r, i) => (
         <View key={r.key}>
           <Pressable onPress={r.onPress} accessibilityRole="button" accessibilityState={{ checked: r.ok }} accessibilityLabel={`${r.title}: ${r.sub}`}
@@ -55,7 +72,7 @@ export function DayPlan() {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={{ color: t.ink, fontSize: 18 * k, fontWeight: "800", textDecorationLine: r.ok ? "line-through" : "none", opacity: r.ok ? 0.7 : 1 }}>{r.title}</Text>
-              <Text style={{ color: r.ok ? t.ok : t.muted, fontSize: 15 * k }} numberOfLines={2}>{r.sub}</Text>
+              <Text style={{ color: r.ok ? (r.key === "glu" && gluOut ? t.warn : t.ok) : t.muted, fontSize: 15 * k }} numberOfLines={2}>{r.sub}</Text>
             </View>
             {!r.ok && <Text style={{ color: t.muted, fontSize: 26 }}>›</Text>}
           </Pressable>
