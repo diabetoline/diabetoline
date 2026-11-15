@@ -132,7 +132,7 @@ export default function ScanScreen() {
                 {compare && <Text style={{ color: t.ink, fontSize: 16, fontWeight: "700" }}>{compare}</Text>}
                 <View style={{ flexDirection: "row", gap: 8 }}>
                   <View style={{ flex: 1 }}><Button title={onList ? "✓ " + s.list_added : "🛒 " + (cur.v.level === "red" ? s.list_add_anyway : s.list_add)} kind={onList ? "ghost" : cur.v.level === "red" ? "ghost" : undefined} onPress={() => { if (!onList) { addToList({ name: cur.p.name, code: cur.p.code, level: cur.v.level, by: "me" }); track("list_added", { from: "shop", level: cur.v.level }); } }} /></View>
-                  <View style={{ flex: 1 }}><Button title={s.shop_details} kind="soft" onPress={() => router.push({ pathname: "/product/[code]", params: { code: cur.p.code } })} /></View>
+                  <View style={{ flex: 1 }}><Button title={s.shop_details} kind="soft" onPress={() => router.push({ pathname: "/product/[code]", params: { code: cur.p.code, from: "scan" } })} /></View>
                 </View>
                 <Text style={[st.hint2, { color: t.muted }]}>{s.shop_next}</Text>
               </View>
@@ -140,7 +140,7 @@ export default function ScanScreen() {
               <View style={{ gap: 10 }}>
                 <Text style={st.hint}>{err.kind === "notfound" ? s.not_found : s.network}</Text>
                 <View style={{ flexDirection: "row", gap: 8 }}>
-                  {err.kind === "notfound" && <View style={{ flex: 1 }}><Button title={s.add_product} onPress={() => router.push({ pathname: "/product/add", params: { code: err.code } })} /></View>}
+                  {err.kind === "notfound" && <View style={{ flex: 1 }}><Button title={s.add_product} onPress={() => router.push({ pathname: "/product/add", params: { code: err.code, from: "scan" } })} /></View>}
                   <View style={{ flex: 1 }}><Button title={s.basics_btn} kind="soft" onPress={() => router.push("/basics")} /></View>
                 </View>
                 <Text style={st.hint2}>{s.shop_next}</Text>

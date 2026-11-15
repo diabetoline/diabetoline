@@ -22,7 +22,9 @@ import { money } from "../../src/money";
 const n = (x: number) => x.toLocaleString(undefined, { maximumFractionDigits: 1 });
 
 export default function ProductScreen() {
-  const { code } = useLocalSearchParams<{ code: string }>();
+  const { code, from } = useLocalSearchParams<{ code: string; from?: string }>();
+  // deschis din modul cumpărături: „Scanează altul” se întoarce la scanarea de dedesubt, nu deschide încă una peste
+  const scanAgain = () => (from === "scan" && router.canGoBack() ? router.back() : router.replace("/scan"));
   const t = useTheme(); const k = useScale();
   const router = useRouter();
   const { t: s, s: state, recordScan, addMeal, addToList, removeFromList } = useStore();
@@ -60,7 +62,7 @@ export default function ProductScreen() {
           {item && <Text style={{ color: t.accent, fontSize: 24 * k, fontWeight: "800" }}>{money(item.price)}</Text>}
           {item && <Button title={s.partner_order} size="xl" onPress={() => Linking.openURL(item.url)} />}
         </Card>
-        <Button title={s.scan_again} kind="soft" onPress={() => router.replace("/scan")} />
+        <Button title={s.scan_again} kind="soft" onPress={scanAgain} />
         {other.kind === "food" && <Hint>{s.other_food_hint}</Hint>}
       </ScrollView>
     );
@@ -73,7 +75,7 @@ export default function ProductScreen() {
         {p?.incomplete && <Text style={{ color: t.ink, fontSize: 17 * k }}>{p.name}</Text>}
         <Hint>{err === "network" ? "" : err === "notfound" ? s.not_found_help : s.incomplete_help}</Hint>
         {err !== "network" && <Button title={s.add_product} onPress={() => router.replace({ pathname: "/product/add", params: { code, name: p?.name ?? "", brand: p?.brand ?? "" } })} />}
-        <Button title={s.scan_again} kind="soft" onPress={() => router.replace("/scan")} />
+        <Button title={s.scan_again} kind="soft" onPress={scanAgain} />
         <Button title={s.back} onPress={() => router.back()} kind="ghost" /></Card>
     </View>
   );
@@ -110,7 +112,7 @@ export default function ProductScreen() {
         {v.level === "red" && <Button title={onList ? "✓ " + s.list_added : "🛒 " + s.list_add_anyway} kind="ghost" onPress={() => (onList ? removeFromList(onList.id) : addToList({ name: p.name, code: p.code, level: v.level, by: "me" }))} />}
         <View style={{ flexDirection: "row", gap: 10 }}>
           <View style={{ flex: 1 }}><Button title={ate ? "✓ " + s.ate_this : s.ate_this} kind="soft" disabled={ate} onPress={() => { addMeal({ code: p.code, name: p.name, level: v.level, slot: slotForHour(new Date().getHours()) }); setAte(true); }} /></View>
-          <View style={{ flex: 1 }}><Button title={s.scan_again} kind="soft" onPress={() => router.replace("/scan")} /></View>
+          <View style={{ flex: 1 }}><Button title={s.scan_again} kind="soft" onPress={scanAgain} /></View>
         </View>
         {ate && v.level !== "green" && <AfterMeal level={v.level} walkMinutes={v.walkMinutes} />}
         {ate && <Button title={s.log_after} kind="ghost" onPress={() => router.push({ pathname: "/glucose/new", params: { after: p.name } })} />}

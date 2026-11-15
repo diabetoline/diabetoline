@@ -21,7 +21,7 @@ const str = (x: number | null | undefined) => (x == null ? "" : String(x).replac
  * Fără introducere manuală: câmpurile apar abia după citire, ca să poată corecta o cifră.
  */
 export default function AddProduct() {
-  const { code, name: name0, brand: brand0 } = useLocalSearchParams<{ code: string; name?: string; brand?: string }>();
+  const { code, name: name0, brand: brand0, from } = useLocalSearchParams<{ code: string; name?: string; brand?: string; from?: string }>();
   const t = useTheme(); const router = useRouter(); const ins = useSafeAreaInsets();
   const { t: s, s: state, addUserProduct } = useStore();
   const [perm, requestPerm] = useCameraPermissions();
@@ -59,7 +59,7 @@ export default function AddProduct() {
       serving: num(serving) > 0 ? num(serving) : undefined, unit, ingredients: ing, categories: [], claims: findClaims(nm),
       gi: gi.gi, giSource: gi.source, source: "user" };
     addUserProduct(p); shareProduct(p, state.lang);
-    router.replace({ pathname: "/product/[code]", params: { code } });
+    router.replace({ pathname: "/product/[code]", params: { code, from: from ?? "" } });
   };
 
   if (step === "camera" || step === "reading") return (
