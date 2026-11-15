@@ -161,7 +161,7 @@ export default function ProductScreen() {
               </View>
             )}
             <View><Label>{s.nut}</Label>
-              <Hint style={{ marginBottom: 6 }}>{s.serving} {v.serving} {p.unit}{v.servingAssumed ? ` (${s.serving_assumed})` : ""}{p.source === "user" ? ` · ${s.added_by_you}` : ""}</Hint>
+              <Hint style={{ marginBottom: 6 }}>{s.serving} {v.serving} {p.unit}{v.servingAssumed ? ` (${s.serving_assumed})` : ""}{p.code.startsWith("basic:ai:") ? ` · ${s.basics_guess_hint}` : p.code.startsWith("basic:") ? ` · ${s.basics_avg}` : p.source === "user" ? ` · ${s.added_by_you}` : ""}</Hint>
               <View style={{ borderWidth: 2, borderColor: t.ink, borderRadius: 8, padding: 8 }}>
                 <Row t={t} k={k} a="" b={`100 ${p.unit}`} c={s.serving} head />
                 <Row t={t} k={k} a={s.carbs} b={`${n(p.carbs100)} g`} c={`${n(v.carbs)} g`} />

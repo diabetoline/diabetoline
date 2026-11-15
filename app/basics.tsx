@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { guessBasic } from "../src/api/basic";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { BASIC_GROUPS, BASICS, basicProduct, type Basic } from "../src/basics";
@@ -6,7 +7,7 @@ import { analyze } from "../src/engine/verdict";
 import { useStore } from "../src/store";
 import { track } from "../src/analytics";
 import { levelColor, useTheme } from "../src/theme";
-import { Hint, Label, useScale } from "../src/ui/Primitives";
+import { Button, Hint, Label, useScale } from "../src/ui/Primitives";
 
 /** „N-are cod”: alimentele de bază (pâine de la panificație, fructe, legume, cântar) cu verdict gata, fără internet. */
 export default function Basics() {
@@ -14,6 +15,17 @@ export default function Basics() {
   const { from } = useLocalSearchParams<{ from?: string }>();
   const { t: s, s: state, addUserProduct } = useStore();
   const [q, setQ] = useState("");
+  const [busy, setBusy] = useState(false); const [guessErr, setGuessErr] = useState<string | null>(null);
+  // nu e în listă: omul scrie numele, serverul estimează valorile (nu introducere manuală de cifre), omul vede verdictul și confirmă
+  const guess = async () => {
+    const name = q.trim(); if (name.length < 2 || busy) return;
+    setBusy(true); setGuessErr(null);
+    const r = await guessBasic(name, state.lang);
+    setBusy(false);
+    if (!r.ok) { setGuessErr(r.error === "not_food" ? s.basics_not_food : s.basics_guess_err); return; }
+    addUserProduct(r.product); track("basics_guess", { ok: true });
+    router.replace({ pathname: "/product/[code]", params: { code: r.product.code, from: from ?? "" } });
+  };
   const items = useMemo(() => {
     const needle = q.trim().toLowerCase();
     return BASICS.filter((b) => !needle || Object.values(b.name).some((n) => n.toLowerCase().includes(needle)));
@@ -44,7 +56,14 @@ export default function Basics() {
           })}
         </View>
       ))}
-      {!groups.length && <Hint>{s.basics_none}</Hint>}
+      {q.trim().length >= 2 && (
+        <View style={{ gap: 8, marginTop: groups.length ? 6 : 0 }}>
+          {!groups.length && <Hint>{s.basics_none}</Hint>}
+          <Button title={busy ? s.basics_guessing : `✨ ${s.basics_guess_btn(q.trim())}`} kind={groups.length ? "soft" : "primary"} disabled={busy} onPress={guess} />
+          {guessErr && <Hint style={{ color: t.bad }}>{guessErr}</Hint>}
+          <Hint>{s.basics_guess_hint}</Hint>
+        </View>
+      )}
     </ScrollView>
   );
 }
