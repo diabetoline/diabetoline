@@ -156,10 +156,10 @@ export default function ScanScreen() {
                     <Button title={s.check} onPress={submit} size="sm" />
                   </View>
                 ) : (
-                  <View style={{ flexDirection: "row", gap: 10, marginTop: 10 }}>
-                    {/* „N-are cod” vizibil ca buton (Alex, 15 nov 2026): pâine, fructe, legume, cântar */}
-                    <View style={{ flex: 1 }}><Button title={"🍎 " + s.basics_btn} kind="soft" onPress={() => router.push({ pathname: "/basics", params: { from: "scan" } })} /></View>
-                    <View style={{ flex: 1 }}><Button title={"⌨️ " + s.type_short} kind="soft" onPress={() => setTyping(true)} /></View>
+                  <View style={{ gap: 8, marginTop: 10 }}>
+                    {/* „N-are cod” vizibil ca buton (Alex, 15 nov 2026): pâine, fructe, legume, cântar; unul sub altul ca să fie egale la orice mărime de text */}
+                    <Button title={"🍎 " + s.basics_btn} kind="soft" onPress={() => router.push({ pathname: "/basics", params: { from: "scan" } })} />
+                    <Button title={"⌨️ " + s.type_short} kind="soft" onPress={() => setTyping(true)} />
                   </View>
                 )}
               </>
