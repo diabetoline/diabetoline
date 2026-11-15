@@ -44,8 +44,17 @@ export default function Home() {
         <DayHeader />
         {trialDaysLeft(state.trialStart) > 0 && <Hint style={{ textAlign: "center" }}>{s.pay_left(trialDaysLeft(state.trialStart))}</Hint>}
         <View style={{ paddingHorizontal: 16, gap: 12 }}>
-        {/* lista zilei, clară, deasupra (Alex, 15 nov 2026) */}
-        <DayPlan />
+        {/* mesajul de la copil/părinte e cel mai important lucru de pe ecran */}
+        <MessageCard />
+        {/* lista zilei, clară, deasupra (Alex, 15 nov 2026); la prima deschidere, în locul ei, îndemnul de a scana ceva */}
+        {fresh ? (
+          <Card style={{ borderColor: t.accent, borderWidth: 2, gap: 10 }}>
+            <Text style={{ color: t.ink, fontSize: 20 * k, fontWeight: "800" }}>👉 {s.first_title}</Text>
+            <Text style={{ color: t.ink, fontSize: 17 * k, lineHeight: 25 * k }}>{s.first_text}</Text>
+            <Button title={s.first_btn} size="xl" onPress={() => router.push("/scan")} />
+            <Pressable onPress={() => router.push("/welcome")} accessibilityRole="button"><Hint style={{ textAlign: "center", textDecorationLine: "underline" }}>{s.first_again}</Hint></Pressable>
+          </Card>
+        ) : <DayPlan />}
 
         <View style={{ flexDirection: "row", gap: 12 }}>
           <Tile t={t} k={k} icon="barcode" title={s.tile_scan} to="/scan" bg={t.accent} fg={t.accentInk} big />
@@ -126,16 +135,7 @@ export default function Home() {
 
         </View>
         <View style={{ paddingHorizontal: 16, gap: 12 }}>
-        <MessageCard />
         <ReviewCard />
-        {fresh && (
-          <Card style={{ borderColor: t.accent, borderWidth: 2, gap: 10 }}>
-            <Text style={{ color: t.ink, fontSize: 20 * k, fontWeight: "800" }}>👉 {s.first_title}</Text>
-            <Text style={{ color: t.ink, fontSize: 17 * k, lineHeight: 25 * k }}>{s.first_text}</Text>
-            <Button title={s.first_btn} size="xl" onPress={() => router.push("/scan")} />
-            <Pressable onPress={() => router.push("/welcome")} accessibilityRole="button"><Hint style={{ textAlign: "center", textDecorationLine: "underline" }}>{s.first_again}</Hint></Pressable>
-          </Card>
-        )}
         </View>
       </ScrollView>
     </SafeAreaView>

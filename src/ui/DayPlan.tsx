@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
-import { dayKeyLocal, gluClass } from "../engine/days";
+import { dayProgress } from "../engine/dayplan";
 import { useStore } from "../store";
 import { useTheme } from "../theme";
 import { Icon, type IconName } from "./Icon";
@@ -18,14 +18,8 @@ export function DayPlan() {
   const [moveOpen, setMoveOpen] = useState(false);
   // strâns implicit (Alex, 15 nov 2026: „e prea mare”): un rând cu bifele; apăsarea îl desface
   const [open, setOpen] = useState(false);
-  const today = dayKeyLocal(Date.now());
-  const glu = state.glucose.filter((g) => dayKeyLocal(g.t) === today).sort((a, b) => a.t - b.t);
-  const meals = state.meals.filter((m) => dayKeyLocal(m.t) === today);
-  const walk = (state.walks ?? []).filter((w) => dayKeyLocal(w.t) === today).reduce((a, w) => a + w.min, 0);
-  const nowHM = new Date().toTimeString().slice(0, 5);
-  const medsDue = state.meds.flatMap((m) => m.times.filter((time) => time <= nowHM).map((time) => ({ m, time })));
-  const medsTaken = medsDue.filter(({ m, time }) => state.medLog.some((l) => l.medId === m.id && l.time === time && l.day === today)).length;
-  const medsTotal = state.meds.reduce((a, m) => a + m.times.length, 0);
+  const p = dayProgress(state);
+  const { glu, meals, medsDue, medsTaken, medsTotal, gluOut } = p; const walk = p.walkMin;
   const hm = (ms: number) => new Date(ms).toTimeString().slice(0, 5);
   const unit = state.unit === "mg" ? "mg/dL" : "mmol/L";
   const last = glu[glu.length - 1];
@@ -42,7 +36,6 @@ export function DayPlan() {
       sub: medsDue.length ? s.plan_meds_done(medsTaken, medsDue.length) : s.plan_meds_later(medsTotal), onPress: () => router.push("/meds") }] : []),
   ];
   const done = rows.filter((r) => r.ok).length;
-  const gluOut = glu.some((g) => gluClass(g.v, g.ctx) !== "ok");
   if (!open) return (
     <Pressable onPress={() => setOpen(true)} accessibilityRole="button" accessibilityLabel={`${s.plan_title}: ${s.day_progress(done, rows.length)}`}
       style={({ pressed }) => ({ backgroundColor: t.surface, borderColor: t.line, borderWidth: 1, borderRadius: 18, paddingLeft: 14, paddingRight: 8, paddingVertical: 9, flexDirection: "row", alignItems: "center", gap: 8, opacity: pressed ? 0.8 : 1 })}>

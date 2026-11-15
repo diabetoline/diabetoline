@@ -4,7 +4,7 @@ import { deviceLang, type Lang } from "../i18n";
 import { Icon } from "./Icon";
 import { LinearGradient } from "expo-linear-gradient";
 import Svg, { Circle } from "react-native-svg";
-import { dayKeyLocal, gluClass } from "../engine/days";
+import { dayProgress } from "../engine/dayplan";
 import { useStore } from "../store";
 import { useTheme } from "../theme";
 import { useScale } from "./Primitives";
@@ -21,24 +21,13 @@ export function DayHeader() {
   const langs: Lang[] = [first, ...(["ro", "en", "de"] as Lang[]).filter((l) => l !== first)];
   const h = new Date().getHours();
   const hi = h < 11 ? s.hi_morning : h < 18 ? s.hi_day : s.hi_evening;
-  const today = dayKeyLocal(Date.now());
-  const glu = state.glucose.filter((g) => dayKeyLocal(g.t) === today);
-  const meals = state.meals.filter((m) => dayKeyLocal(m.t) === today);
-  const walked = (state.walks ?? []).some((w) => dayKeyLocal(w.t) === today);
-  const nowHM = new Date().toTimeString().slice(0, 5);
-  const medsDue = state.meds.flatMap((m) => m.times.filter((time) => time <= nowHM).map((time) => ({ m, time })));
-  const medsOk = medsDue.every(({ m, time }) => state.medLog.some((l) => l.medId === m.id && l.time === time && l.day === today));
-  const steps = [
-    { ok: glu.length > 0, label: s.d_glu, show: true },
-    { ok: meals.length > 0, label: s.d_meal, show: true },
-    { ok: walked, label: s.d_move, show: h >= 12 },
-    { ok: medsOk && medsDue.length > 0, label: s.d_meds, show: state.meds.length > 0 },
-  ].filter((x) => x.show);
-  const done = steps.filter((x) => x.ok).length;
-  const todo = steps.filter((x) => !x.ok).map((x) => x.label);
-  const anyOut = glu.some((g) => gluClass(g.v, g.ctx) !== "ok") || meals.some((m) => m.level === "red" && !walked);
-  const nothing = glu.length === 0 && meals.length === 0 && !walked;
-  const line = nothing ? s.day_empty : todo.length === 0 && !anyOut ? s.day_all_good : s.day_todo(todo.join(", ") || s.d_move);
+  // aceiași pași ca în lista „Azi” (src/engine/dayplan.ts), ca inelul și lista să spună același lucru
+  const p = dayProgress(state);
+  const labels = { glu: s.d_glu, meal: s.d_meal, move: s.d_move, meds: s.d_meds } as const;
+  const steps = p.steps; const done = p.done;
+  const todo = steps.filter((x) => !x.ok).map((x) => labels[x.key]);
+  const anyOut = p.anyOut;
+  const line = p.nothing ? s.day_empty : todo.length === 0 && !anyOut ? s.day_all_good : s.day_todo(todo.join(", "));
   const ring = anyOut ? t.warn : t.ok;
 
   const R = 30, C = 2 * Math.PI * R, pct = steps.length ? done / steps.length : 0;
