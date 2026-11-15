@@ -29,6 +29,7 @@ export default function Home() {
   const todayGlu = state.glucose.filter((g) => dayKey(g.t) === today);
   const [justTook, setJustTook] = useState<string | null>(null);
   const nowHM = new Date().toTimeString().slice(0, 5);
+  const openList = (state.list ?? []).filter((x) => !x.done);
   const dueNow = state.meds.flatMap((m) => m.times.map((time) => ({ m, time, done: state.medLog.some((l) => l.medId === m.id && l.time === time && l.day === today) })))
     .filter((x) => !x.done && x.time <= nowHM).sort((a, b) => a.time.localeCompare(b.time));
   const open = (c: string) => router.push({ pathname: "/product/[code]", params: { code: c } });
@@ -44,9 +45,31 @@ export default function Home() {
         <View style={{ paddingHorizontal: 16, gap: 12 }}>
 
         <View style={{ flexDirection: "row", gap: 12 }}>
-          <Tile t={t} k={k} icon="barcode" title={s.tile_scan} to="/scan" bg={t.accent} fg={t.accentInk} big badge={(state.list ?? []).filter((x) => !x.done).length || undefined} />
+          <Tile t={t} k={k} icon="barcode" title={s.tile_scan} to="/scan" bg={t.accent} fg={t.accentInk} big />
           <Tile t={t} k={k} icon="plate" title={s.tile_plate} to="/plate" bg={t.accent} fg={t.accentInk} big />
         </View>
+        {/* ordinea de pe prima pagină (Alex, 15 nov 2026): scanare + farfurie · lista (cu numărul produselor) · ce mănânc azi · glicemia + medicamente */}
+        <Pressable onPress={() => router.push("/list")} accessibilityRole="button" style={({ pressed }) => [st.ideas, { backgroundColor: t.surface, borderColor: t.line, opacity: pressed ? 0.85 : 1 }]}>
+          <View style={{ width: 48, height: 48, borderRadius: 14, backgroundColor: t.accentSoft, alignItems: "center", justifyContent: "center" }}>
+            <Icon name="cart" size={26} color={t.accent} />
+            {openList.length > 0 && <View style={[st.badge, { top: -8, right: -8, backgroundColor: t.warn }]}><Text style={{ color: "#fff", fontWeight: "800", fontSize: 14 }}>{openList.length}</Text></View>}
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={{ color: t.ink, fontSize: 19 * k, fontWeight: "800" }}>{s.list_title}</Text>
+            <Text style={{ color: t.muted, fontSize: 15 * k }} numberOfLines={1}>{openList.length ? `${s.list_count(openList.length)} · ${openList.slice(0, 3).map((x) => x.name).join(", ")}` : s.list_empty}</Text>
+          </View>
+          <Text style={{ color: t.muted, fontSize: 26 }}>›</Text>
+        </Pressable>
+        {!fresh && (
+          <Pressable onPress={() => router.push("/ideas")} accessibilityRole="button" style={({ pressed }) => [st.ideas, { backgroundColor: t.surface, borderColor: t.line, opacity: pressed ? 0.85 : 1 }]}>
+            <View style={{ width: 48, height: 48, borderRadius: 14, backgroundColor: t.accentSoft, alignItems: "center", justifyContent: "center" }}><Icon name="pot" size={26} color={t.accent} /></View>
+            <View style={{ flex: 1 }}>
+              <Text style={{ color: t.ink, fontSize: 19 * k, fontWeight: "800" }}>{s.ideas_title}</Text>
+              <Text style={{ color: t.muted, fontSize: 15 * k }}>{s.ideas_btn} {s.ideas_slot[slotForHour(new Date().getHours())]}</Text>
+            </View>
+            <Text style={{ color: t.muted, fontSize: 26 }}>›</Text>
+          </Pressable>
+        )}
         <View style={{ flexDirection: "row", gap: 12 }}>
           <Tile t={t} k={k} icon="drop" title={s.tile_glu} to="/glucose/new" bg={t.surface} fg={t.ink} tint={t.brandRed} />
           <Tile t={t} k={k} icon="pill" title={s.tile_meds} to="/meds" bg={t.surface} fg={t.ink} tint={t.warn} badge={dueNow.length || undefined} />
@@ -66,26 +89,6 @@ export default function Home() {
           </Card>
         )}
 
-        {!fresh && (
-          <Pressable onPress={() => router.push("/ideas")} accessibilityRole="button" style={({ pressed }) => [st.ideas, { backgroundColor: t.surface, borderColor: t.line, opacity: pressed ? 0.85 : 1 }]}>
-            <View style={{ width: 48, height: 48, borderRadius: 14, backgroundColor: t.accentSoft, alignItems: "center", justifyContent: "center" }}><Icon name="pot" size={26} color={t.accent} /></View>
-            <View style={{ flex: 1 }}>
-              <Text style={{ color: t.ink, fontSize: 19 * k, fontWeight: "800" }}>{s.ideas_title}</Text>
-              <Text style={{ color: t.muted, fontSize: 15 * k }}>{s.ideas_btn} {s.ideas_slot[slotForHour(new Date().getHours())]}</Text>
-            </View>
-            <Text style={{ color: t.muted, fontSize: 26 }}>›</Text>
-          </Pressable>
-        )}
-        {(state.list ?? []).some((x) => !x.done) && (
-          <Pressable onPress={() => router.push("/list")} accessibilityRole="button" style={({ pressed }) => [st.ideas, { backgroundColor: t.surface, borderColor: t.line, opacity: pressed ? 0.85 : 1 }]}>
-            <View style={{ width: 48, height: 48, borderRadius: 14, backgroundColor: t.accentSoft, alignItems: "center", justifyContent: "center" }}><Icon name="cart" size={26} color={t.accent} /></View>
-            <View style={{ flex: 1 }}>
-              <Text style={{ color: t.ink, fontSize: 19 * k, fontWeight: "800" }}>{s.list_title}</Text>
-              <Text style={{ color: t.muted, fontSize: 15 * k }}>{s.list_count((state.list ?? []).filter((x) => !x.done).length)} · {(state.list ?? []).filter((x) => !x.done).slice(0, 3).map((x) => x.name).join(", ")}</Text>
-            </View>
-            <Text style={{ color: t.muted, fontSize: 26 }}>›</Text>
-          </Pressable>
-        )}
         {!fresh && <MoveCheckin />}
         {!fresh && <WeightCheckin />}
         {!fresh && <RecoCard placement="home" />}
