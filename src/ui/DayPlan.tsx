@@ -24,9 +24,9 @@ export function DayPlan() {
   const unit = state.unit === "mg" ? "mg/dL" : "mmol/L";
   const last = glu[glu.length - 1];
 
-  type Row = { key: string; icon: IconName; tint: string; title: string; short: string; sub: string; ok: boolean; onPress: () => void };
+  type Row = { key: string; icon: IconName; tint: string; title: string; short: string; sub: string; ok: boolean; warn?: boolean; onPress: () => void };
   const rows: Row[] = [
-    { key: "glu", icon: "drop", tint: t.brandRed, title: s.plan_glu, short: s.plan_glu, ok: glu.length > 0,
+    { key: "glu", icon: "drop", tint: t.brandRed, title: s.plan_glu, short: s.plan_glu, ok: glu.length > 0, warn: gluOut,
       sub: last ? s.plan_glu_done(`${last.v} ${unit}`, hm(last.t), glu.length) : s.plan_glu_todo, onPress: () => router.push("/glucose/new") },
     { key: "meal", icon: "plate", tint: t.accent, title: s.plan_meal, short: s.plan_meal_short, ok: meals.length > 0,
       sub: meals.length ? s.plan_meal_done(meals.length) : s.plan_meal_todo, onPress: () => router.push("/plate") },
@@ -43,8 +43,8 @@ export function DayPlan() {
       {/* un singur rând oricâte limbi/mărimi de text: bifele derulează orizontal dacă nu încap */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flex: 1 }} contentContainerStyle={{ gap: 6, alignItems: "center" }}>
         {rows.map((r) => (
-          <Pressable key={r.key} onPress={() => setOpen(true)} style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999, backgroundColor: r.ok ? t.accentSoft : t.badBg, borderWidth: 1, borderColor: r.ok ? t.ok : t.bad }}>
-            <Text style={{ color: r.ok ? t.ok : t.bad, fontSize: 12.5 * k, fontWeight: "800" }} numberOfLines={1}>{r.ok ? "✓" : "✗"} {r.short}</Text>
+          <Pressable key={r.key} onPress={() => setOpen(true)} style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999, backgroundColor: !r.ok ? t.badBg : r.warn ? t.warnBg : t.accentSoft, borderWidth: 1, borderColor: !r.ok ? t.bad : r.warn ? t.warn : t.ok }}>
+            <Text style={{ color: !r.ok ? t.bad : r.warn ? t.warn : t.ok, fontSize: 12.5 * k, fontWeight: "800" }} numberOfLines={1}>{r.ok ? (r.warn ? "!" : "✓") : "✗"} {r.short}</Text>
           </Pressable>
         ))}
       </ScrollView>
