@@ -77,6 +77,7 @@ export function DayPlan() {
           )}
         </View>
       ))}
+      <Button title={`📋 ${s.day_report}`} kind="ghost" size="sm" onPress={() => router.push("/day")} />
     </Card>
   );
 }

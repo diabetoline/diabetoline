@@ -25,6 +25,7 @@ export default function Root() {
           <Stack.Screen name="paywall" options={{ headerShown: false, presentation: "fullScreenModal", animation: "fade" }} />
           <Stack.Screen name="scan" options={{ headerShown: false, presentation: "fullScreenModal" }} />
           <Stack.Screen name="basics" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
+          <Stack.Screen name="day" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
           <Stack.Screen name="plate" options={{ headerShown: false, presentation: "fullScreenModal" }} />
           <Stack.Screen name="glucose/new" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
           <Stack.Screen name="meds" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
