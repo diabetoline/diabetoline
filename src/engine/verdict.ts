@@ -23,7 +23,8 @@ export function assumedServing(p: Product): number {
 
 /** Thresholds (per serving). Starting point, to be validated with a diabetologist before launch. */
 export const T = {
-  greenCarbs: 15, greenSugars: 5, greenSugarsDairy: 8,
+  greenCarbs: 15, greenSugars: 5, greenSugarsDairy: 8, greenSugarsFruit: 10, // fructe proaspete: zahăr natural cu fibre
+  giLowCap: 40, // IG măsurat ≤ 40 cu fibre (linte, fasole, năut): nu roșu dacă încărcătura e sub prag
   yellowCarbs: 30, yellowSugars: 12,
   fiberBonusSmall: 3, fiberBonusBig: 4,
   fiberBonusSmallCarbs: 5, fiberBonusBigCarbs: 7, // carbohidrați în plus permiși la verde, dacă are fibre
@@ -41,6 +42,9 @@ const ALCOHOL_NAME = /\bbere\b|\bbier\b|\bbeer\b|\bvin\b|\bwein\b|\bwine\b|vodka
 const ADDED_SUGAR = /\b(sugar|sugars|zahăr|zahar|zucker|sucre|azúcar|zucchero|cukor|brown-sugar|cane-sugar|zahăr brun|rohrzucker|glucose|dextrose|fructose|syrup|sirop|sirup|honey|miere|honig)\b/i;
 /** Lactate simple: zahărul e lactoză, nu zahăr adăugat. */
 const PLAIN_DAIRY = /yogurts|plain-yogurts|natural-yogurts|greek-yogurts|skyr|kefir|cottage|milks|buttermilk|sana|iaurt|lapte|joghurt|milch/i;
+/** Fruct sau legumă întreagă, proaspătă: zahărul e al fructului, vine cu fibre și apă; nu e dulciuri. Nu sucuri, uscate, compoturi, gemuri. */
+const FRESH_PRODUCE = /\bfruits\b|fresh-fruits|\bapples\b|\bpears\b|\bbananas\b|\boranges\b|\bgrapes\b|\bberries\b|strawberries|cherries|melons|peaches|apricots|\bplums\b|\bkiwis\b|\bvegetables\b|fresh-vegetables|\bpeppers\b|\bcarrots\b|\btomatoes\b/i;
+const NOT_FRESH = /juice|dried|canned|syrup|jam|compote|smoothie|puree|chips|candied|sweetened|nectar|dessert|yogurt|cakes|pastr|cereal|bars/i;
 const DAIRY_DRINK = /milks|dairy-drinks|plant-based-milks|kefir|drinking-yogurt|ayran|lapte|milch|milk/i;
 /** Categorii cu porții declarate adesea „de marketing” (o napolitană, un pătrățel). */
 const FLOORED = /chocolates|biscuits|cookies|wafers|cakes|pastries|breads|cereals|muesli|granola|spreads|jams|honey|crisps|snacks|candies|bars|crackers/i;
@@ -78,7 +82,9 @@ export function analyze(p: Product): Verdict {
   const addedSugar = p.ingredients.slice(0, 4).some((i) => ADDED_SUGAR.test(i));
   // iaurt natural, lapte, kefir: lactoza nu e zahăr adăugat; un pahar/un iaurt rămâne verde
   const plainDairy = PLAIN_DAIRY.test(cats + " " + p.name) && !addedSugar && !hidden.length && p.sugars100 <= 5.5;
-  const greenSugars = plainDairy ? T.greenSugarsDairy : T.greenSugars;
+  // fruct/legumă proaspătă, fără nimic adăugat: zahărul natural e judecat ca la lactatele simple (nu ca la dulciuri)
+  const freshProduce = FRESH_PRODUCE.test(cats) && !NOT_FRESH.test(cats + " " + p.name) && p.unit !== "ml" && !addedSugar && !hidden.length && p.ingredients.length <= 1;
+  const greenSugars = plainDairy ? T.greenSugarsDairy : freshProduce ? T.greenSugarsFruit : T.greenSugars;
 
   let level: Level =
     carbs <= T.greenCarbs + bonus && sugars <= greenSugars ? "green"
@@ -87,6 +93,10 @@ export function analyze(p: Product): Verdict {
 
   const gl = p.gi == null ? null : (p.gi * carbs) / 100;
   if (gl != null && gl >= T.glRed) level = "red";
+  // un fruct întreg (măr, portocală) nu e roșu doar din cauza zahărului natural: cu IG scăzut și încărcătură mică rămâne cel mult galben
+  if (freshProduce && level === "red" && carbs <= T.yellowCarbs && (gl == null || gl < T.glRed) && p.sugars100 < T.denseYellow) level = "yellow";
+  // leguminoase și alte alimente cu IG scăzut măsurat și fibre: încărcătura glicemică decide, nu cantitatea brută de carbohidrați
+  if (p.gi != null && p.giSource === "measured" && p.gi <= T.giLowCap && level === "red" && gl != null && gl < T.glRed && bonus && !addedSugar && !hidden.length && p.sugars100 < T.denseYellow) level = "yellow";
   // density rule: a product that is mostly sugar stays red even in a tiny declared serving
   const sugarDense = p.sugars100 >= T.denseRed;
   if (sugarDense) level = "red";

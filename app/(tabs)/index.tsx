@@ -76,6 +76,14 @@ export default function Home() {
             <Text style={{ color: t.muted, fontSize: 26 }}>›</Text>
           </Pressable>
         )}
+        <Pressable onPress={() => router.push("/basics")} accessibilityRole="button" style={({ pressed }) => [st.ideas, { backgroundColor: t.surface, borderColor: t.line, opacity: pressed ? 0.85 : 1 }]}>
+          <View style={{ width: 48, height: 48, borderRadius: 14, backgroundColor: t.accentSoft, alignItems: "center", justifyContent: "center" }}><Text style={{ fontSize: 26 }}>🍎</Text></View>
+          <View style={{ flex: 1 }}>
+            <Text style={{ color: t.ink, fontSize: 19 * k, fontWeight: "800" }}>{s.basics_btn}?</Text>
+            <Text style={{ color: t.muted, fontSize: 15 * k }}>{s.basics_home}</Text>
+          </View>
+          <Text style={{ color: t.muted, fontSize: 26 }}>›</Text>
+        </Pressable>
         {(state.list ?? []).some((x) => !x.done) && (
           <Pressable onPress={() => router.push("/list")} accessibilityRole="button" style={({ pressed }) => [st.ideas, { backgroundColor: t.surface, borderColor: t.line, opacity: pressed ? 0.85 : 1 }]}>
             <View style={{ width: 48, height: 48, borderRadius: 14, backgroundColor: t.accentSoft, alignItems: "center", justifyContent: "center" }}><Icon name="cart" size={26} color={t.accent} /></View>

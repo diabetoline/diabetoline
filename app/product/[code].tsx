@@ -24,9 +24,11 @@ const n = (x: number) => x.toLocaleString(undefined, { maximumFractionDigits: 1 
 export default function ProductScreen() {
   const { code, from } = useLocalSearchParams<{ code: string; from?: string }>();
   // deschis din modul cumpărături: „Scanează altul” se întoarce la scanarea de dedesubt, nu deschide încă una peste
-  const scanAgain = () => (from === "scan" && router.canGoBack() ? router.back() : router.replace("/scan"));
   const t = useTheme(); const k = useScale();
   const router = useRouter();
+  const scanAgain = () => (from === "scan" && router.canGoBack() ? router.back() : router.replace("/scan"));
+  // „Pune pe listă” închide pagina (Alex, 15 nov 2026): omul e la raft, se întoarce la scanare / de unde a venit
+  const listAndClose = (lvl: Verdict["level"]) => { addToList({ name: p!.name, code: p!.code, level: lvl, by: "me" }); if (router.canGoBack()) router.back(); else router.replace("/scan"); };
   const { t: s, s: state, recordScan, addMeal, addToList, removeFromList } = useStore();
   const [p, setP] = useState<Product | null>(state.cache[code] ?? null);
   const [err, setErr] = useState<"notfound" | "network" | null>(null);
@@ -106,10 +108,10 @@ export default function ProductScreen() {
       <View style={{ padding: 16, gap: 12 }}>
         {/* la cumpărături întrebarea e „îl iau?” (Alex, 15 nov 2026): la verde/galben butonul mare e lista; „Am mâncat asta” rămâne, secundar, pentru scanările de acasă */}
         {v.level !== "red" && (
-          <Button title={onList ? "✓ " + s.list_added : "🛒 " + s.list_add} size="xl" kind={onList ? "ghost" : undefined} onPress={() => (onList ? removeFromList(onList.id) : addToList({ name: p.name, code: p.code, level: v.level, by: "me" }))} />
+          <Button title={onList ? "✓ " + s.list_added : "🛒 " + s.list_add} size="xl" kind={onList ? "ghost" : undefined} onPress={() => (onList ? removeFromList(onList.id) : listAndClose(v.level))} />
         )}
         {v.level === "red" && <Button title={"🥗 " + s.ideas_lighter} size="xl" onPress={() => router.push({ pathname: "/ideas", params: { focus: p.name, lighter: "1" } })} />}
-        {v.level === "red" && <Button title={onList ? "✓ " + s.list_added : "🛒 " + s.list_add_anyway} kind="ghost" onPress={() => (onList ? removeFromList(onList.id) : addToList({ name: p.name, code: p.code, level: v.level, by: "me" }))} />}
+        {v.level === "red" && <Button title={onList ? "✓ " + s.list_added : "🛒 " + s.list_add_anyway} kind="ghost" onPress={() => (onList ? removeFromList(onList.id) : listAndClose(v.level))} />}
         <View style={{ flexDirection: "row", gap: 10 }}>
           <View style={{ flex: 1 }}><Button title={ate ? "✓ " + s.ate_this : s.ate_this} kind="soft" disabled={ate} onPress={() => { addMeal({ code: p.code, name: p.name, level: v.level, slot: slotForHour(new Date().getHours()) }); setAte(true); }} /></View>
           <View style={{ flex: 1 }}><Button title={s.scan_again} kind="soft" onPress={scanAgain} /></View>

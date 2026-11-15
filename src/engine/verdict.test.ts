@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { analyze } from "./verdict.ts";
 import { normalize } from "../api/off.ts";
 import { estimateGi } from "./gi.ts";
+import { BASICS, basicProduct } from "../basics.ts";
 
 // Fixtures shaped like real Open Food Facts responses
 const nutella = {
@@ -173,4 +174,24 @@ test("nuci, brânză, ouă, carne, apă: verde", () => {
   ] as const) {
     assert.equal(analyze(mk({ product_name: name, quantity: "200 g", nutriments: n, ingredients_text_en: name, categories_tags: [...cats] })).level, "green", name);
   }
+});
+
+// Alimente de bază (fără cod, 15 nov 2026): fructul întreg nu e dulciuri, leguminoasele nu sunt roșii
+test("Cazuri capcană: fructele proaspete și leguminoasele", () => {
+  const by = (id: string) => analyze(basicProduct(BASICS.find((b) => b.id === id)!, "ro")).level;
+  assert.equal(by("strawberries"), "green");
+  assert.equal(by("berries"), "green");
+  assert.equal(by("apple"), "yellow");
+  assert.equal(by("orange"), "yellow");
+  assert.equal(by("grapes"), "yellow");
+  assert.equal(by("dried-fruit"), "red");
+  assert.equal(by("beans"), "yellow");
+  assert.equal(by("white-rice"), "red");
+  assert.equal(by("honey"), "red");
+  // sucul de fructe rămâne băutură dulce → roșu, chiar dacă e „din fructe”
+  const juice = mk({ product_name: "Suc de portocale 100%", quantity: "1 l", serving_quantity: 250, nutriments: { carbohydrates_100g: 10, sugars_100g: 9, fiber_100g: 0.2 }, ingredients_text_en: "Orange juice", categories_tags: ["en:beverages", "en:fruit-juices", "en:orange-juices"] });
+  assert.equal(analyze(juice).level, "red");
+  // compotul/fructele în sirop nu sunt „proaspete”
+  const compote = mk({ product_name: "Compot de piersici", quantity: "400 g", serving_quantity: 150, nutriments: { carbohydrates_100g: 17, sugars_100g: 16, fiber_100g: 1 }, ingredients_text_en: "Peaches, water, sugar", categories_tags: ["en:fruits", "en:canned-fruits", "en:peaches-in-syrup"] });
+  assert.equal(analyze(compote).level, "red");
 });

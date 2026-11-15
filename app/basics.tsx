@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { BASIC_GROUPS, BASICS, basicProduct, type Basic } from "../src/basics";
 import { analyze } from "../src/engine/verdict";
 import { useStore } from "../src/store";
@@ -11,6 +11,7 @@ import { Hint, Label, useScale } from "../src/ui/Primitives";
 /** „N-are cod”: alimentele de bază (pâine de la panificație, fructe, legume, cântar) cu verdict gata, fără internet. */
 export default function Basics() {
   const t = useTheme(); const k = useScale(); const router = useRouter();
+  const { from } = useLocalSearchParams<{ from?: string }>();
   const { t: s, s: state, addUserProduct } = useStore();
   const [q, setQ] = useState("");
   const items = useMemo(() => {
@@ -21,7 +22,7 @@ export default function Basics() {
   const pick = (b: Basic) => {
     const p = basicProduct(b, state.lang);
     addUserProduct(p); track("basics_pick", { id: b.id });
-    router.replace({ pathname: "/product/[code]", params: { code: p.code } });
+    router.replace({ pathname: "/product/[code]", params: { code: p.code, from: from ?? "" } });
   };
   return (
     <ScrollView contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">

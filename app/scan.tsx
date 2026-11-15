@@ -141,7 +141,7 @@ export default function ScanScreen() {
                 <Text style={st.hint}>{err.kind === "notfound" ? s.not_found : s.network}</Text>
                 <View style={{ flexDirection: "row", gap: 8 }}>
                   {err.kind === "notfound" && <View style={{ flex: 1 }}><Button title={s.add_product} onPress={() => router.push({ pathname: "/product/add", params: { code: err.code, from: "scan" } })} /></View>}
-                  <View style={{ flex: 1 }}><Button title={s.basics_btn} kind="soft" onPress={() => router.push("/basics")} /></View>
+                  <View style={{ flex: 1 }}><Button title={"🍎 " + s.basics_btn} kind="soft" onPress={() => router.push({ pathname: "/basics", params: { from: "scan" } })} /></View>
                 </View>
                 <Text style={st.hint2}>{s.shop_next}</Text>
               </View>
@@ -156,9 +156,10 @@ export default function ScanScreen() {
                     <Button title={s.check} onPress={submit} size="sm" />
                   </View>
                 ) : (
-                  <View style={{ flexDirection: "row", gap: 16, justifyContent: "center", marginTop: 8 }}>
-                    <Pressable onPress={() => setTyping(true)} hitSlop={10} accessibilityRole="button"><Text style={[st.hint2, { textDecorationLine: "underline", color: "#fff" }]}>{s.code_toggle}</Text></Pressable>
-                    <Pressable onPress={() => router.push("/basics")} hitSlop={10} accessibilityRole="button"><Text style={[st.hint2, { textDecorationLine: "underline", color: "#fff" }]}>{s.basics_btn}</Text></Pressable>
+                  <View style={{ flexDirection: "row", gap: 10, marginTop: 10 }}>
+                    {/* „N-are cod” vizibil ca buton (Alex, 15 nov 2026): pâine, fructe, legume, cântar */}
+                    <View style={{ flex: 1 }}><Button title={"🍎 " + s.basics_btn} kind="soft" onPress={() => router.push({ pathname: "/basics", params: { from: "scan" } })} /></View>
+                    <View style={{ flex: 1 }}><Button title={s.code_toggle} kind="soft" onPress={() => setTyping(true)} /></View>
                   </View>
                 )}
               </>
