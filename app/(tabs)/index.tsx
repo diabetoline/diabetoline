@@ -7,8 +7,9 @@ import { levelColor, useTheme, type Theme } from "../../src/theme";
 import { Icon, type IconName } from "../../src/ui/Icon";
 import { Button, Card, Hint, Label, useScale } from "../../src/ui/Primitives";
 import { Quip } from "../../src/ui/Quip";
-import { MoveCheckin, WeightCheckin } from "../../src/ui/Checkins";
+import { WeightCheckin } from "../../src/ui/Checkins";
 import { DayHeader } from "../../src/ui/DayHeader";
+import { DayPlan } from "../../src/ui/DayPlan";
 import { RecoCard } from "../../src/ui/RecoCard";
 import { trialDaysLeft } from "../../src/money";
 import { MessageCard } from "../../src/ui/MessageCard";
@@ -43,6 +44,8 @@ export default function Home() {
         <DayHeader />
         {trialDaysLeft(state.trialStart) > 0 && <Hint style={{ textAlign: "center" }}>{s.pay_left(trialDaysLeft(state.trialStart))}</Hint>}
         <View style={{ paddingHorizontal: 16, gap: 12 }}>
+        {/* lista zilei, clară, deasupra (Alex, 15 nov 2026) */}
+        <DayPlan />
 
         <View style={{ flexDirection: "row", gap: 12 }}>
           <Tile t={t} k={k} icon="barcode" title={s.tile_scan} to="/scan" bg={t.accent} fg={t.accentInk} big />
@@ -89,7 +92,6 @@ export default function Home() {
           </Card>
         )}
 
-        {!fresh && <MoveCheckin />}
         {!fresh && <WeightCheckin />}
         {!fresh && <RecoCard placement="home" />}
         {!fresh && (
