@@ -16,31 +16,40 @@ def fetch(url):
     with urllib.request.urlopen(req, timeout=60) as r:
         return json.load(r)
 
+# OFF nu dă mai mult de 10 pagini (1.000 de produse) pe o căutare fără autentificare (401 de la pagina 11),
+# așa că luăm cele mai scanate produse pe categorii: ~500 din fiecare, fără dubluri.
+CATS = ["", "breads", "dairies", "beverages", "snacks", "sweet-snacks", "breakfast-cereals", "meats", "cheeses", "yogurts", "pastas", "biscuits-and-cakes", "chocolates", "plant-based-foods", "frozen-foods", "sauces", "fruit-juices", "sodas", "meals"]
+PAGES_PER_CAT = 5
+
 def main(cc, limit):
     tag = COUNTRY[cc]
-    out, page, size, fails = [], 1, 100, 0
-    while len(out) < limit:
-        q = urllib.parse.urlencode({"countries_tags_en": tag, "sort_by": "unique_scans_n", "page_size": size, "page": page, "fields": FIELDS})
+    out, seen, size, fails = [], set(), 100, 0
+    jobs = [(cat, page) for cat in CATS for page in range(1, (10 if cat == "" else PAGES_PER_CAT) + 1)]
+    for cat, page in jobs:
+        if len(out) >= limit: break
+        params = {"countries_tags_en": tag, "sort_by": "unique_scans_n", "page_size": size, "page": page, "fields": FIELDS}
+        if cat: params["categories_tags_en"] = cat
+        q = urllib.parse.urlencode(params)
         try:
             data = fetch(f"https://world.openfoodfacts.org/api/v2/search?{q}")
         except Exception as e:
             # OFF limitează căutarea la ~10 cereri/minut; nu reîncercăm la nesfârșit (pe 15 nov 2026 workflow-ul a rulat 6 ore și a fost oprit)
-            fails += 1; print("retry", page, e, file=sys.stderr)
-            if fails > 6: print("renunț la", cc, "după", page - 1, "pagini", file=sys.stderr); break
+            fails += 1; print("retry", cat or "all", page, e, file=sys.stderr)
+            if fails > 8: print("renunț la", cc, file=sys.stderr); break
             time.sleep(30); continue
         fails = 0
         prods = data.get("products") or []
-        if not prods: break
+        if not prods: continue
         for p in prods:
             n = p.get("nutriments") or {}
-            if not p.get("code") or ("carbohydrates_100g" not in n and "sugars_100g" not in n): continue
+            if not p.get("code") or p["code"] in seen or ("carbohydrates_100g" not in n and "sugars_100g" not in n): continue
+            seen.add(p["code"])
             slim = {k: p[k] for k in ("code", "product_name", "product_name_en", "product_name_de", "product_name_ro", "brands", "serving_quantity", "quantity", "categories_tags", "labels_tags", "labels") if p.get(k)}
             slim["nutriments"] = {k: n[k] for k in KEEP_NUTR if k in n}
             ing = p.get("ingredients_text_ro") or p.get("ingredients_text_de") or p.get("ingredients_text_en") or p.get("ingredients_text")
             if ing: slim["ingredients_text"] = str(ing)[:400]
             if slim.get("categories_tags"): slim["categories_tags"] = slim["categories_tags"][-6:]
             out.append(slim)
-        page += 1
         time.sleep(6.5)  # limita OFF pentru căutare: 10 cereri/minut
     out = out[:limit]
     with open(f"public/pack/{cc}.json", "w", encoding="utf-8") as f:
