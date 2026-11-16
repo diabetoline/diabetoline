@@ -18,13 +18,17 @@ def fetch(url):
 
 def main(cc, limit):
     tag = COUNTRY[cc]
-    out, page, size = [], 1, 100
+    out, page, size, fails = [], 1, 100, 0
     while len(out) < limit:
         q = urllib.parse.urlencode({"countries_tags_en": tag, "sort_by": "unique_scans_n", "page_size": size, "page": page, "fields": FIELDS})
         try:
             data = fetch(f"https://world.openfoodfacts.org/api/v2/search?{q}")
         except Exception as e:
-            print("retry", page, e, file=sys.stderr); time.sleep(5); continue
+            # OFF limitează căutarea la ~10 cereri/minut; nu reîncercăm la nesfârșit (pe 15 nov 2026 workflow-ul a rulat 6 ore și a fost oprit)
+            fails += 1; print("retry", page, e, file=sys.stderr)
+            if fails > 6: print("renunț la", cc, "după", page - 1, "pagini", file=sys.stderr); break
+            time.sleep(30); continue
+        fails = 0
         prods = data.get("products") or []
         if not prods: break
         for p in prods:
@@ -37,7 +41,7 @@ def main(cc, limit):
             if slim.get("categories_tags"): slim["categories_tags"] = slim["categories_tags"][-6:]
             out.append(slim)
         page += 1
-        time.sleep(1.2)  # politețe față de OFF
+        time.sleep(6.5)  # limita OFF pentru căutare: 10 cereri/minut
     out = out[:limit]
     with open(f"public/pack/{cc}.json", "w", encoding="utf-8") as f:
         json.dump({"country": cc, "at": int(time.time()), "n": len(out), "products": out}, f, ensure_ascii=False, separators=(",", ":"))
