@@ -165,9 +165,15 @@ export default function ProductScreen() {
               <View style={{ borderWidth: 2, borderColor: t.ink, borderRadius: 8, padding: 8 }}>
                 <Row t={t} k={k} a="" b={`100 ${p.unit}`} c={s.serving} head />
                 <Row t={t} k={k} a={s.carbs} b={`${n(p.carbs100)} g`} c={`${n(v.carbs)} g`} />
-                <Row t={t} k={k} a={`  ${s.sugars}`} b={`${n(p.sugars100)} g`} c={`${n(v.sugars)} g`} muted />
+                <Row t={t} k={k} a={`  ${s.sugars}`} b={`${v.sugarsEstimated ? "≈ " : ""}${n(v.sugars100 ?? p.sugars100)} g`} c={`${v.sugarsEstimated ? "≈ " : ""}${n(v.sugars)} g`} muted />
                 <Row t={t} k={k} a={s.fiber} b={`${n(p.fiber100)} g`} c={`${n(v.fiber)} g`} last />
               </View>
+              {(v.sugarsEstimated || (p.source === "off" && p.fiber100 === 0 && p.sugars100 === 0)) && (
+                <View style={{ gap: 8, marginTop: 10 }}>
+                  <Hint>{s.fix_label_hint}</Hint>
+                  <Button title={s.fix_label} kind="soft" onPress={() => router.push({ pathname: "/product/add", params: { code: p.code, name: p.name, brand: p.brand ?? "" } })} />
+                </View>
+              )}
             </View>
             {p.imageUrl && <Image source={{ uri: p.imageUrl }} style={{ width: 90, height: 90, borderRadius: 10, alignSelf: "center" }} />}
             <Hint>{p.code}</Hint>

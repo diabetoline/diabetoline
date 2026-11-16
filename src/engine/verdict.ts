@@ -11,6 +11,8 @@ export function assumedServing(p: Product): number {
   if (/breads/.test(cats)) return 50;
   if (/cereals|muesli|granola|oats/.test(cats)) return 40;
   if (/yogurts|dairy-desserts/.test(cats)) return 150;
+  // un croissant / o brioșă / o gogoașă cântărește 50–80 g, nu „un biscuit” (16 nov 2026: 7 Days ieșea cu porție de 30 g)
+  if (/croissant|viennoiser|pastries|muffin|donut|doughnut|brioche|cornuri|gogoa/.test(cats + " " + p.name.toLowerCase())) return 60;
   if (/chocolates|biscuits|cookies|candies|bars/.test(cats)) return 25;
   if (/sauces|ketchup|spreads|jams|honey/.test(cats)) return 15;
   if (/seeds|nuts|chia|flax|sesame|almonds|walnuts|peanut/.test(cats)) return 30;
@@ -33,6 +35,7 @@ export const T = {
   giHigh: 70, giHighRedCarbs: 20, // IG ridicat: niciodată verde; cu ≥ 20 g carbohidrați pe porție → roșu
   sugaryDrink: 4, sugaryMilk: 7,  // zahăr la 100 ml: băuturile dulci sunt roșii oricare ar fi porția; laptele/iaurtul de băut doar dacă e îndulcit
   alcoholRedMl: 400, alcoholRedSugars: 5,
+  sweetRedCarbs: 20, // dulce cu zahăr adăugat și ≥ 20 g carbohidrați pe porție → roșu (croissant, gogoașă, felie de tort)
   servingFloor: 0.6, // porția declarată nu poate fi mai mică de 60% din porția obișnuită a categoriei (contra „porțiilor de 10 g”)
 };
 
@@ -48,6 +51,8 @@ const NOT_FRESH = /juice|dried|canned|syrup|jam|compote|smoothie|puree|chips|can
 const DAIRY_DRINK = /milks|dairy-drinks|plant-based-milks|kefir|drinking-yogurt|ayran|lapte|milch|milk/i;
 /** Categorii cu porții declarate adesea „de marketing” (o napolitană, un pătrățel). */
 const FLOORED = /chocolates|biscuits|cookies|wafers|cakes|pastries|breads|cereals|muesli|granola|spreads|jams|honey|crisps|snacks|candies|bars|crackers/i;
+/** Dulciuri și patiserie: când zahărul lipsește din bază, e de regulă ~40 % din carbohidrați. */
+const SWEET = /chocolates|biscuits|cookies|wafers|cakes|pastries|croissant|viennoiser|candies|bars|desserts|ice-cream|jams|spreads|sweet|confectioner|brioche|donut|muffin|prăjitur|prajitur|napolitan|7 days/i;
 
 /** Categorii OFF aproximate din numele produsului, pentru produsele fără categorii (adăugate din poză). */
 export function categoriesFromName(name: string): string {
@@ -58,6 +63,7 @@ export function categoriesFromName(name: string): string {
   if (/cereal|musli|müsli|muesli|granola|fulgi|ovăz|ovaz|oats|hafer|flakes/.test(n)) out.push("cereals");
   if (/iaurt|yog|joghurt|budinc|pudding|dessert/.test(n)) out.push("yogurts");
   if (/ciocolat|chocolat|schokol|biscuit|biscui|cookie|keks|bombo|candy|napolitan|waffel|baton|bar\b|riegel|prăjitur|prajitur|cake|kuchen/.test(n)) out.push("chocolates biscuits");
+  if (/croissant|cornuri|corn cu|brioș|brios|brioche|gogoa|donut|muffin|7 days|7days/.test(n)) out.push("pastries");
   if (/sos|sauce|ketchup|maionez|mayo|gem\b|dulcea|jam|marmel|miere|honey|honig|crem[aă] de|spread|aufstrich|nutella/.test(n)) out.push("sauces spreads");
   if (/paste|pasta|spaghet|penne|fusilli|macaroane|nudel|orez|rice|reis|bulgur|quinoa|couscous|cuscus|linte|lentil|linsen|fasole|beans|bohnen|năut|naut|chickpea|kichererb/.test(n)) out.push("pastas rices grains legumes");
   if (/pizza|lasagn|lasagne|ready|gata|fertig/.test(n)) out.push("pizzas ready-meals");
@@ -76,12 +82,17 @@ export function analyze(p: Product): Verdict {
   const floor = FLOORED.test(cats) ? T.servingFloor * usual : 0;
   const serving = p.serving == null ? usual : Math.max(p.serving, floor);
   const k = serving / 100;
-  const carbs = p.carbs100 * k, sugars = p.sugars100 * k, fiber = p.fiber100 * k;
   const hidden = findHiddenSugars(p.ingredients);
-  const bonus = fiber >= T.fiberBonusBig ? T.fiberBonusBigCarbs : fiber >= T.fiberBonusSmall ? T.fiberBonusSmallCarbs : 0;
   const addedSugar = p.ingredients.slice(0, 4).some((i) => ADDED_SUGAR.test(i));
+  // „0 g zahăr” în bază, dar zahăr/sirop de glucoză în ingrediente (16 nov 2026, 7 Days: eticheta reală avea 18 g): valoarea lipsește,
+  // nu e zero — estimăm din carbohidrați (dulciuri/patiserie ~40 %, altfel ~25 %) și cerem omului poza la tabel
+  const anySugarIng = hidden.length > 0 || p.ingredients.some((i) => ADDED_SUGAR.test(i));
+  const sugarsEstimated = p.sugars100 <= 0 && p.carbs100 >= 10 && anySugarIng;
+  const sugars100 = sugarsEstimated ? r1(p.carbs100 * (SWEET.test(cats + " " + p.name) ? 0.4 : 0.25)) : p.sugars100;
+  const carbs = p.carbs100 * k, sugars = sugars100 * k, fiber = p.fiber100 * k;
+  const bonus = fiber >= T.fiberBonusBig ? T.fiberBonusBigCarbs : fiber >= T.fiberBonusSmall ? T.fiberBonusSmallCarbs : 0;
   // iaurt natural, lapte, kefir: lactoza nu e zahăr adăugat; un pahar/un iaurt rămâne verde
-  const plainDairy = PLAIN_DAIRY.test(cats + " " + p.name) && !addedSugar && !hidden.length && p.sugars100 <= 5.5;
+  const plainDairy = PLAIN_DAIRY.test(cats + " " + p.name) && !addedSugar && !hidden.length && sugars100 <= 5.5;
   // fruct/legumă proaspătă, fără nimic adăugat: zahărul natural e judecat ca la lactatele simple (nu ca la dulciuri)
   const freshProduce = FRESH_PRODUCE.test(cats) && !NOT_FRESH.test(cats + " " + p.name) && p.unit !== "ml" && !addedSugar && !hidden.length && p.ingredients.length <= 1;
   const greenSugars = plainDairy ? T.greenSugarsDairy : freshProduce ? T.greenSugarsFruit : T.greenSugars;
@@ -94,19 +105,24 @@ export function analyze(p: Product): Verdict {
   const gl = p.gi == null ? null : (p.gi * carbs) / 100;
   if (gl != null && gl >= T.glRed) level = "red";
   // un fruct întreg (măr, portocală) nu e roșu doar din cauza zahărului natural: cu IG scăzut și încărcătură mică rămâne cel mult galben
-  if (freshProduce && level === "red" && carbs <= T.yellowCarbs && (gl == null || gl < T.glRed) && p.sugars100 < T.denseYellow) level = "yellow";
+  if (freshProduce && level === "red" && carbs <= T.yellowCarbs && (gl == null || gl < T.glRed) && sugars100 < T.denseYellow) level = "yellow";
   // leguminoase și alte alimente cu IG scăzut măsurat și fibre: încărcătura glicemică decide, nu cantitatea brută de carbohidrați
-  if (p.gi != null && p.giSource === "measured" && p.gi <= T.giLowCap && level === "red" && gl != null && gl < T.glRed && bonus && !addedSugar && !hidden.length && p.sugars100 < T.denseYellow) level = "yellow";
+  if (p.gi != null && p.giSource === "measured" && p.gi <= T.giLowCap && level === "red" && gl != null && gl < T.glRed && bonus && !addedSugar && !hidden.length && sugars100 < T.denseYellow) level = "yellow";
   // density rule: a product that is mostly sugar stays red even in a tiny declared serving
-  const sugarDense = p.sugars100 >= T.denseRed;
+  const sugarDense = sugars100 >= T.denseRed;
   if (sugarDense) level = "red";
-  else if (p.sugars100 >= T.denseYellow && level === "green") level = "yellow";
+  else if (sugars100 >= T.denseYellow && level === "green") level = "yellow";
   if (hidden.length && level === "green") level = "yellow";
   if (addedSugar && level === "green") level = "yellow";
 
   const sweetClaim = p.claims.some((c) => ["no_added_sugar", "sugar_free", "for_diabetics"].includes(c));
   const labelTrap = sweetClaim && (hidden.length > 0 || sugars > T.greenSugars);
   if (labelTrap) level = "red";
+
+  // dulce de patiserie/cofetărie cu zahăr adăugat, într-o porție întreagă (croissant, brioșă, gogoașă, felie de tort): roșu,
+  // ca la farfurie („dulce cu zahăr niciodată verde”, Alex, 5 nov 2026); un biscuit sau un pătrățel de ciocolată rămân galbene
+  const sweetPortion = SWEET.test(cats + " " + p.name) && (addedSugar || hidden.length > 0) && carbs >= T.sweetRedCarbs && !plainDairy;
+  if (sweetPortion) level = "red";
 
   // indice glicemic ridicat (pâine albă, orez alb, fulgi de porumb): niciodată verde; cu o porție reală de carbohidrați, roșu
   const giHigh = p.gi != null && p.gi >= T.giHigh && carbs >= 5;
@@ -115,7 +131,7 @@ export function analyze(p: Product): Verdict {
 
   // băuturi dulci: zahărul lichid intră direct în sânge; nu contează cât de mică e porția declarată
   const dairy = DAIRY_DRINK.test(cats + " " + p.name);
-  const sugaryDrink = p.unit === "ml" && p.sugars100 >= (dairy ? T.sugaryMilk : T.sugaryDrink) && !isAlcohol(p);
+  const sugaryDrink = p.unit === "ml" && sugars100 >= (dairy ? T.sugaryMilk : T.sugaryDrink) && !isAlcohol(p);
   if (sugaryDrink) level = "red";
 
   // alcool: niciodată verde; mult sau dulce → roșu
@@ -132,9 +148,11 @@ export function analyze(p: Product): Verdict {
   if (p.gi != null && p.gi >= 70) reasons.push("gi_high");
   if (gl != null && gl >= T.glRed) reasons.push("gl_high");
   if (sugarDense) reasons.push("sugar_dense");
+  if (sugarsEstimated) reasons.push("sugar_estimated");
   if (hidden.length) reasons.push("hidden_sugar");
   else if (addedSugar && sugars > 0) reasons.push("added_sugar");
   if (labelTrap) reasons.push("label_trap");
+  if (sweetPortion) reasons.push("sweet_portion");
   if (sugaryDrink) reasons.push("sugary_drink");
   if (alcohol) reasons.push("alcohol");
 
@@ -143,7 +161,7 @@ export function analyze(p: Product): Verdict {
   return {
     level, carbs: r1(carbs), sugars: r1(sugars), fiber: r1(fiber), serving,
     servingAssumed: p.serving == null, gl: gl == null ? null : Math.round(gl),
-    hiddenSugars: hidden, labelTrap, reasons, walkMinutes,
+    hiddenSugars: hidden, labelTrap, reasons, walkMinutes, sugarsEstimated, sugars100,
   };
 }
 

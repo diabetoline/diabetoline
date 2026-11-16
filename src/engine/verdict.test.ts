@@ -195,3 +195,26 @@ test("Cazuri capcană: fructele proaspete și leguminoasele", () => {
   const compote = mk({ product_name: "Compot de piersici", quantity: "400 g", serving_quantity: 150, nutriments: { carbohydrates_100g: 17, sugars_100g: 16, fiber_100g: 1 }, ingredients_text_en: "Peaches, water, sugar", categories_tags: ["en:fruits", "en:canned-fruits", "en:peaches-in-syrup"] });
   assert.equal(analyze(compote).level, "red");
 });
+
+test("Cazuri capcană: „0 g zahăr” în bază la un croissant cu sirop de glucoză (7 Days, 16 nov 2026)", () => {
+  // Open Food Facts avea zahăr 0 și fibre 0 (eticheta reală: 18 g zahăr), fără porție; ieșea galben cu porție de 30 g
+  const sevenDays = mk({
+    product_name: "7 days mondelez", nutriments: { carbohydrates_100g: 43, sugars_100g: 0, fiber_100g: 0 },
+    ingredients_text_en: "Wheat flour, palm oil, sugar, water, peanuts 4%, glucose-fructose syrup, cocoa powder 1%, sunflower oil, yeast",
+    categories_tags: ["en:snacks", "en:sweet-snacks", "en:viennoiseries", "en:croissants"],
+  });
+  const v = analyze(sevenDays);
+  assert.equal(v.sugarsEstimated, true);
+  assert.ok((v.sugars100 ?? 0) >= 15, `zahăr estimat ${v.sugars100}`);
+  assert.equal(v.serving, 60, "un croissant e ~60 g, nu 30");
+  assert.equal(v.level, "red");
+  assert.ok(v.reasons.includes("sugar_estimated"));
+  // același produs cu eticheta corectă (poză la tabel) dă același verdict, fără estimare
+  const fixed = analyze(mk({ ...sevenDays, nutriments: { carbohydrates_100g: 43, sugars_100g: 18, fiber_100g: 2.2 } } as any));
+  assert.equal(fixed.sugarsEstimated, undefined === fixed.sugarsEstimated ? undefined : false);
+  assert.equal(fixed.level, "red");
+  // un produs cinstit cu zahăr 0 și fără zahăr în ingrediente nu e atins (brânză, carne)
+  const cheese = analyze(mk({ product_name: "Telemea", nutriments: { carbohydrates_100g: 1, sugars_100g: 0, fiber_100g: 0 }, ingredients_text_en: "Milk, salt, rennet", categories_tags: ["en:cheeses"] }));
+  assert.equal(cheese.sugarsEstimated, false);
+  assert.equal(cheese.level, "green");
+});

@@ -38,6 +38,10 @@ export interface Verdict {
   gl: number | null;
   hiddenSugars: string[];
   labelTrap: boolean;
+  /** baza de date spune „0 g zahăr” la un produs cu zahăr/sirop în ingrediente: am estimat zahărul din carbohidrați */
+  sugarsEstimated?: boolean;
+  /** zahăr la 100 g folosit în verdict (cel estimat, când eticheta din bază e incompletă) */
+  sugars100?: number;
   reasons: string[];
   walkMinutes: number;
 }
