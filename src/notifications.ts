@@ -28,7 +28,8 @@ export function routeFor(data: Record<string, unknown> | null | undefined): stri
   if (kind === "summary") return "/day";
   if (kind === "message") return data?.linkId ? `/messages?link=${data.linkId}` : "/family";
   if (["alert", "high", "low", "heavy", "quiet", "noglu"].includes(kind)) return "/family/parent";
-  return null; // mișcarea: prima pagină, unde e cardul „Ai făcut mișcare azi?”
+  if (kind === "move") return "/move"; // întrebarea cu Da (15/30/60) / Nu — nu prima pagină (Alex, 16 nov 2026: „e confuz”)
+  return null;
 }
 let handled: string | null = null;
 /** În `_layout`: apăsarea pe o notificare (aplicația deschisă, în fundal sau închisă) duce la ecranul potrivit. */

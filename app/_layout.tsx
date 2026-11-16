@@ -26,6 +26,7 @@ export default function Root() {
           <Stack.Screen name="scan" options={{ headerShown: false, presentation: "fullScreenModal" }} />
           <Stack.Screen name="basics" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
           <Stack.Screen name="day" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
+          <Stack.Screen name="move" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
           <Stack.Screen name="plate" options={{ headerShown: false, presentation: "fullScreenModal" }} />
           <Stack.Screen name="glucose/new" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
           <Stack.Screen name="meds" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
