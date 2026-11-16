@@ -3,11 +3,12 @@
  * Protejat cu `STATS_TOKEN` (variabilă secretă EAS); fără ea ruta e închisă.
  */
 import { createClient } from "@supabase/supabase-js";
-const URL = process.env.SUPABASE_URL ?? "https://boxyorzzmvjezaspestt.supabase.co";
+// NU numi constanta `URL`: ascunde constructorul global și `new URL(...)` crapă pe server („t is not a constructor”, 16 nov 2026)
+const SB_URL = process.env.SUPABASE_URL ?? "https://boxyorzzmvjezaspestt.supabase.co";
 
 export async function statsFor(days: number): Promise<Record<string, unknown> | null> {
   const key = process.env.SUPABASE_SERVICE_KEY; if (!key) return null;
-  const admin = createClient(URL, key, { auth: { persistSession: false } });
+  const admin = createClient(SB_URL, key, { auth: { persistSession: false } });
   const since = new Date(Date.now() - days * 864e5).toISOString();
   const { data, error } = await admin.rpc("app_stats", { p_since: since });
   if (error) return { error: error.message };

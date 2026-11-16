@@ -4,8 +4,8 @@
  * POST /api/product { product, lang } → salvează/actualizează valorile confirmate de om (validate, fără date personale).
  */
 import { createClient } from "@supabase/supabase-js";
-const URL = process.env.SUPABASE_URL ?? "https://boxyorzzmvjezaspestt.supabase.co";
-const admin = () => { const k = process.env.SUPABASE_SERVICE_KEY; return k ? createClient(URL, k, { auth: { persistSession: false } }) : null; };
+const SB_URL = process.env.SUPABASE_URL ?? "https://boxyorzzmvjezaspestt.supabase.co";
+const admin = () => { const k = process.env.SUPABASE_SERVICE_KEY; return k ? createClient(SB_URL, k, { auth: { persistSession: false } }) : null; };
 const num = (x: unknown, max = 100) => (typeof x === "number" && Number.isFinite(x) && x >= 0 && x <= max ? Math.round(x * 10) / 10 : 0);
 
 export async function GET(request: Request): Promise<Response> {
