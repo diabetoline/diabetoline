@@ -22,14 +22,15 @@ export function DayPlan() {
   const { glu, meals, medsDue, medsTaken, medsTotal, gluOut } = p; const walk = p.walkMin;
   // „Nu, azi n-am făcut” (Alex, 16 nov 2026): răspunsul e notat, rândul nu mai e roșu, nu mai întrebăm azi
   const moveSkipped = walk === 0 && state.moveAskedDay === p.day;
+  const gluSkipped = glu.length === 0 && state.gluSkippedDay === p.day;
   const hm = (ms: number) => new Date(ms).toTimeString().slice(0, 5);
   const unit = state.unit === "mg" ? "mg/dL" : "mmol/L";
   const last = glu[glu.length - 1];
 
   type Row = { key: string; icon: IconName; tint: string; title: string; short: string; sub: string; ok: boolean; warn?: boolean; skipped?: boolean; onPress: () => void };
   const rows: Row[] = [
-    { key: "glu", icon: "drop", tint: t.brandRed, title: s.plan_glu, short: s.plan_glu, ok: glu.length > 0, warn: gluOut,
-      sub: last ? s.plan_glu_done(`${last.v} ${unit}`, hm(last.t), glu.length) : s.plan_glu_todo, onPress: () => router.push("/glucose/new") },
+    { key: "glu", icon: "drop", tint: t.brandRed, title: s.plan_glu, short: s.plan_glu, ok: glu.length > 0, warn: gluOut, skipped: gluSkipped,
+      sub: last ? s.plan_glu_done(`${last.v} ${unit}`, hm(last.t), glu.length) : gluSkipped ? s.glu_skipped : s.plan_glu_todo, onPress: () => router.push("/glucose/new") },
     { key: "meal", icon: "plate", tint: t.accent, title: s.plan_meal, short: s.plan_meal_short, ok: meals.length > 0,
       sub: meals.length ? s.plan_meal_done(meals.length) : s.plan_meal_todo, onPress: () => router.push("/plate") },
     { key: "move", icon: "walk", tint: t.accent, title: s.plan_move, short: s.plan_move, ok: walk > 0, skipped: moveSkipped,

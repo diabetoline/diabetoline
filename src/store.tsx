@@ -59,6 +59,7 @@ export interface State {
   trips?: Trip[];
   /** ziua (YYYY-MM-DD) în care a răspuns „nu încă” la întrebarea de seară, ca să nu-l mai întrebăm azi */
   moveAskedDay?: string; moveNotifId?: string;
+  gluSkippedDay?: string; // „Nu mi-am măsurat azi” (16 nov 2026): nu mai amintim azi, rândul din „Azi” e gri
   reco?: RecoState;
   /** reamintiri blânde: care sunt pornite și ce am programat (src/reminders.ts) */
   remind?: Partial<RemindPrefs>; plan?: Plan;
@@ -109,7 +110,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => { if (ready) void refreshPack(); }, [ready]);
   // reamintirile se replanifică la deschidere și după fiecare notare (cu o mică întârziere, ca să nu le facem de 10 ori)
   const latest = useRef(s); latest.current = s; // planificarea folosește mereu starea curentă, nu una veche
-  const planKey = JSON.stringify([s.glucose.length, s.meals.length, s.walks?.length, s.medLog.length, s.meds, s.moveAskedDay, s.remind]);
+  const planKey = JSON.stringify([s.glucose.length, s.meals.length, s.walks?.length, s.medLog.length, s.meds, s.moveAskedDay, s.gluSkippedDay, s.remind]);
   useEffect(() => {
     if (!ready || !s.welcomed) return;
     let alive = true;

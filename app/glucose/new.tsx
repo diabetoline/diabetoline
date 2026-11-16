@@ -3,6 +3,7 @@ import { Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { ctxForHour, useStore, type GluCtx } from "../../src/store";
+import { dayKeyLocal } from "../../src/engine/days";
 import { useTheme } from "../../src/theme";
 import { Button, Card, Hint, Label, Title, useScale } from "../../src/ui/Primitives";
 import { Quip } from "../../src/ui/Quip";
@@ -14,7 +15,7 @@ const CTX: GluCtx[] = ["fasting", "pre", "post2h", "evening", "other"];
 export default function NewGlucose() {
   const { after } = useLocalSearchParams<{ after?: string }>();
   const t = useTheme(); const k = useScale(); const router = useRouter(); const ins = useSafeAreaInsets();
-  const { t: s, s: state, addGlucose } = useStore();
+  const { t: s, s: state, addGlucose, set } = useStore();
   const [val, setVal] = useState("");
   const [saved, setSaved] = useState<{ v: number; ctx: GluCtx } | null>(null);
   const [ctx, setCtx] = useState<GluCtx>(after ? "post2h" : ctxForHour(new Date().getHours()));
@@ -67,6 +68,8 @@ export default function NewGlucose() {
         </View>
       </Card>
       <Hint>{s.glu_hint}</Hint>
+      {/* „Nu mi-am măsurat azi” (Alex, 16 nov 2026): notăm răspunsul, nu mai amintim azi, fără predică */}
+      <Button title={s.glu_skip} kind="ghost" onPress={() => { set({ gluSkippedDay: dayKeyLocal(Date.now()) }); router.canGoBack() ? router.back() : router.replace("/"); }} />
     </ScrollView>
     <View style={{ padding: 16, paddingBottom: Math.max(ins.bottom, 12), backgroundColor: t.surface, borderTopWidth: 1, borderTopColor: t.line }}>
       <Button title={s.save.split(" ")[0]} size="xl" onPress={() => { Keyboard.dismiss(); save(); }} disabled={!valid} />

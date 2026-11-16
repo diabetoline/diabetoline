@@ -50,7 +50,7 @@ async function planNow(s: State, t: Strings): Promise<Plan> {
   const ids: string[] = []; const medFollow: Record<string, string> = {};
   const now = new Date(); const today = dayKeyLocal(now.getTime());
   const yesterday = dayKeyLocal(now.getTime() - 864e5);
-  const gluToday = s.glucose.some((g) => dayKeyLocal(g.t) === today);
+  const gluToday = s.glucose.some((g) => dayKeyLocal(g.t) === today) || s.gluSkippedDay === today;
   const gluYesterday = s.glucose.some((g) => dayKeyLocal(g.t) === yesterday);
   const schedule = async (date: Date, title: string, body: string, kind: string) => {
     if (date.getTime() <= Date.now()) return;
