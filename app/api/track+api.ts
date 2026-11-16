@@ -33,5 +33,7 @@ export async function POST(request: Request): Promise<Response> {
   if (!rows.length) return Response.json({ ok: true, n: 0 });
   const admin = createClient(URL, key, { auth: { persistSession: false } });
   const { error } = await admin.from("events").insert(rows);
-  return Response.json({ ok: !error, n: rows.length, reason: error?.message });
+  // la eroare răspundem 500, ca telefonul să păstreze coada și să reîncerce (16 nov 2026: până la migrarea 0009 răspundeam 200 și evenimentele se pierdeau)
+  if (error) return Response.json({ ok: false, reason: error.message }, { status: 500 });
+  return Response.json({ ok: true, n: rows.length });
 }
