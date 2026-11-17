@@ -4,6 +4,8 @@ import { dayKeyLocal } from "./engine/days";
 import type { Strings } from "./i18n";
 import type { State } from "./store";
 import { daySummary } from "./summary";
+import { PAYMENTS_LIVE } from "./access";
+import { TRIAL_DAYS } from "./money";
 
 /**
  * Reamintiri blânde pentru părinte, toate locale (merg fără internet). Regula: să nu enerveze.
@@ -39,7 +41,7 @@ async function planNow(s: State, t: Strings): Promise<Plan> {
   // curățăm TOT ce am programat noi înainte, după tip (nu doar id-urile din plan: două planificări în paralel lăsau
   // notificări orfane — 4–5 „Ai făcut mișcare?” la 19:00 pe iOS, 11 nov 2026). Reamintirile fixe de medicamente
   // (fără `kind`) și cele ale copilului rămân.
-  const ours = new Set(["glucose", "move", "med", "summary"]);
+  const ours = new Set(["glucose", "move", "med", "summary", "trial"]);
   try {
     for (const n of await Notifications.getAllScheduledNotificationsAsync()) {
       if (ours.has(String((n.content.data as { kind?: string } | null)?.kind))) { try { await Notifications.cancelScheduledNotificationAsync(n.identifier); } catch {} }
@@ -91,6 +93,11 @@ async function planNow(s: State, t: Strings): Promise<Plan> {
   if (prefs.summary) {
     const sum = daySummary(s, t);
     if (sum) await schedule(at(now, 21), sum.title, sum.body, "summary");
+  }
+  // sfârșitul probei (17 nov 2026): o singură reamintire, în ziua 4 la 18:00, doar în build-urile cu plăți și doar dacă nu e abonat
+  if (PAYMENTS_LIVE && s.trialStart && !s.entitled) {
+    const d = at(new Date(s.trialStart + (TRIAL_DAYS - 1) * 864e5), 18);
+    if (d.getTime() > Date.now()) await schedule(d, t.notif_trial_title, t.notif_trial_body, "trial");
   }
   return { ids, gluIgnored, lastGluAt, medFollow };
 }

@@ -30,6 +30,10 @@ export default function Paywall() {
     if (state.profile?.forWhom === "child") setTimeout(() => router.push("/family"), 50);
   };
   const perks = [s.q_plan_scan, s.q_plan_plate, s.q_plan_family_me, s.q_plan_report];
+  // ce a folosit omul în probă (17 nov 2026): cifrele lui, nu promisiuni
+  const since = state.trialStart ?? 0;
+  const used = { sc: state.history.filter((h) => h.t >= since).length, pl: state.meals.filter((m) => m.t >= since).length, gl: state.glucose.filter((g) => g.t >= since).length };
+  const showUsed = locked && used.sc + used.pl + used.gl >= 3;
   // planurile cu prețul magazinului; cumpărarea deschide fereastra Apple/Google
   const [plans, setPlans] = useState<Plan[]>([]); const [busy, setBusy] = useState(false);
   useEffect(() => { if (PAYMENTS_LIVE) fetchPlans().then(setPlans); }, []);
@@ -52,6 +56,7 @@ export default function Paywall() {
         </View>
         <Text style={{ color: t.ink, fontSize: 28 * k, fontWeight: "800", textAlign: "center", letterSpacing: -0.4 }}>{locked ? s.pay_locked_title : s.pay_title}</Text>
         <Text style={{ color: t.muted, fontSize: 18 * k, textAlign: "center" }}>{locked ? s.pay_locked_sub : s.pay_sub}</Text>
+        {showUsed && <Text style={{ color: t.ink, fontSize: 17 * k, textAlign: "center", fontWeight: "700" }}>{s.pay_used(used.sc, used.pl, used.gl)}</Text>}
         <View style={{ backgroundColor: t.surface, borderRadius: 20, padding: 18, gap: 10, borderWidth: 1, borderColor: t.line }}>
           {perks.map((p, j) => <Text key={j} style={{ color: t.ink, fontSize: 16 * k, lineHeight: 23 * k }}>✓ {p}</Text>)}
         </View>

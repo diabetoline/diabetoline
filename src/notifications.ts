@@ -26,6 +26,7 @@ export function routeFor(data: Record<string, unknown> | null | undefined): stri
   if (kind === "glucose" || kind === "glucose_check") return "/glucose/new";
   if (kind === "med" || (!kind && data?.medId)) return "/meds";
   if (kind === "summary") return "/day";
+  if (kind === "trial") return "/paywall?from=trial";
   if (kind === "message") return data?.linkId ? `/messages?link=${data.linkId}` : "/family";
   if (["alert", "high", "low", "heavy", "quiet", "noglu"].includes(kind)) return "/family/parent";
   if (kind === "move") return "/move"; // întrebarea cu Da (15/30/60) / Nu — nu prima pagină (Alex, 16 nov 2026: „e confuz”)
