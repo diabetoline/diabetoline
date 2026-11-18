@@ -12,7 +12,19 @@ export async function statsFor(days: number): Promise<Record<string, unknown> | 
   const since = new Date(Date.now() - days * 864e5).toISOString();
   const { data, error } = await admin.rpc("app_stats", { p_since: since });
   if (error) return { error: error.message };
-  return data as Record<string, unknown>;
+  // produsele negăsite (codul e în props din 18 nov 2026) și sursa de unde a venit fiecare produs găsit
+  const out = data as Record<string, unknown>;
+  try {
+    const { data: nf } = await admin.from("events").select("props").eq("name", "scan_notfound").gte("t", since).limit(2000);
+    const cnt: Record<string, number> = {};
+    for (const e of nf ?? []) { const c = (e.props as { code?: string } | null)?.code; if (c) cnt[c] = (cnt[c] ?? 0) + 1; }
+    out.notfound = Object.entries(cnt).sort((a, b) => b[1] - a[1]).slice(0, 50).map(([code, n]) => ({ code, n }));
+    const { data: sr } = await admin.from("events").select("props").eq("name", "scan_result").gte("t", since).limit(5000);
+    const from: Record<string, number> = {};
+    for (const e of sr ?? []) { const f = (e.props as { from?: string } | null)?.from ?? "?"; from[f] = (from[f] ?? 0) + 1; }
+    out.scan_from = from;
+  } catch { /* lipsa listei nu strică tabloul */ }
+  return out;
 }
 
 export function authorized(request: Request): boolean {

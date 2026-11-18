@@ -42,9 +42,9 @@ export default function ProductScreen() {
     (async () => {
       const r = await lookupProduct(code, state.cache, state.lang);
       if (!alive) return;
-      if (r.ok) { const verdict = analyze(r.product); setP(r.product); setV(verdict); setErr(null); recordScan(r.product, verdict); return; }
+      if (r.ok) { const verdict = analyze(r.product); setP(r.product); setV(verdict); setErr(null); recordScan(r.product, verdict, r.from); return; }
       if (p) return;
-      setErr(r.error); if (r.error === "notfound") track("scan_notfound");
+      setErr(r.error); if (r.error === "notfound") track("scan_notfound", { code, lang: state.lang }); else track("scan_network", { code });
     })();
     return () => { alive = false; stopSpeech(); };
   }, [code]);

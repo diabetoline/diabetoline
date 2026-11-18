@@ -77,7 +77,7 @@ interface Ctx {
   syncNow: () => void;
   /** o scanare în plus azi (limita de la gratuit) */
   countScan: () => void;
-  recordScan: (p: Product, v: Verdict) => void;
+  recordScan: (p: Product, v: Verdict, from?: string) => void;
   addUserProduct: (p: Product) => void;
   addGlucose: (e: Omit<GluEntry, "id" | "t"> & { t?: number }) => void;
   addMeal: (m: Omit<MealEntry, "id" | "t"> & { t?: number }) => string;
@@ -152,7 +152,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     set: (patch) => setS((prev) => ({ ...prev, ...(typeof patch === "function" ? patch(prev) : patch) })),
     syncNow: () => setSyncTick((n) => n + 1),
     countScan: () => setS((prev) => { const day = dayKeyLocal(Date.now()); return { ...prev, scans: { day, n: (prev.scans?.day === day ? prev.scans.n : 0) + 1 } }; }),
-    recordScan: (p, v) => { track("scan_result", { level: v.level, src: p.source ?? "off" }); setS((prev) => ({
+    recordScan: (p, v, from) => { track("scan_result", { level: v.level, src: p.source ?? "off", from: from ?? "?" }); setS((prev) => ({
       ...prev, cache: { ...prev.cache, [p.code]: p },
       history: [{ code: p.code, name: p.name, level: v.level, t: Date.now() }, ...prev.history.filter((h) => h.code !== p.code)].slice(0, 200),
     })); },

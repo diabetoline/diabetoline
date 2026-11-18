@@ -48,6 +48,9 @@ async function load(){
   const bc=d.by_country||[];h+='<h2>Pe țară</h2><div class="c"><table><tr><th>țară</th><th class="r">instalări</th><th class="r">plăți</th></tr>'+bc.map(x=>'<tr><td>'+x.country+'</td><td class="r">'+x.installs+'</td><td class="r">'+x.purchases+'</td></tr>').join("")+'</table></div>';
   const pl=d.plans||{};const use=[["scan_result","scanări"],["scan_notfound","produs negăsit"],["glucose_logged","glicemii"],["plate_result","poze la farfurie"],["ask_used","Întreabă"],["ideas_used","Ce mănânc azi"],["report_made","rapoarte"],["family_code","coduri familie"],["family_linked","familii legate"],["reco_tap","click pe produs"],["reco_dismiss","„Nu acum”"],["feedback_sent","sugestii"],["data_wiped","date șterse"]];
   h+='<h2>Folosire</h2><div class="c"><table><tr><th>acțiune</th><th class="r">de câte ori</th><th class="r">oameni</th></tr>'+use.map(([k,l])=>'<tr><td>'+l+'</td><td class="r">'+((f[k]||{}).n||0)+'</td><td class="r">'+((f[k]||{}).devices||0)+'</td></tr>').join("")+'<tr><td>planuri plătite</td><td class="r" colspan="2">'+Object.entries(pl).map(([k,v])=>k+": "+v).join(" · ")+'</td></tr></table></div>';
+  const nf=d.notfound||[],sf2=d.scan_from||{};
+  h+='<h2>Produse negăsite (coduri)</h2><div class="c">'+(nf.length?'<table><tr><th>cod</th><th class="r">de câte ori</th><th></th></tr>'+nf.map(x=>'<tr><td>'+x.code+'</td><td class="r">'+x.n+'</td><td><a href="https://world.openfoodfacts.org/product/'+x.code+'" target="_blank">OFF</a></td></tr>').join("")+'</table>':'<div class="l">niciun cod înregistrat încă (se notează din 18 nov)</div>')
+   +'<div class="l" style="margin-top:8px">de unde au venit produsele găsite: '+(Object.keys(sf2).length?Object.entries(sf2).map(([k,v])=>({cache:"memorie",partner:"Diabetoline",pack:"pachet offline",off:"Open Food Facts",shared:"baza comună"}[k]||k)+" "+v).join(" · "):"–")+'</div></div>';
   $("#root").innerHTML=h;
 }
 load();
