@@ -4,6 +4,7 @@
  * Acceptă doar numele din lista de mai jos și proprietăți scurte; nimic personal, nimic medical.
  */
 import { createClient } from "@supabase/supabase-js";
+import { alertOnEvents } from "../../src/server/alerts";
 const URL = process.env.SUPABASE_URL ?? "https://boxyorzzmvjezaspestt.supabase.co";
 export const EVENT_NAMES = new Set([
   "app_install", "app_open", "welcome_done", "trial_start", "paywall_view", "purchase", "restore", "stay_free",
@@ -28,12 +29,14 @@ export async function POST(request: Request): Promise<Response> {
       else if (typeof v === "string") props[k.slice(0, 20)] = v.slice(0, 40);
     }
     const t = typeof e.t === "number" && e.t > now - 30 * 864e5 && e.t < now + 6e5 ? new Date(e.t).toISOString() : new Date(now).toISOString();
-    return { device, name: e.name, props, country: short(b.country, 2), lang: short(b.lang, 5), platform: short(b.platform, 10), build: short(b.build, 20), source: short(b.source, 40), t };
+    return { device, name: e.name as string, props, country: short(b.country, 2), lang: short(b.lang, 5), platform: short(b.platform, 10), build: short(b.build, 20), source: short(b.source, 40), t };
   });
   if (!rows.length) return Response.json({ ok: true, n: 0 });
   const admin = createClient(URL, key, { auth: { persistSession: false } });
   const { error } = await admin.from("events").insert(rows);
   // la eroare răspundem 500, ca telefonul să păstreze coada și să reîncerce (16 nov 2026: până la migrarea 0009 răspundeam 200 și evenimentele se pierdeau)
   if (error) return Response.json({ ok: false, reason: error.message }, { status: 500 });
+  // alerte pe telefonul lui Alex (ntfy) la instalări, probe, plăți — după ce evenimentele sunt scrise
+  await alertOnEvents(rows);
   return Response.json({ ok: true, n: rows.length });
 }
