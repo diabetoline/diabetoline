@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { ActivityIndicator, KeyboardAvoidingView, Linking, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useFocusEffect, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useGate } from "../src/access";
 import { lookupProduct } from "../src/api/lookup";
@@ -28,6 +28,11 @@ export default function ScanScreen() {
   const openList = (state.list ?? []).filter((x) => !x.done).length;
   const gate = useGate(state);
   const [perm, requestPerm] = useCameraPermissions();
+  // iOS dă camera unui singur ecran: când se deschide altceva peste scanare (produs → „Fotografiază tabelul”),
+  // camera de aici se oprește, altfel cea nouă rămâne neagră (20 nov 2026, iPhone; pe Android mergea)
+  const [focused, setFocused] = useState(true);
+  useFocusEffect(useCallback(() => { setFocused(true); return () => setFocused(false); }, []));
+  const allowCam = () => (perm && !perm.granted && !perm.canAskAgain ? Linking.openSettings() : requestPerm());
   const [torch, setTorch] = useState(false);
   const [typing, setTyping] = useState(false);
   const [code, setCode] = useState("");
@@ -97,13 +102,13 @@ export default function ScanScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: "#000" }}>
       <Stack.Screen options={{ headerShown: false }} />
-      {perm?.granted ? (
+      {perm?.granted ? (focused ? (
         <CameraView style={StyleSheet.absoluteFill} facing="back" autofocus="on" enableTorch={torch}
           barcodeScannerSettings={{ barcodeTypes: ["ean13", "ean8", "upc_a", "upc_e", "code128"] }} onBarcodeScanned={onScan} />
-      ) : (
+      ) : null) : perm == null ? null : (
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 24, gap: 14 }}>
           <Hint style={{ textAlign: "center", color: "#fff" }}>{s.cam_denied}</Hint>
-          <Button title={s.cam_allow} onPress={() => requestPerm()} />
+          <Button title={s.cam_allow} onPress={allowCam} />
         </View>
       )}
       <View style={[StyleSheet.absoluteFill, st.overlay, { paddingTop: ins.top, paddingBottom: ins.bottom }]} pointerEvents="box-none">

@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Image, Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -26,6 +26,7 @@ export default function AddProduct() {
   const { t: s, s: state, addUserProduct } = useStore();
   const [perm, requestPerm] = useCameraPermissions();
   const cam = useRef<CameraView>(null);
+  const allowCam = () => (perm && !perm.granted && !perm.canAskAgain ? Linking.openSettings() : requestPerm());
   const [step, setStep] = useState<"camera" | "reading" | "confirm" | "error">("camera");
   const [err, setErr] = useState<LabelError | null>(null);
   const [shot, setShot] = useState<string | null>(null);
@@ -67,10 +68,11 @@ export default function AddProduct() {
       <Stack.Screen options={{ headerShown: false }} />
       {step === "reading" && shot ? <Image source={{ uri: shot }} style={StyleSheet.absoluteFill} resizeMode="cover" />
         : perm?.granted ? <CameraView ref={cam} style={StyleSheet.absoluteFill} facing="back" autofocus="on" />
+        : perm == null ? null
         : (
           <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 24, gap: 14 }}>
             <Hint style={{ textAlign: "center", color: "#fff" }}>{s.cam_denied}</Hint>
-            <Button title={s.cam_allow} onPress={() => requestPerm()} />
+            <Button title={s.cam_allow} onPress={allowCam} />
           </View>
         )}
       <View style={[StyleSheet.absoluteFill, { zIndex: 10, elevation: 10, paddingTop: ins.top, paddingBottom: ins.bottom, justifyContent: "space-between" }]} pointerEvents="box-none">

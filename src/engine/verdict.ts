@@ -12,7 +12,7 @@ export function assumedServing(p: Product): number {
   if (/cereals|muesli|granola|oats/.test(cats)) return 40;
   if (/yogurts|dairy-desserts/.test(cats)) return 150;
   // un croissant / o brioșă / o gogoașă cântărește 50–80 g, nu „un biscuit” (16 nov 2026: 7 Days ieșea cu porție de 30 g)
-  if (/croissant|viennoiser|pastries|muffin|donut|doughnut|brioche|cornuri|gogoa/.test(cats + " " + p.name.toLowerCase())) return 60;
+  if (/croissant|viennoiser|pastries|muffin|donut|doughnut|brioche|cornuri|cornule|kifli|rugelach|gogoa/.test(cats + " " + p.name.toLowerCase())) return 60;
   if (/chocolates|biscuits|cookies|candies|bars/.test(cats)) return 25;
   if (/sauces|ketchup|spreads|jams|honey/.test(cats)) return 15;
   if (/seeds|nuts|chia|flax|sesame|almonds|walnuts|peanut/.test(cats)) return 30;
@@ -52,7 +52,7 @@ const DAIRY_DRINK = /milks|dairy-drinks|plant-based-milks|kefir|drinking-yogurt|
 /** Categorii cu porții declarate adesea „de marketing” (o napolitană, un pătrățel). */
 const FLOORED = /chocolates|biscuits|cookies|wafers|cakes|pastries|breads|cereals|muesli|granola|spreads|jams|honey|crisps|snacks|candies|bars|crackers/i;
 /** Dulciuri și patiserie: când zahărul lipsește din bază, e de regulă ~40 % din carbohidrați. */
-const SWEET = /chocolates|biscuits|cookies|wafers|cakes|pastries|croissant|viennoiser|candies|bars|desserts|ice-cream|jams|spreads|sweet|confectioner|brioche|donut|muffin|prăjitur|prajitur|napolitan|7 days/i;
+const SWEET = /chocolates|biscuits|cookies|wafers|cakes|pastries|croissant|viennoiser|candies|bars|desserts|ice-cream|jams|spreads|sweet|confectioner|brioche|donut|muffin|prăjitur|prajitur|napolitan|cornule|kifli|rugelach|7 days/i;
 
 /** Categorii OFF aproximate din numele produsului, pentru produsele fără categorii (adăugate din poză). */
 export function categoriesFromName(name: string): string {
@@ -63,7 +63,7 @@ export function categoriesFromName(name: string): string {
   if (/cereal|musli|müsli|muesli|granola|fulgi|ovăz|ovaz|oats|hafer|flakes/.test(n)) out.push("cereals");
   if (/iaurt|yog|joghurt|budinc|pudding|dessert/.test(n)) out.push("yogurts");
   if (/ciocolat|chocolat|schokol|biscuit|biscui|cookie|keks|bombo|candy|napolitan|waffel|baton|bar\b|riegel|prăjitur|prajitur|cake|kuchen/.test(n)) out.push("chocolates biscuits");
-  if (/croissant|cornuri|corn cu|brioș|brios|brioche|gogoa|donut|muffin|7 days|7days/.test(n)) out.push("pastries");
+  if (/croissant|cornuri|cornule|corn cu|kifli|rugelach|brioș|brios|brioche|gogoa|donut|muffin|7 days|7days/.test(n)) out.push("pastries");
   if (/sos|sauce|ketchup|maionez|mayo|gem\b|dulcea|jam|marmel|miere|honey|honig|crem[aă] de|spread|aufstrich|nutella/.test(n)) out.push("sauces spreads");
   if (/paste|pasta|spaghet|penne|fusilli|macaroane|nudel|orez|rice|reis|bulgur|quinoa|couscous|cuscus|linte|lentil|linsen|fasole|beans|bohnen|năut|naut|chickpea|kichererb/.test(n)) out.push("pastas rices grains legumes");
   if (/pizza|lasagn|lasagne|ready|gata|fertig/.test(n)) out.push("pizzas ready-meals");

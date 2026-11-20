@@ -218,3 +218,19 @@ test("Cazuri capcană: „0 g zahăr” în bază la un croissant cu sirop de gl
   assert.equal(cheese.sugarsEstimated, false);
   assert.equal(cheese.level, "green");
 });
+
+test("Cazuri capcană: cornulețe cu gem, porție declarată 20 g (Alex, 20 nov 2026: ieșeau „bune”)", () => {
+  // „cornulețe” nu era recunoscut ca patiserie (doar „cornuri”) → porție mică de snack, nu dulce → verde
+  const corn = mk({
+    product_name: "Cornulețe cu gem de prune", serving_quantity: 20,
+    nutriments: { carbohydrates_100g: 58, sugars_100g: 22, fiber_100g: 2 },
+    ingredients_text_en: "Făină de grâu, gem de prune 25% (zahăr, prune), margarină, zahăr, ouă, drojdie",
+    categories_tags: ["en:snacks"],
+  });
+  const v = analyze(corn);
+  assert.ok(v.serving >= 36, `porția nu coboară sub 60% din 60 g: ${v.serving}`);
+  assert.equal(v.level, "red");
+  // fără categorii în bază: numele ajunge
+  const bare = analyze(mk({ product_name: "Cornulete cu rahat", nutriments: { carbohydrates_100g: 60, sugars_100g: 25, fiber_100g: 1 }, ingredients_text_en: "Faina, rahat 30% (zahar, sirop de glucoza, amidon), margarina, zahar" }));
+  assert.equal(bare.level, "red");
+});
