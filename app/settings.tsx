@@ -59,7 +59,7 @@ export default function Settings() {
       </Card>
       <Card>
         <Label>{s.rem_title}</Label>
-        {([["glucose", s.rem_glu], ["move", s.rem_move], ["medFollow", s.rem_med], ["summary", s.rem_summary]] as const).map(([key, label]) => (
+        {([["glucose", s.rem_glu], ["medFollow", s.rem_med], ["summary", s.rem_summary]] as const).map(([key, label]) => (
           <View key={key} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
             <Text style={{ flex: 1, color: t.ink, fontSize: 17 * k }}>{label}</Text>
             <Switch value={state.remind?.[key] ?? true} onValueChange={(v) => set({ remind: { ...(state.remind ?? {}), [key]: v } })} trackColor={{ true: t.ok }} />

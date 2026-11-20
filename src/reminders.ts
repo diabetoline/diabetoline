@@ -9,10 +9,9 @@ import { TRIAL_DAYS } from "./money";
 
 /**
  * Reamintiri blânde pentru părinte, toate locale (merg fără internet). Regula: să nu enerveze.
- * - glicemia: una la 10:00 dacă azi n-a notat nimic; a doua, la 20:00, doar dacă nici ieri n-a notat
- * - mișcarea: întrebarea de la 19:00 doar dacă azi n-a bifat nicio plimbare și n-a răspuns deja „nu încă”
+ * - întrebarea zilei (20 nov 2026): cel mult una pe zi, prima lipsă — glicemia 10:00 · masa 13:30 · mișcarea 19:00; în fiecare zi, fără rărire
  * - medicamentele: o singură reamintire la 1 oră după ora prizei, dacă n-a apăsat „Am luat”
- * - dacă omul ignoră reamintirea de glicemie de 3 ori la rând, o rărim: o dată la 3 zile
+ * - rezumatul zilei la 21:00, doar dacă a notat ceva
  * Totul se replanifică la fiecare deschidere a aplicației și la fiecare notare; nimic nu se repetă pe spate.
  */
 export interface Plan { ids: string[]; gluIgnored: number; lastGluAt?: number; medFollow: Record<string, string> }
@@ -41,7 +40,7 @@ async function planNow(s: State, t: Strings): Promise<Plan> {
   // curățăm TOT ce am programat noi înainte, după tip (nu doar id-urile din plan: două planificări în paralel lăsau
   // notificări orfane — 4–5 „Ai făcut mișcare?” la 19:00 pe iOS, 11 nov 2026). Reamintirile fixe de medicamente
   // (fără `kind`) și cele ale copilului rămân.
-  const ours = new Set(["glucose", "move", "med", "summary", "trial"]);
+  const ours = new Set(["glucose", "meal", "move", "med", "summary", "trial"]);
   try {
     for (const n of await Notifications.getAllScheduledNotificationsAsync()) {
       if (ours.has(String((n.content.data as { kind?: string } | null)?.kind))) { try { await Notifications.cancelScheduledNotificationAsync(n.identifier); } catch {} }
@@ -51,31 +50,33 @@ async function planNow(s: State, t: Strings): Promise<Plan> {
   }
   const ids: string[] = []; const medFollow: Record<string, string> = {};
   const now = new Date(); const today = dayKeyLocal(now.getTime());
-  const yesterday = dayKeyLocal(now.getTime() - 864e5);
   const gluToday = s.glucose.some((g) => dayKeyLocal(g.t) === today) || s.gluSkippedDay === today;
-  const gluYesterday = s.glucose.some((g) => dayKeyLocal(g.t) === yesterday);
-  const schedule = async (date: Date, title: string, body: string, kind: string) => {
+    const schedule = async (date: Date, title: string, body: string, kind: string) => {
     if (date.getTime() <= Date.now()) return;
     ids.push(await Notifications.scheduleNotificationAsync({ content: { title, body, data: { kind } }, trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date, channelId: "reminders" } }));
   };
 
-  // a ignorat reamintirea de ieri? (a fost programată, a trecut, și n-a notat nimic după)
-  let gluIgnored = prev.gluIgnored;
-  if (prev.lastGluAt && prev.lastGluAt < Date.now()) gluIgnored = s.glucose.some((g) => g.t > prev.lastGluAt!) ? 0 : gluIgnored + 1;
-  let lastGluAt: number | undefined;
+  // Întrebarea zilei (Alex, 20 nov 2026: „o singură întrebare, în fiecare zi, neinvaziv, nu multe push-uri”):
+  // cel mult UNA pe zi, prima lipsă din zi — glicemia la 10:00 (dacă n-a notat-o), altfel masa la 13:30 (nicio masă/scanare azi),
+  // altfel mișcarea la 19:00 (dacă n-a bifat). Fără rărire (înainte glicemia se rărea la 3 zile și omul nu mai primea nimic).
+  // Dacă azi a fost deja trimisă una (programată și ora a trecut), nu mai vine alta azi; mâine o luăm de la capăt.
+  let lastGluAt: number | undefined; const gluIgnored = 0;
   if (prefs.glucose) {
-    const every = gluIgnored >= 3 ? 3 : 1;                       // rărim când e ignorată
-    const dayOk = (d: Date) => every === 1 || Math.floor(d.getTime() / 864e5) % every === 0;
-    const first = gluToday ? tomorrow(now) : now;
-    let d = at(first, 10); if (d.getTime() <= Date.now()) d = at(tomorrow(now), 10);
-    while (!dayOk(d)) d = at(tomorrow(d), 10);
-    await schedule(d, t.rem_glu_title, t.rem_glu_body, "glucose"); lastGluAt = d.getTime();
-    if (!gluToday && !gluYesterday && every === 1) await schedule(at(now, 20), t.rem_glu_title, t.rem_glu_body2, "glucose");
-  }
-  if (prefs.move) {
+    const sentToday = !!prev.lastGluAt && dayKeyLocal(prev.lastGluAt) === today && prev.lastGluAt < Date.now();
+    const mealToday = s.meals.some((m) => dayKeyLocal(m.t) === today) || s.history.some((h) => dayKeyLocal(h.t) === today);
     const walked = (s.walks ?? []).some((w) => dayKeyLocal(w.t) === today) || s.moveAskedDay === today;
-    const d = walked ? at(tomorrow(now), 19) : at(now, 19);
-    await schedule(d.getTime() <= Date.now() ? at(tomorrow(now), 19) : d, t.notif_mv_title, t.notif_mv_body, "move");
+    const slots: [number, number, boolean, string, string, string][] = [
+      [10, 0, gluToday, t.rem_glu_title, t.rem_glu_body, "glucose"],
+      [13, 30, mealToday, t.notif_meal_title, t.notif_meal_body, "meal"],
+      [19, 0, walked, t.notif_mv_title, t.notif_mv_body, "move"],
+    ];
+    let planned = false;
+    if (!sentToday) for (const [h, m, done, title, body, kind] of slots) {
+      if (done) continue; const d = at(now, h, m); if (d.getTime() <= Date.now()) continue;
+      await schedule(d, title, body, kind); lastGluAt = d.getTime(); planned = true; break;
+    }
+    // pentru mâine: glicemia la 10:00 (mâine nimic nu e notat încă); se replanifică oricum la prima deschidere
+    if (!planned) { const d = at(tomorrow(now), 10); await schedule(d, t.rem_glu_title, t.rem_glu_body, "glucose"); lastGluAt = d.getTime(); }
   }
   if (prefs.medFollow) {
     const nowHM = now.toTimeString().slice(0, 5);

@@ -110,7 +110,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => { if (ready) void refreshPack(); }, [ready]);
   // reamintirile se replanifică la deschidere și după fiecare notare (cu o mică întârziere, ca să nu le facem de 10 ori)
   const latest = useRef(s); latest.current = s; // planificarea folosește mereu starea curentă, nu una veche
-  const planKey = JSON.stringify([s.glucose.length, s.meals.length, s.walks?.length, s.medLog.length, s.meds, s.moveAskedDay, s.gluSkippedDay, s.remind]);
+  const planKey = JSON.stringify([s.glucose.length, s.meals.length, s.history.length, s.walks?.length, s.medLog.length, s.meds, s.moveAskedDay, s.gluSkippedDay, s.remind]);
   useEffect(() => {
     if (!ready || !s.welcomed) return;
     let alive = true;
