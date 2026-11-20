@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, TextInput, View } from "react-native";
 import { Stack } from "expo-router";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
@@ -16,18 +16,29 @@ const LOCALE = { ro: "ro-RO", en: "en-GB", de: "de-DE" } as const;
 /** Raportul pentru medic: 30 de zile într-un PDF, trimis prin orice aplicație (WhatsApp, e-mail) sau printat. */
 export default function Report() {
   const t = useTheme(); const k = useScale();
-  const { t: s, s: state } = useStore();
+  const { t: s, s: state, set } = useStore();
   const gate = useGate(state);
   useEffect(() => { gate("report"); }, []);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  // vârsta și înălțimea se cer aici, unde contează (au ieșit din chestionarul de start, 20 nov 2026); opțional
+  const askBody = !!state.profile && state.profile.forWhom !== "child" && (!state.profile.age || !state.profile.heightCm);
+  const [age, setAge] = useState(state.profile?.age ? String(state.profile.age) : "");
+  const [height, setHeight] = useState(state.profile?.heightCm ? String(state.profile.heightCm) : "");
+  const numOk = (v: string, lo: number, hi: number) => { const n = parseInt(v, 10); return Number.isFinite(n) && n >= lo && n <= hi ? n : undefined; };
+  const saveBody = () => {
+    if (!state.profile) return state.profile;
+    const p = { ...state.profile, age: numOk(age, 10, 110) ?? state.profile.age, heightCm: numOk(height, 100, 230) ?? state.profile.heightCm };
+    set({ profile: p }); return p;
+  };
   const r = buildReport({ glucose: state.glucose, meals: state.meals, walks: state.walks ?? [], meds: state.meds, medLog: state.medLog, weights: state.weights ?? [] });
   const empty = r.glucose.count === 0 && r.meals.count === 0;
 
   const make = async () => {
+    const profile = askBody ? saveBody() : state.profile;
     setBusy(true); setErr("");
     try {
-      const html = reportHtml(r, s, { name: state.name, unit: state.unit, locale: LOCALE[state.lang], profile: state.profile });
+      const html = reportHtml(r, s, { name: state.name, unit: state.unit, locale: LOCALE[state.lang], profile });
       const { uri } = await Print.printToFileAsync({ html }); track("report_made");
       if (await Sharing.isAvailableAsync()) await Sharing.shareAsync(uri, { mimeType: "application/pdf", UTI: "com.adobe.pdf", dialogTitle: s.rep_share });
       else await Print.printAsync({ uri });
@@ -48,6 +59,18 @@ export default function Report() {
       <Stack.Screen options={{ title: s.rep_title }} />
       <Title>{s.rep_title}</Title>
       <Hint>{s.rep_sub}</Hint>
+      {askBody && (
+        <Card style={{ gap: 10 }}>
+          <Text style={{ color: t.ink, fontSize: 18 * k, fontWeight: "800" }}>{s.w_body_ask}</Text>
+          <Hint>{s.q_body_hint}</Hint>
+          <View style={{ flexDirection: "row", gap: 10 }}>
+            <TextInput value={age} onChangeText={setAge} onEndEditing={saveBody} keyboardType="number-pad" placeholder={s.q_age} placeholderTextColor={t.muted} accessibilityLabel={s.q_age}
+              style={{ flex: 1, borderWidth: 2, borderColor: t.line, borderRadius: 14, padding: 12, fontSize: 20 * k, fontWeight: "700", color: t.ink, backgroundColor: t.surface }} />
+            <TextInput value={height} onChangeText={setHeight} onEndEditing={saveBody} keyboardType="number-pad" placeholder={s.q_height} placeholderTextColor={t.muted} accessibilityLabel={s.q_height}
+              style={{ flex: 1, borderWidth: 2, borderColor: t.line, borderRadius: 14, padding: 12, fontSize: 20 * k, fontWeight: "700", color: t.ink, backgroundColor: t.surface }} />
+          </View>
+        </Card>
+      )}
       {empty ? <Card><Hint>{s.rep_empty}</Hint></Card> : (
         <>
           <View style={{ flexDirection: "row", gap: 8 }}>

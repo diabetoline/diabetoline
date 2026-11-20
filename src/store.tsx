@@ -41,7 +41,7 @@ export interface Family {
 export interface MedLog { id: string; medId: string; time: string; day: string; t: number }
 
 /** Răspunsurile de la prima deschidere (chestionarul scurt). Fără diagnostic: „condition” e ce a spus omul, folosit doar pentru ton și raport. */
-export interface Profile { forWhom: "me" | "parent" | "child"; condition: "t2" | "t1" | "pre" | "unsure"; age?: number; heightCm?: number; concerns: string[]; meter?: boolean }
+export interface Profile { forWhom: "me" | "parent" | "child"; condition?: "t2" | "t1" | "pre" | "unsure"; age?: number; heightCm?: number; concerns: string[]; meter?: boolean }
 
 export interface State {
   profile?: Profile;

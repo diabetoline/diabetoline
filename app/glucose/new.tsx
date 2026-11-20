@@ -18,6 +18,7 @@ export default function NewGlucose() {
   const { t: s, s: state, addGlucose, set } = useStore();
   const [val, setVal] = useState("");
   const [saved, setSaved] = useState<{ v: number; ctx: GluCtx } | null>(null);
+  const [askCond, setAskCond] = useState(!!state.profile && state.profile.forWhom !== "child" && state.profile.condition == null);
   const [ctx, setCtx] = useState<GluCtx>(after ? "post2h" : ctxForHour(new Date().getHours()));
   const unitLbl = state.unit === "mg" ? "mg/dL" : "mmol/L";
   const parsed = parseFloat(val.replace(",", "."));
@@ -27,6 +28,8 @@ export default function NewGlucose() {
   const save = () => {
     if (!valid) return;
     addGlucose({ v: Math.round(mg), ctx, note: after ? `după ${after}` : "" });
+    // cine își notează glicemia are de unde s-o măsoare (întrebarea cu glucometrul a ieșit din chestionarul de start, 20 nov 2026)
+    if (state.profile && state.profile.meter == null) set({ profile: { ...state.profile, meter: true } });
     setSaved({ v: Math.round(mg), ctx });
   };
   if (saved) {
@@ -42,6 +45,16 @@ export default function NewGlucose() {
           {c === "ok" && <Quip k="glu_ok" seed={saved.v} />}
         </Card>
         {c !== "ok" && <GlucoseGuide cls={c} value={saved.v} />}
+        {/* „ce a spus medicul”, o singură dată, la prima glicemie (a ieșit din chestionarul de start, 20 nov 2026); opțional */}
+        {askCond && (
+          <Card style={{ gap: 10 }}>
+            <Text style={{ color: t.ink, fontSize: 19 * k, fontWeight: "800" }}>{s.q_cond}</Text>
+            <Hint>{s.w_cond_hint}</Hint>
+            {(["t2", "pre", "t1", "unsure"] as const).map((cnd) => (
+              <Button key={cnd} title={s[`q_cond_${cnd}`]} kind="soft" onPress={() => { set({ profile: { ...state.profile!, condition: cnd } }); setAskCond(false); }} />
+            ))}
+          </Card>
+        )}
         <Button title={s.care_done} size="xl" onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))} />
       </ScrollView>
     );

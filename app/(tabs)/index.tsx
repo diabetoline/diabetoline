@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useRouter, type Href } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -37,6 +37,14 @@ export default function Home() {
   const hasDay = todayMeals.length > 0 || todayGlu.length > 0;
   const fresh = state.history.length === 0 && state.meals.length === 0 && state.glucose.length === 0;
   useEffect(() => { if (!state.welcomed) router.replace("/welcome"); }, [state.welcomed]);
+  // după primul verdict (scanarea vine înaintea întrebărilor, 20 nov 2026): cele două întrebări scurte, o dată pe pornire
+  const askedWho = useRef(false);
+  useEffect(() => {
+    if (state.welcomed && !state.profile && state.history.length > 0 && !askedWho.current) {
+      askedWho.current = true;
+      router.push({ pathname: "/welcome", params: { part: "who" } });
+    }
+  }, [state.welcomed, state.profile, state.history.length]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }} edges={["top"]}>

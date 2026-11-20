@@ -10,7 +10,7 @@ export function journalContext(s: State, t: Strings): string {
   const lines: string[] = [];
   const pr = s.profile;
   if (pr) {
-    const cond = { t2: "type 2 diabetes", t1: "type 1 diabetes", pre: "prediabetes", unsure: "unsure" }[pr.condition];
+    const cond = { t2: "type 2 diabetes", t1: "type 1 diabetes", pre: "prediabetes", unsure: "unsure" }[pr.condition ?? "unsure"];
     lines.push(`profile (self-reported, not a diagnosis): ${cond}${pr.age ? `, age ${pr.age}` : ""}${pr.heightCm ? `, height ${pr.heightCm} cm` : ""}${pr.meter === false ? ", no glucose meter at home" : ""}`);
   }
   for (const g of s.glucose.filter((x) => x.t >= since).slice(-20)) lines.push(`glucose ${u(g.v)} (${t.ctx[g.ctx]}, ${gluClass(g.v, g.ctx)}) ${when(g.t)}`);
