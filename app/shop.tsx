@@ -22,9 +22,10 @@ export default function Shop() {
   const { t: s } = useStore();
   const lei = (x: number) => money(x);
   const sections: { key: Item["section"]; title: string; sub: string }[] = [
+    // ordinea decisă de Alex (22 nov 2026): Curalin · cremele Diabetoline · FiberPasta
+    { key: "supp", title: s.supp_title, sub: s.supp_sub },
     { key: "skin", title: s.skin_title, sub: s.skin_sub },
     { key: "food", title: s.shop_title, sub: s.shop_sub },
-    { key: "supp", title: s.supp_title, sub: s.supp_sub },
   ];
   const giFor = (name: string) => PARTNER.find((p) => name.toLowerCase().includes(p.name.split(" ")[1].toLowerCase()))?.gi;
   return (
