@@ -3,7 +3,8 @@ import { Stack, useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Updates from "expo-updates";
 import Constants from "expo-constants";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import * as Notifications from "expo-notifications";
 import buildInfo from "../src/build.json";
 import { deviceId } from "../src/analytics";
 import { useStore } from "../src/store";
@@ -26,6 +27,27 @@ export default function Settings() {
   };
   const { t: s, s: state, set } = useStore();
   const router = useRouter();
+  // diagnostic pentru reamintiri (22 nov 2026, Alex: „notificări nu am mai primit”): ce e programat acum + o notificare de test
+  const [sched, setSched] = useState<string>(""); const [perm, setPerm] = useState<boolean | null>(null);
+  const loadSched = async () => {
+    try {
+      const p = await Notifications.getPermissionsAsync(); setPerm(p.granted);
+      const all = await Notifications.getAllScheduledNotificationsAsync();
+      const rows = all.map((n) => { const tr = n.trigger as { date?: number | string; value?: number } | null; const d = tr?.date ?? tr?.value; const when = d ? new Date(d) : null; return { when, kind: String((n.content.data as { kind?: string } | null)?.kind ?? "?") }; })
+        .filter((r) => r.when).sort((a, b) => a.when!.getTime() - b.when!.getTime()).slice(0, 4)
+        .map((r) => `${r.when!.toLocaleString(undefined, { weekday: "short", hour: "2-digit", minute: "2-digit" })} · ${r.kind}`);
+      setSched(rows.join("\n"));
+    } catch { setSched(""); }
+  };
+  useEffect(() => { void loadSched(); }, [state.remind, state.plan]);
+  const testNotif = async () => {
+    try {
+      let p = await Notifications.getPermissionsAsync(); if (!p.granted && p.canAskAgain) p = await Notifications.requestPermissionsAsync();
+      if (!p.granted) { setPerm(false); return; }
+      await Notifications.scheduleNotificationAsync({ content: { title: "Diabetoline", body: s.rem_test_body, data: { kind: "test" } }, trigger: { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds: 5, channelId: "reminders" } });
+      track("notif_test");
+    } catch {}
+  };
   const langs: { v: Lang; l: string }[] = [{ v: "ro", l: "Română" }, { v: "en", l: "English" }, { v: "de", l: "Deutsch" }];
   const Seg = <T extends string>({ value, options, onChange }: { value: T; options: { v: T; l: string }[]; onChange: (v: T) => void }) => (
     <View style={{ flexDirection: "row", gap: 8 }}>
@@ -71,6 +93,9 @@ export default function Settings() {
           <Switch value={state.offers !== false} onValueChange={(v) => set({ offers: v })} trackColor={{ true: t.ok }} />
         </View>
         <Hint>{s.rem_hint}</Hint>
+        {perm === false ? <Text style={{ color: t.bad, fontSize: 15 * k }}>{s.rem_off}</Text> : null}
+        <Text style={{ color: t.muted, fontSize: 14 * k }}>{s.rem_next}: {sched || s.rem_none}</Text>
+        <Button title={s.rem_test} kind="soft" onPress={testNotif} />
       </Card>
       <Card>
         <Label>{s.upd_version}</Label>
