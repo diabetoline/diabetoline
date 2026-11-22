@@ -42,12 +42,15 @@ export async function GET(request: Request): Promise<Response> {
 export async function POST(request: Request): Promise<Response> {
   if (!authorized(request)) return Response.json({ ok: false }, { status: 401 });
   const key = process.env.SUPABASE_SERVICE_KEY; if (!key) return Response.json({ ok: false, reason: "not_configured" }, { status: 503 });
-  let b: { id?: string; title?: Record<string, string>; body?: Record<string, string>; url?: string; country?: string; lang?: string; platform?: string; dry?: boolean; limit?: number };
+  let b: { id?: string; title?: Record<string, string>; body?: Record<string, string>; url?: string; country?: string; lang?: string; platform?: string; dry?: boolean; limit?: number; device?: string };
   try { b = await request.json(); } catch { return Response.json({ ok: false }, { status: 400 }); }
   const id = String(b.id ?? "").slice(0, 40);
   if (!id || !b.title?.ro || !b.body?.ro || !b.url) return Response.json({ ok: false, reason: "id/title.ro/body.ro/url required" }, { status: 400 });
   const db = createClient(URL, key, { auth: { persistSession: false } });
-  const rows = await eligible(db, { country: b.country, lang: b.lang, platform: b.platform }, Math.min(b.limit ?? 5000, 20000));
+  let rows = await eligible(db, { country: b.country, lang: b.lang, platform: b.platform }, Math.min(b.limit ?? 5000, 20000));
+  // test pe un singur telefon (pagina /api/offers): nu numără în limita de 2/săptămână
+  const testOnly = typeof b.device === "string" && b.device.length >= 8;
+  if (testOnly) { const { data: one } = await db.from("push_tokens").select("device,token,lang,country,platform").eq("device", b.device).maybeSingle(); rows = one ? [one as Row] : []; }
   if (b.dry) return Response.json({ ok: true, dry: true, would_send: rows.length });
   const pick = (m: Record<string, string>, lang: string | null) => m[lang ?? "ro"] ?? m.en ?? m.ro;
   let sent = 0; const errors: string[] = [];
@@ -60,9 +63,9 @@ export async function POST(request: Request): Promise<Response> {
       const ok = chunk.filter((_, k) => j.data?.[k]?.status === "ok");
       sent += ok.length;
       for (const [k, d] of (j.data ?? []).entries()) if (d.status !== "ok" && errors.length < 10) errors.push(`${chunk[k].device}: ${d.message ?? d.status}`);
-      if (ok.length) await db.from("offer_sends").insert(ok.map((r) => ({ device: r.device, offer: id })));
+      if (ok.length && !testOnly) await db.from("offer_sends").insert(ok.map((r) => ({ device: r.device, offer: id })));
     } catch (e) { errors.push(String((e as Error)?.message ?? e)); }
   }
-  await db.from("events").insert({ device: "server-offer", name: "offer_sent", props: { id, n: sent, country: b.country ?? "", url: String(b.url).slice(0, 40) }, platform: "server" }).then(() => {}, () => {});
+  if (!testOnly) await db.from("events").insert({ device: "server-offer", name: "offer_sent", props: { id, n: sent, country: b.country ?? "", url: String(b.url).slice(0, 40) }, platform: "server" }).then(() => {}, () => {});
   return Response.json({ ok: true, sent, eligible: rows.length, errors });
 }

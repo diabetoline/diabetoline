@@ -5,6 +5,7 @@ import * as Updates from "expo-updates";
 import Constants from "expo-constants";
 import { useState } from "react";
 import buildInfo from "../src/build.json";
+import { deviceId } from "../src/analytics";
 import { useStore } from "../src/store";
 import { track, resetAnalytics } from "../src/analytics";
 import { PAYMENTS_LIVE } from "../src/access";
@@ -74,6 +75,7 @@ export default function Settings() {
       <Card>
         <Label>{s.upd_version}</Label>
         <Text style={{ color: t.ink, fontSize: 16 * k }}>{Constants.nativeApplicationVersion ?? ""}{Constants.nativeBuildVersion ? ` (${Constants.nativeBuildVersion})` : ""} · {build} · {when}</Text>
+        <Text selectable style={{ color: t.muted, fontSize: 12 * k }}>id {deviceId() ?? "—"}</Text>
         <Button title={s.upd_check} kind="soft" onPress={checkUpdates} />
         {upd ? <Text style={{ color: t.muted, fontSize: 14 * k }}>{upd}</Text> : null}
       </Card>
