@@ -12,6 +12,7 @@ import { levelColor, useTheme } from "../../src/theme";
 import { Button, Card, Hint, Label, useScale } from "../../src/ui/Primitives";
 import { GreenAlternatives } from "../../src/ui/GreenAlternatives";
 import { CommunitySection } from "../../src/ui/Community";
+import { COMMUNITY_ON } from "../../src/community";
 import { AfterMeal } from "../../src/ui/AfterMeal";
 import { Quip } from "../../src/ui/Quip";
 import { VerdictBadge } from "../../src/ui/VerdictBadge";
@@ -136,8 +137,8 @@ export default function ProductScreen() {
           return null; })()}
         {v.level !== "green" && !p.incomplete && <GreenAlternatives product={p} />}
         {v.level !== "red" && <Button title={"🍲 " + s.ideas_product} kind="soft" onPress={() => router.push({ pathname: "/ideas", params: { focus: p.name } })} />}
-        <CommunitySection code={p.code} />
-        <Button title={"💬 " + s.share_community} kind="soft" onPress={() => router.push({ pathname: "/community", params: { share: "1", code: p.code, name: p.name, level: v.level, kind: "scan" } })} />
+        {COMMUNITY_ON && <CommunitySection code={p.code} />}
+        {COMMUNITY_ON && <Button title={"💬 " + s.share_community} kind="soft" onPress={() => router.push({ pathname: "/community", params: { share: "1", code: p.code, name: p.name, level: v.level, kind: "scan" } })} />}
         {(
           <Card>
             <View>{reasons.map((r, i) => <Text key={i} style={{ color: t.ink, fontSize: 17 * k, lineHeight: 25 * k }}>• {r}</Text>)}</View>

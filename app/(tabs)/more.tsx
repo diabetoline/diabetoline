@@ -9,6 +9,7 @@ import { privacyUrl } from "../../src/i18n";
 import { useTheme } from "../../src/theme";
 import { Button, Card, Hint, Label, Title, useScale } from "../../src/ui/Primitives";
 import { Icon, type IconName } from "../../src/ui/Icon";
+import { COMMUNITY_ON } from "../../src/community";
 
 export default function More() {
   const t = useTheme(); const k = useScale(); const router = useRouter();
@@ -26,7 +27,7 @@ export default function More() {
     { icon: "pill", title: s.meds, sub: state.meds.length ? state.meds.map((m) => m.name).join(", ") : s.meds_sub, to: "/meds" },
     { icon: "family", title: s.family, sub: state.family.role === "child" && state.family.parent ? s.fam_parent_of(state.family.parent.name) : state.family.role === "parent" && state.family.children.length ? state.family.children.map((c) => c.name).join(", ") : s.fam_short, to: "/family" },
     { icon: "cart", title: s.list_title, sub: (state.list ?? []).filter((x) => !x.done).length ? s.list_count((state.list ?? []).filter((x) => !x.done).length) : s.list_sub, to: "/list" },
-    { icon: "community", title: s.community, sub: s.community_sub, to: "/community" },
+    ...(COMMUNITY_ON ? [{ icon: "community" as IconName, title: s.community, sub: s.community_sub, to: "/community" }] : []),
     { icon: "chat", title: s.ask_title, sub: s.ask_sub, to: "/ask" },
     { icon: "report", title: s.report, sub: s.rep_short, to: "/report" },
     { icon: "care", title: s.care, sub: s.skin_sub, to: "/shop" },
