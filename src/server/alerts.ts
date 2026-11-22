@@ -63,3 +63,8 @@ export async function testPush(): Promise<boolean> {
     return r.ok;
   } catch { return false; }
 }
+
+/** Raportare în comunitate (22 nov 2026): Alex află imediat și vede coada la /api/moderate. */
+export async function notifyModeration(commentId: number, excerpt: string): Promise<void> {
+  await push("Comentariu raportat", `${excerpt.slice(0, 140)}\n→ verifică în pagina de moderare (#${commentId})`, "warning", 4);
+}
