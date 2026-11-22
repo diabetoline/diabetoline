@@ -21,6 +21,14 @@ import { Button, Hint } from "../src/ui/Primitives";
 type Hit = { code: string; name: string; level: Level; carbs: number; t: number };
 const ORDER: Record<Level, number> = { green: 0, yellow: 1, red: 2 };
 
+/** Cifra de control GS1 (EAN-8/13, UPC-A, GTIN-14): respinge citirile greșite ale camerei. Codurile scurte (UPC-E) și code128 trec. */
+function validCode(c: string, type?: string): boolean {
+  if (type === "code128" || ![8, 12, 13, 14].includes(c.length)) return c.length >= 6;
+  let sum = 0;
+  for (let i = 0; i < c.length - 1; i++) { const d = c.charCodeAt(c.length - 2 - i) - 48; sum += (i % 2 === 0 ? 3 : 1) * d; }
+  return (10 - (sum % 10)) % 10 === c.charCodeAt(c.length - 1) - 48;
+}
+
 export default function ScanScreen() {
   const t = useTheme(); const router = useRouter();
   const ins = useSafeAreaInsets();
@@ -58,11 +66,14 @@ export default function ScanScreen() {
     setHits((h) => [...h.filter((x) => x.code !== c), { code: c, name: r.product.name, level: v.level, carbs: v.carbs, t: Date.now() }]);
   };
   const submit = () => { const c = code.replace(/\D/g, ""); if (c.length >= 6) { setTyping(false); void go(c); } };
-  const onScan = ({ data }: { data: string }) => {
+  const onScan = ({ data, type }: { data: string; type?: string }) => {
     const clean = data.replace(/\D/g, "");
     if (clean.length < 6 || busy) return;
-    // același cod nu se rescanează timp de 4 s (camera îl vede de multe ori pe secundă)
-    if (clean === lastCode.current && Date.now() - lastAt.current < 4000) return;
+    // 22 nov 2026: camera citea coduri greșite din cadre neclare (…001735 în 4 variante) și le căuta pe toate → cifra de control
+    if (!validCode(clean, type)) return;
+    // același cod nu se redeclanșează cât e pe ecran (produs sau „negăsit”): în modul cumpărături camera îl vedea la fiecare 4 s
+    // și un cod negăsit era căutat de 18 ori (22 nov 2026); altfel, 4 s pauză
+    if (clean === lastCode.current && (cur?.p.code === clean || err?.code === clean || Date.now() - lastAt.current < 4000)) return;
     lastCode.current = clean; lastAt.current = Date.now();
     void go(clean);
   };
