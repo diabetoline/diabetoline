@@ -65,6 +65,10 @@ export default function Settings() {
             <Switch value={state.remind?.[key] ?? true} onValueChange={(v) => set({ remind: { ...(state.remind ?? {}), [key]: v } })} trackColor={{ true: t.ok }} />
           </View>
         ))}
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+          <Text style={{ flex: 1, color: t.ink, fontSize: 17 * k }}>{s.offers_toggle}</Text>
+          <Switch value={state.offers !== false} onValueChange={(v) => set({ offers: v })} trackColor={{ true: t.ok }} />
+        </View>
         <Hint>{s.rem_hint}</Hint>
       </Card>
       <Card>

@@ -11,6 +11,7 @@ import { planReminders, type Plan, type RemindPrefs } from "./reminders";
 import { dayKeyLocal } from "./engine/days";
 import { AppState } from "react-native";
 import { startAnalytics, track } from "./analytics";
+import { registerPush } from "./offers";
 import { refreshPack } from "./api/pack";
 import { sendNewAlerts } from "./family/alerts";
 
@@ -53,7 +54,7 @@ export interface State {
   scans?: { day: string; n: number };
   /** cererea de recenzie: de câte ori am întrebat și de când putem întreba din nou */
   review?: { asked: number; next: number; done?: boolean };
-  lang: Lang; langManual?: boolean; humor: boolean; welcomed?: boolean; unit: "mg" | "mmol"; name: string; bigText: boolean;
+  lang: Lang; langManual?: boolean; humor: boolean; /** oferte comerciale prin push (Setări; implicit pornit, max 2/săpt.) */ offers?: boolean; welcomed?: boolean; unit: "mg" | "mmol"; name: string; bigText: boolean;
   history: HistItem[]; glucose: GluEntry[]; meals: MealEntry[]; meds: Med[]; medLog: MedLog[]; walks: Walk[]; weights: Weight[]; list: ListItem[]; family: Family;
   /** vizitele la cumpărături (modul de scanare în lanț): ce a scanat, cu verdictele */
   trips?: Trip[];
@@ -106,6 +107,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => { if (ready) AsyncStorage.setItem(KEY, JSON.stringify(s)).catch(() => {}); }, [s, ready]);
   // evenimente anonime de utilizare (src/analytics.ts): pornire + app_open la fiecare revenire
   useEffect(() => startAnalytics(), []);
+  // tokenul de push pentru oferte: la pornire (după ce analytics a dat id-ul) și când se schimbă opțiunea/limba
+  useEffect(() => { if (!ready) return; const id = setTimeout(() => { void registerPush(s.lang, s.offers !== false); }, 4000); return () => clearTimeout(id); }, [ready, s.offers, s.lang]);
   // pachetul offline al țării (produsele populare), reîmprospătat la 14 zile
   useEffect(() => { if (ready) void refreshPack(); }, [ready]);
   // reamintirile se replanifică la deschidere și după fiecare notare (cu o mică întârziere, ca să nu le facem de 10 ori)

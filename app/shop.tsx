@@ -1,5 +1,7 @@
 import { Image, Linking, Pressable, ScrollView, Text, View } from "react-native";
-import { Stack } from "expo-router";
+import { Stack, useLocalSearchParams } from "expo-router";
+import { useEffect } from "react";
+import { track } from "../src/analytics";
 import catalog from "../src/catalog.json";
 import { PARTNER, SHOP } from "../src/partner";
 import { money } from "../src/money";
@@ -13,6 +15,9 @@ const ITEMS = catalog as Item[];
 
 /** Îngrijire: produsele de pe diabetoline.com relevante pentru un diabetic, cu poze și prețuri reale (catalog generat din magazin). */
 export default function Shop() {
+  const params = useLocalSearchParams<{ offer?: string; id?: string }>();
+  // deschis dintr-un push comercial: numărăm și ducem direct la comandă
+  useEffect(() => { if (params.offer) { track("offer_open", { id: String(params.id ?? "") }); order(String(params.offer), "push"); } }, [params.offer]);
   const t = useTheme(); const k = useScale();
   const { t: s } = useStore();
   const lei = (x: number) => money(x);
