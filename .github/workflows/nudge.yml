@@ -10,3 +10,4 @@ jobs:
     steps:
       - run: curl -sS -X POST https://curalife.expo.app/api/nudge
       - run: curl -sS -X POST https://curalife.expo.app/api/watch
+      - run: curl -sS -X POST https://curalife.expo.app/api/reorder
