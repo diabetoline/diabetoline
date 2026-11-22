@@ -3,6 +3,7 @@ import { Stack } from "expo-router";
 import catalog from "../src/catalog.json";
 import { PARTNER, SHOP } from "../src/partner";
 import { money } from "../src/money";
+import { order } from "../src/shop";
 import { useStore } from "../src/store";
 import { useTheme } from "../src/theme";
 import { Button, Card, Hint, Label, Title, useScale } from "../src/ui/Primitives";
@@ -40,7 +41,7 @@ export default function Shop() {
                   {gi ? <Text style={{ color: t.ok, fontSize: 14 * k, fontWeight: "700" }}>{s.gi_short} {gi} · 15 g {s.fiber.toLowerCase()} {s.shop_each}</Text> : null}
                   {!p.available && <Text style={{ color: t.muted, fontSize: 13 * k }}>{s.shop_soldout}</Text>}
                 </View>
-                <Text style={{ color: t.accent, fontSize: 16 * k, fontWeight: "800" }}>{lei(p.price)}</Text>
+                <View style={{ alignItems: "flex-end", gap: 6 }}><Text style={{ color: t.accent, fontSize: 16 * k, fontWeight: "800" }}>{lei(p.price)}</Text>{p.available && <Button title={s.reco_order} size="sm" onPress={() => order(p.url, "shop")} />}</View>
               </Pressable>
             );
           })}

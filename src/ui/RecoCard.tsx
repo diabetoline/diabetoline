@@ -6,6 +6,7 @@ import { track } from "../analytics";
 import { useTheme } from "../theme";
 import { Button, useScale } from "./Primitives";
 import { deviceRegion, money } from "../money";
+import { order } from "../shop";
 
 /** Un card discret „De la Diabetoline”, cu poză, o propoziție și două butoane: vezi / nu acum. */
 export function RecoCard({ placement }: { placement: Placement }) {
@@ -25,7 +26,7 @@ export function RecoCard({ placement }: { placement: Placement }) {
         </View>
       </Pressable>
       <View style={{ flexDirection: "row", gap: 8 }}>
-        <View style={{ flex: 1 }}><Button title={s.reco_view} size="sm" kind="soft" onPress={() => { track("reco_tap", { id: reco.id, placement }); Linking.openURL(reco.url); }} /></View>
+        <View style={{ flex: 1 }}><Button title={reco.partner ? s.reco_view : s.reco_order} size="sm" kind={reco.partner ? "soft" : "primary"} onPress={() => { track("reco_tap", { id: reco.id, placement }); if (reco.partner) Linking.openURL(reco.url); else order(reco.url, placement); }} /></View>
         <View style={{ flex: 1 }}><Button title={s.reco_later} size="sm" kind="ghost" onPress={() => { track("reco_dismiss", { id: reco.id, placement }); set((p) => ({ reco: snooze(p.reco, reco.id) })); }} /></View>
       </View>
     </View>

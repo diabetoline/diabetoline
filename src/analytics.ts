@@ -46,6 +46,9 @@ async function load(): Promise<void> {
 async function persist() { try { await AsyncStorage.setItem(KEY, JSON.stringify({ meta, queue: queue.slice(-200) })); } catch {} }
 
 /** Înregistrează un eveniment; pleacă la server când se poate. Nu aruncă niciodată. */
+/** Id-ul anonim al telefonului (pentru atributul comenzii și tokenul de push); null până la prima încărcare. */
+export function deviceId(): string | null { return meta?.device ?? null; }
+
 export function track(name: string, props?: Record<string, string | number | boolean>): void {
   queue.push({ name, props, t: Date.now() });
   void load().then(() => { void persist(); schedule(); });
