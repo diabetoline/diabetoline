@@ -49,6 +49,14 @@ async function persist() { try { await AsyncStorage.setItem(KEY, JSON.stringify(
 /** Id-ul anonim al telefonului (pentru atributul comenzii și tokenul de push); null până la prima încărcare. */
 export function deviceId(): string | null { return meta?.device ?? null; }
 
+/** Sursa instalării aflată mai târziu (Play Install Referrer): se păstrează doar dacă nu venise deja din `?src=`. */
+export async function setInstallSource(src: string): Promise<void> {
+  await load();
+  if (!meta || meta.source) return;
+  meta.source = src.slice(0, 40);
+  await persist();
+}
+
 export function track(name: string, props?: Record<string, string | number | boolean>): void {
   queue.push({ name, props, t: Date.now() });
   void load().then(() => { void persist(); schedule(); });
