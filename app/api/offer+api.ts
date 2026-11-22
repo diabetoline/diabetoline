@@ -7,7 +7,7 @@
  */
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { authorized } from "./stats+api";
-const URL = process.env.SUPABASE_URL ?? "https://boxyorzzmvjezaspestt.supabase.co";
+const SB_URL = process.env.SUPABASE_URL ?? "https://boxyorzzmvjezaspestt.supabase.co";
 const WEEK = 7 * 864e5;
 type Row = { device: string; token: string; lang: string | null; country: string | null; platform: string | null };
 
@@ -30,7 +30,7 @@ async function eligible(db: SupabaseClient<any, "public", "public", any, any>, f
 export async function GET(request: Request): Promise<Response> {
   if (!authorized(request)) return Response.json({ ok: false }, { status: 401 });
   const key = process.env.SUPABASE_SERVICE_KEY; if (!key) return Response.json({ ok: false, reason: "not_configured" }, { status: 503 });
-  const db = createClient(URL, key, { auth: { persistSession: false } });
+  const db = createClient(SB_URL, key, { auth: { persistSession: false } });
   const u = new URL(request.url);
   const rows = await eligible(db, { country: u.searchParams.get("country") ?? undefined, lang: u.searchParams.get("lang") ?? undefined, platform: u.searchParams.get("platform") ?? undefined }, 10000);
   const { count } = await db.from("push_tokens").select("device", { count: "exact", head: true });
@@ -46,7 +46,7 @@ export async function POST(request: Request): Promise<Response> {
   try { b = await request.json(); } catch { return Response.json({ ok: false }, { status: 400 }); }
   const id = String(b.id ?? "").slice(0, 40);
   if (!id || !b.title?.ro || !b.body?.ro || !b.url) return Response.json({ ok: false, reason: "id/title.ro/body.ro/url required" }, { status: 400 });
-  const db = createClient(URL, key, { auth: { persistSession: false } });
+  const db = createClient(SB_URL, key, { auth: { persistSession: false } });
   let rows = await eligible(db, { country: b.country, lang: b.lang, platform: b.platform }, Math.min(b.limit ?? 5000, 20000));
   // test pe un singur telefon (pagina /api/offers): nu numără în limita de 2/săptămână
   const testOnly = typeof b.device === "string" && b.device.length >= 8;
