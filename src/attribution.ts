@@ -7,14 +7,17 @@
  * Ambele module sunt native: în build-urile vechi `require` dă eroare și sărim peste, fără să crape nimic.
  */
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Platform } from "react-native";
+import { NativeModules, Platform } from "react-native";
 import { setInstallSource, track } from "./analytics";
 
 const KEY = "diabetoline.attribution.done";
 
 export async function initAttribution(): Promise<void> {
-  // SDK-ul Meta: la fiecare pornire (activarea aplicației e evenimentul pe care optimizează Meta)
-  try {
+  // SDK-ul Meta: la fiecare pornire (activarea aplicației e evenimentul pe care optimizează Meta).
+  // IMPORTANT (22 nov 2026, iPhone-ul lui Alex crăpa la pornire după OTA): pachetul se încarcă DOAR dacă modulul nativ există;
+  // în build-urile fără SDK (toate cele de dinainte de 1.1.2) nu-l atingem deloc — `require` singur poate crăpa aplicația.
+  const mods = (NativeModules ?? {}) as Record<string, unknown>;
+  if (mods.FBSettings) try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const fb = require("react-native-fbsdk-next") as { Settings?: { initializeSDK: () => void; setAdvertiserTrackingEnabled?: (b: boolean) => Promise<boolean> } };
     fb.Settings?.initializeSDK();
@@ -23,6 +26,7 @@ export async function initAttribution(): Promise<void> {
   // Install Referrer: o singură dată, la prima deschidere după instalare
   if (Platform.OS !== "android") return;
   try { if (await AsyncStorage.getItem(KEY)) return; } catch {}
+  if (!mods.PlayInstallReferrer) { void AsyncStorage.setItem(KEY, "1").catch(() => {}); return; }
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { PlayInstallReferrer } = require("react-native-play-install-referrer") as {
