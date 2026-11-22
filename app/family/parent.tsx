@@ -11,6 +11,9 @@ import * as Sharing from "expo-sharing";
 import { buildReport } from "../../src/engine/report";
 import { reportHtml } from "../../src/report/html";
 import { dayKeyLocal } from "../../src/engine/days";
+import { order } from "../../src/shop";
+import catalog from "../../src/catalog.json";
+import { money } from "../../src/money";
 
 /** Ecranul copilului: jurnalul părintelui pe ultimele 14 zile, cu ce merită urmărit sus. */
 export default function ParentJournal() {
@@ -91,6 +94,16 @@ export default function ParentJournal() {
           {alerts.length === 0 ? <Hint>{s.fam_quiet}</Hint> : alerts.slice(0, 6).map((a, i) => <Text key={i} style={{ color: t.ink, fontSize: 17 * k }}>⚠️ {a}</Text>)}
         </Card>
       )}
+
+      {/* copilul cumpără pentru părinte (22 nov 2026): comanda se livrează la părinte, plătește copilul */}
+      {(() => { const cur = (catalog as { id: string; name: string; price: number; url: string; available: boolean }[]).find((i) => i.id === "curalin-90-capsule"); return cur ? (
+        <Card>
+          <Label>🎁 {s.fam_gift_title(parent.name)}</Label>
+          <Hint>{s.fam_gift_hint}</Hint>
+          <Button title={`${s.fam_gift_btn} · ${cur.name} · ${money(cur.price)}`} onPress={() => order(cur.url, "family")} />
+          <Button title={s.fam_gift_more} size="sm" kind="ghost" onPress={() => router.push("/shop")} />
+        </Card>
+      ) : null; })()}
 
       <Card>
         <Label>🛒 {s.list_title}</Label>
