@@ -5,6 +5,7 @@
  */
 import { useCallback, useEffect, useState } from "react";
 import { Pressable, RefreshControl, ScrollView, Text, TextInput, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { track } from "../../src/analytics";
 import { createPost, loadFeed, loadTop, myBadges, type Post, type PostRef, type TopItem } from "../../src/community";
@@ -38,6 +39,7 @@ export default function CommunityScreen() {
   };
   const refColor = ref?.level === "green" ? t.ok : ref?.level === "yellow" ? t.warn : ref?.level === "red" ? t.bad : t.muted;
   return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }} edges={["top"]}>
     <ScrollView contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 40 }} keyboardShouldPersistTaps="handled" refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
       <Stack.Screen options={{ title: s.community }} />
       <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
@@ -80,6 +82,7 @@ export default function CommunityScreen() {
         : posts.map((p) => <PostCard key={p.id} post={p} onChange={(np) => setPosts(posts.map((x) => x.id === np.id ? np : x))} onRemoved={() => setPosts(posts.filter((x) => x.id !== p.id))} />)}
       <Button title={"📷 " + s.tile_scan} kind="soft" onPress={() => router.push("/scan")} />
     </ScrollView>
+    </SafeAreaView>
   );
 }
 

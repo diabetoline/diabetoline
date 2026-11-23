@@ -20,6 +20,8 @@ export default function Root() {
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="product/[code]" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
           <Stack.Screen name="product/add" options={{ title: "", headerBackButtonDisplayMode: "minimal" }} />
+          <Stack.Screen name="community/[id]" options={{ headerBackButtonDisplayMode: "minimal" }} />
+          <Stack.Screen name="community/photo" options={{ headerBackButtonDisplayMode: "minimal" }} />
           <Stack.Screen name="welcome" options={{ headerShown: false, presentation: "fullScreenModal", animation: "fade" }} />
           <Stack.Screen name="messages" />
           <Stack.Screen name="paywall" options={{ headerShown: false, presentation: "fullScreenModal", animation: "fade" }} />
