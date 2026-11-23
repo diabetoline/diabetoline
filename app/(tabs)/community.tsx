@@ -89,9 +89,10 @@ export default function CommunityScreen() {
         </View>
       ) : null}
       <WelcomePost />
-      <View style={{ flexDirection: "row", gap: 8 }}>
-        <View style={{ flex: 1 }}><Button title={"📷 " + s.tile_scan} kind="soft" onPress={() => router.push({ pathname: "/scan", params: { for: "community" } })} /></View>
-        <View style={{ flex: 1 }}><Button title={"🍽 " + s.plate_share_btn} kind="soft" onPress={() => router.push("/plate")} /></View>
+      {/* unul sub altul, aceeași mărime (Alex, 23 nov 2026) */}
+      <View style={{ gap: 8 }}>
+        <Button title={"📷 " + s.tile_scan} kind="soft" onPress={() => router.push({ pathname: "/scan", params: { for: "community" } })} />
+        <Button title={"🍽 " + s.plate_share_btn} kind="soft" onPress={() => router.push("/plate")} />
       </View>
     </ScrollView>
     </SafeAreaView>
