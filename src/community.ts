@@ -42,7 +42,7 @@ export async function loadTop(): Promise<{ green: TopItem[]; red: TopItem[] } | 
 }
 
 // ——— feed-ul comunității (postări + comentarii la postări) ———
-export type PostRef = { code?: string; name: string; level?: string; kind?: "scan" | "plate" } | null;
+export type PostRef = { code?: string; name: string; level?: string; kind?: "scan" | "plate"; photo?: string } | null;
 export type Post = { id: number; name: string; text: string; ref: PostRef; t: string; likes: number; liked: boolean; n_comments: number; mine: boolean; photo?: string | null; badges?: string[] };
 
 async function postFeed(body: Record<string, unknown>): Promise<{ ok: boolean; reason?: string; status: number; data?: Record<string, unknown> }> {
@@ -104,4 +104,14 @@ export async function uploadAvatar(jpegBase64: string, name: string): Promise<{ 
 export async function removeAvatar(): Promise<void> {
   const device = deviceId(); if (!device) return;
   try { await fetch(`${API}/api/avatar`, { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ device }) }); } catch {}
+}
+
+/** Poza farfuriei pentru o postare: micșorată pe telefon (~900 px), verificată pe server, în bucket-ul public `plates`. */
+export async function uploadPlatePhoto(jpegBase64: string): Promise<{ ok: boolean; url?: string; reason?: string }> {
+  const device = deviceId(); if (!device) return { ok: false, reason: "no_device" };
+  try {
+    const r = await fetch(`${API}/api/plate-photo`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ device, jpeg: jpegBase64 }) });
+    const j = (await r.json().catch(() => ({}))) as { ok?: boolean; url?: string; reason?: string };
+    return r.ok && j.ok && j.url ? { ok: true, url: j.url } : { ok: false, reason: j.reason ?? String(r.status) };
+  } catch { return { ok: false, reason: "network" }; }
 }

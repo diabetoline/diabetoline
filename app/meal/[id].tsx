@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Animated } from "react-native";
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
@@ -10,12 +10,15 @@ import { levelColor, useTheme } from "../../src/theme";
 import { AfterMeal } from "../../src/ui/AfterMeal";
 import { Button, Card, Hint, Label, useScale } from "../../src/ui/Primitives";
 import { Quip } from "../../src/ui/Quip";
+import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
+import { COMMUNITY_ON, uploadPlatePhoto } from "../../src/community";
 import { VerdictBadge } from "../../src/ui/VerdictBadge";
 
 /** Rezultatul pozei de la masă: verdictul mesei, ce s-a văzut în farfurie, IG, recomandări și ce ajută acum. */
 export default function MealResult() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const t = useTheme(); const k = useScale(); const router = useRouter();
+  const [sharing, setSharing] = useState(false);
   const { t: s, s: state, removeEntry } = useStore();
   const m = state.meals.find((x) => x.id === id);
   useEffect(() => () => { stopSpeech(); }, []);
@@ -104,6 +107,15 @@ export default function MealResult() {
           </Card>
         )}
 
+        {COMMUNITY_ON && (
+          <Button title={sharing ? "…" : "💬 " + s.share_community} kind="soft" disabled={sharing} onPress={async () => {
+            // poza farfuriei pleacă în comunitate doar dacă omul apasă aici (micșorată, verificată pe server)
+            setSharing(true); let photo: string | undefined;
+            try { if (m.photoUri) { const small = await manipulateAsync(m.photoUri, [{ resize: { width: 900 } }], { compress: 0.7, format: SaveFormat.JPEG, base64: true }); const r = await uploadPlatePhoto(small.base64 ?? ""); if (r.ok) photo = r.url; } } catch {}
+            setSharing(false);
+            router.replace({ pathname: "/community", params: { share: "1", name: m.name ?? s[`meal_${m.slot}` as `meal_${typeof m.slot}`], level: m.level ?? "", kind: "plate", ...(photo ? { photo } : {}) } });
+          }} />
+        )}
         <Button title={"✓ " + s.meal_ate} size="xl" onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))} />
         <Button title={s.meal_looking} kind="ghost" onPress={() => { stopSpeech(); removeEntry("meal", m.id); if (router.canGoBack()) router.back(); else router.replace("/"); }} />
         {a && <Hint>{s.plate_note}</Hint>}

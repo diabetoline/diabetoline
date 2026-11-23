@@ -25,14 +25,15 @@ async function pushReply(db: NonNullable<ReturnType<typeof admin>>, postId: numb
   } catch { /* push-ul nu e critic */ }
 }
 
-type Ref = { code?: string; name?: string; level?: string; kind?: "scan" | "plate" } | null;
+type Ref = { code?: string; name?: string; level?: string; kind?: "scan" | "plate"; photo?: string } | null;
 const cleanRef = (r: unknown): Ref => {
   if (!r || typeof r !== "object") return null;
   const o = r as Record<string, unknown>;
   const level = ["green", "yellow", "red"].includes(String(o.level)) ? String(o.level) : undefined;
   const name = o.name ? String(o.name).slice(0, 60) : undefined;
   if (!name) return null;
-  return { code: o.code ? String(o.code).replace(/[^A-Za-z0-9:_-]/g, "").slice(0, 40) : undefined, name, level, kind: o.kind === "plate" ? "plate" : "scan" };
+  const photo = typeof o.photo === "string" && o.photo.startsWith(`${process.env.SUPABASE_URL ?? "https://boxyorzzmvjezaspestt.supabase.co"}/storage/v1/object/public/plates/`) ? o.photo.slice(0, 300) : undefined;
+  return { code: o.code ? String(o.code).replace(/[^A-Za-z0-9:_-]/g, "").slice(0, 40) : undefined, name, level, kind: o.kind === "plate" ? "plate" : "scan", photo };
 };
 
 async function hiddenAuthors(db: NonNullable<ReturnType<typeof admin>>, device: string): Promise<Set<string>> {

@@ -1,5 +1,5 @@
 /** Cardul unei postări din comunitate: prenume · când · textul · produsul/farfuria atașată cu verdictul · 👍 · 💬 · ··· */
-import { Alert, Pressable, Text, View } from "react-native";
+import { Alert, Image, Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useStore } from "../store";
 import { useTheme } from "../theme";
@@ -36,6 +36,7 @@ export function PostCard({ post, onChange, onRemoved, open }: { post: Post; onCh
         <Pressable onPress={onMore} hitSlop={10} accessibilityLabel={s.com_more}><Text style={{ color: t.muted, fontSize: 20 * k }}>···</Text></Pressable>
       </View>
       <Text style={{ color: t.ink, fontSize: 17 * k, lineHeight: 25 * k }}>{post.text}</Text>
+      {post.ref?.photo ? <Image source={{ uri: post.ref.photo }} style={{ width: "100%", height: 220, borderRadius: 12, backgroundColor: t.bg }} resizeMode="cover" /> : null}
       {post.ref ? (
         <Pressable onPress={() => post.ref?.code && post.ref.kind !== "plate" ? router.push({ pathname: "/product/[code]", params: { code: post.ref.code } }) : undefined}
           style={{ flexDirection: "row", alignItems: "center", gap: 10, borderWidth: 1, borderColor: t.line, borderRadius: 12, padding: 10, backgroundColor: t.bg }}>

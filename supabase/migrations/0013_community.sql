@@ -135,3 +135,8 @@ alter table public.product_comments add column if not exists badges text[] not n
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
   values ('avatars', 'avatars', true, 204800, array['image/jpeg'])
   on conflict (id) do nothing;
+
+-- pozele farfuriilor distribuite în comunitate (23 nov 2026, Alex: „să fotografieze farfuria și să arate celorlalți”)
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+  values ('plates', 'plates', true, 512000, array['image/jpeg'])
+  on conflict (id) do nothing;

@@ -4,7 +4,7 @@
  * Identitatea e prenumele (din Setări); poza de profil vine în treapta următoare.
  */
 import { useCallback, useEffect, useState } from "react";
-import { Pressable, RefreshControl, ScrollView, Text, TextInput, View } from "react-native";
+import { Image, Pressable, RefreshControl, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { track } from "../../src/analytics";
@@ -18,12 +18,12 @@ import { Button, Card, Hint, Label, Title, useScale } from "../../src/ui/Primiti
 export default function CommunityScreen() {
   const t = useTheme(); const k = useScale(); const router = useRouter();
   const { t: s, s: state, set } = useStore();
-  const params = useLocalSearchParams<{ share?: string; code?: string; name?: string; level?: string; kind?: string }>();
+  const params = useLocalSearchParams<{ share?: string; code?: string; name?: string; level?: string; kind?: string; photo?: string }>();
   const [posts, setPosts] = useState<Post[] | null>(null);
   const [top, setTop] = useState<{ green: TopItem[]; red: TopItem[] } | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [text, setText] = useState(""); const [name, setName] = useState(state.name ?? "");
-  const [ref, setRef] = useState<PostRef>(params.share && params.name ? { code: params.code, name: params.name, level: params.level, kind: params.kind === "plate" ? "plate" : "scan" } : null);
+  const [ref, setRef] = useState<PostRef>(params.share && params.name ? { code: params.code, name: params.name, level: params.level || undefined, kind: params.kind === "plate" ? "plate" : "scan", photo: params.photo } : null);
   const [busy, setBusy] = useState(false); const [note, setNote] = useState("");
   const load = useCallback(async () => { const [p, tp] = await Promise.all([loadFeed(), loadTop()]); if (p) setPosts(p); else if (!posts) setPosts([]); if (tp) setTop(tp); }, []);
   useEffect(() => { track("community_view"); void load(); set({ communitySeen: new Date().toISOString() }); }, []);
@@ -58,6 +58,7 @@ export default function CommunityScreen() {
         ) : null}
         {ref ? (
           <View style={{ flexDirection: "row", alignItems: "center", gap: 10, borderWidth: 1, borderColor: t.line, borderRadius: 12, padding: 10, backgroundColor: t.bg }}>
+            {ref.photo ? <Image source={{ uri: ref.photo }} style={{ width: 44, height: 44, borderRadius: 8 }} /> : null}
             <View style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: refColor }} />
             <Text style={{ flex: 1, color: t.ink, fontSize: 15 * k }} numberOfLines={2}>{ref.kind === "plate" ? "🍽 " : "🛒 "}{ref.name}</Text>
             <Text onPress={() => setRef(null)} style={{ color: t.muted, fontSize: 18 * k, paddingHorizontal: 6 }}>✕</Text>
@@ -80,7 +81,11 @@ export default function CommunityScreen() {
       {posts === null ? <Text style={{ color: t.muted, fontSize: 16 * k }}>…</Text>
         : posts.length === 0 ? <Card><Text style={{ color: t.ink, fontSize: 17 * k, lineHeight: 25 * k }}>{s.feed_empty}</Text></Card>
         : posts.map((p) => <PostCard key={p.id} post={p} onChange={(np) => setPosts(posts.map((x) => x.id === np.id ? np : x))} onRemoved={() => setPosts(posts.filter((x) => x.id !== p.id))} />)}
-      <Button title={"📷 " + s.tile_scan} kind="soft" onPress={() => router.push({ pathname: "/scan", params: { for: "community" } })} />
+      <WelcomePost />
+      <View style={{ flexDirection: "row", gap: 8 }}>
+        <View style={{ flex: 1 }}><Button title={"📷 " + s.tile_scan} kind="soft" onPress={() => router.push({ pathname: "/scan", params: { for: "community" } })} /></View>
+        <View style={{ flex: 1 }}><Button title={"🍽 " + s.plate_share_btn} kind="soft" onPress={() => router.push("/plate")} /></View>
+      </View>
     </ScrollView>
     </SafeAreaView>
   );
@@ -96,6 +101,23 @@ function TopList({ title, items, color }: { title: string; items: TopItem[]; col
           <Text style={{ color }}>●</Text> {it.name} <Text style={{ color: t.muted, fontSize: 14 * k }}>· {s.top_n(it.n)}</Text>
         </Text>
       ))}
+    </View>
+  );
+}
+
+/** Prima postare, de la echipă (Alex, 23 nov 2026): mereu la capătul listei, încurajează lumea să scrie. */
+function WelcomePost() {
+  const t = useTheme(); const k = useScale(); const { t: s } = useStore();
+  return (
+    <View style={{ backgroundColor: t.surface, borderRadius: 16, padding: 14, gap: 8, borderWidth: 1, borderColor: t.accentSoft }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+        <View style={{ width: 40 * k, height: 40 * k, borderRadius: 20 * k, backgroundColor: t.accent, alignItems: "center", justifyContent: "center" }}><Text style={{ color: "#fff", fontWeight: "800", fontSize: 18 * k }}>D</Text></View>
+        <View style={{ flex: 1 }}>
+          <Text style={{ color: t.ink, fontWeight: "800", fontSize: 16 * k }}>{s.welcome_post_by}</Text>
+          <Text style={{ color: t.muted, fontSize: 13 * k }}>{s.welcome_post_tag}</Text>
+        </View>
+      </View>
+      <Text style={{ color: t.ink, fontSize: 17 * k, lineHeight: 25 * k }}>{s.welcome_post_text}</Text>
     </View>
   );
 }
