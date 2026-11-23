@@ -33,10 +33,17 @@ export async function POST(request: Request): Promise<Response> {
   });
   if (!rows.length) return Response.json({ ok: true, n: 0 });
   const admin = createClient(URL, key, { auth: { persistSession: false } });
-  const { error } = await admin.from("events").insert(rows);
+  // app_install o singură dată per telefon (23 nov 2026: coada retrimitea evenimentul când răspunsul se pierdea → instalări duble în tablou)
+  let dedup = rows;
+  if (rows.some((r) => r.name === "app_install")) {
+    const { data: had } = await admin.from("events").select("device").eq("device", rows[0].device).eq("name", "app_install").limit(1);
+    if (had && had.length) dedup = rows.filter((r) => r.name !== "app_install");
+    if (!dedup.length) return Response.json({ ok: true, n: 0 });
+  }
+  const { error } = await admin.from("events").insert(dedup);
   // la eroare răspundem 500, ca telefonul să păstreze coada și să reîncerce (16 nov 2026: până la migrarea 0009 răspundeam 200 și evenimentele se pierdeau)
   if (error) return Response.json({ ok: false, reason: error.message }, { status: 500 });
   // alerte pe telefonul lui Alex (ntfy) la instalări, probe, plăți — după ce evenimentele sunt scrise
-  await alertOnEvents(rows);
-  return Response.json({ ok: true, n: rows.length });
+  await alertOnEvents(dedup);
+  return Response.json({ ok: true, n: dedup.length });
 }
