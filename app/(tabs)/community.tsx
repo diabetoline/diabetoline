@@ -24,7 +24,7 @@ export default function CommunityScreen() {
   const [ref, setRef] = useState<PostRef>(params.share && params.name ? { code: params.code, name: params.name, level: params.level, kind: params.kind === "plate" ? "plate" : "scan" } : null);
   const [busy, setBusy] = useState(false); const [note, setNote] = useState("");
   const load = useCallback(async () => { const [p, tp] = await Promise.all([loadFeed(), loadTop()]); if (p) setPosts(p); else if (!posts) setPosts([]); if (tp) setTop(tp); }, []);
-  useEffect(() => { track("community_view"); void load(); }, []);
+  useEffect(() => { track("community_view"); void load(); set({ communitySeen: new Date().toISOString() }); }, []);
   const onRefresh = async () => { setRefreshing(true); await load(); setRefreshing(false); };
   const onSend = async () => {
     const nm = name.trim(); const tx = text.trim();

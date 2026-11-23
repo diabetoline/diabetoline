@@ -9,6 +9,22 @@
  */
 import { admin, cleanDevice, cleanName, cleanText, moderate } from "./community+api";
 
+const REPLY_TITLE: Record<string, (n: string) => string> = { ro: (n) => `${n} ți-a răspuns`, en: (n) => `${n} replied to you`, de: (n) => `${n} hat dir geantwortet` };
+/** Push la autorul postării când cineva îi răspunde (23 nov 2026, aprobat de Alex): cel mult unul la 30 de minute per postare, ca să nu enerveze. */
+async function pushReply(db: NonNullable<ReturnType<typeof admin>>, postId: number, fromDevice: string, fromName: string, text: string) {
+  try {
+    const { data: p } = await db.from("community_posts").select("device, last_push_at").eq("id", postId).maybeSingle();
+    if (!p || p.device === fromDevice) return;
+    if (p.last_push_at && Date.now() - new Date(p.last_push_at).getTime() < 30 * 60e3) return;
+    const { data: tok } = await db.from("push_tokens").select("token, lang").eq("device", p.device).maybeSingle();
+    if (!tok?.token) return;
+    const lang = (tok.lang ?? "ro").slice(0, 2); const title = (REPLY_TITLE[lang] ?? REPLY_TITLE.ro)(fromName);
+    await fetch("https://exp.host/--/api/v2/push/send", { method: "POST", headers: { "content-type": "application/json", accept: "application/json" },
+      body: JSON.stringify([{ to: tok.token, title, body: text.slice(0, 120), sound: "default", channelId: "reminders", data: { kind: "community", id: postId } }]) });
+    await db.from("community_posts").update({ last_push_at: new Date().toISOString() }).eq("id", postId);
+  } catch { /* push-ul nu e critic */ }
+}
+
 type Ref = { code?: string; name?: string; level?: string; kind?: "scan" | "plate" } | null;
 const cleanRef = (r: unknown): Ref => {
   if (!r || typeof r !== "object") return null;
@@ -31,6 +47,17 @@ export async function GET(request: Request): Promise<Response> {
   const db = admin(); if (!db) return Response.json({ ok: false, reason: "not_configured" }, { status: 503 });
   const u = new URL(request.url); const device = cleanDevice(u.searchParams.get("device"));
   const hidden = await hiddenAuthors(db, device);
+  // bulina din meniu: câte răspunsuri noi la postările mele de la ultima vizită
+  const since = u.searchParams.get("inbox");
+  if (since !== null && device) {
+    const { data: mine } = await db.from("community_posts").select("id").eq("device", device).limit(200);
+    const ids = ((mine ?? []) as { id: number }[]).map((x) => x.id);
+    if (!ids.length) return Response.json({ ok: true, n: 0 });
+    let q = db.from("product_comments").select("id", { count: "exact", head: true }).in("post_id", ids).neq("device", device).eq("hidden", false);
+    if (since) q = q.gt("t", since);
+    const { count } = await q;
+    return Response.json({ ok: true, n: count ?? 0 });
+  }
   const postId = Number(u.searchParams.get("post"));
   if (Number.isFinite(postId) && postId > 0) {
     const { data: p } = await db.from("community_posts").select("id, device, name, text, ref, t, likes, n_comments, hidden").eq("id", postId).maybeSingle();
@@ -87,6 +114,7 @@ export async function POST(request: Request): Promise<Response> {
     const { data, error } = await db.from("product_comments").insert({ post_id: post, device, name, text, lang, country: String(b.country ?? "").toUpperCase().slice(0, 2) || null }).select("id, t").single();
     if (error) return Response.json({ ok: false, reason: error.message }, { status: 500 });
     await db.rpc("bump_post", { pid: post, dlikes: 0, dcomments: 1 }).then(() => {}, () => {});
+    await pushReply(db, post, device, name, text);
     return Response.json({ ok: true, id: data.id, t: data.t });
   }
   if (b.action === "like_post") {

@@ -71,3 +71,11 @@ export async function likePost(id: number) { return postFeed({ action: "like_pos
 export async function deletePost(id: number) { return postFeed({ action: "delete_post", id }); }
 export async function reportPost(id: number) { track("community_report", { on: "post" }); return post({ action: "report_post", id }); }
 export async function blockPostAuthor(id: number) { return post({ action: "block_post", id }); }
+
+/** Răspunsuri noi la postările mele de la `since` (ISO) — pentru bulina din meniu. */
+export async function loadInbox(since?: string): Promise<number> {
+  try {
+    const r = await fetch(`${API}/api/feed?inbox=${encodeURIComponent(since ?? "")}&device=${encodeURIComponent(deviceId() ?? "")}`);
+    if (!r.ok) return 0; const j = (await r.json()) as { ok: boolean; n: number }; return j.ok ? j.n : 0;
+  } catch { return 0; }
+}

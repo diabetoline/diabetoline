@@ -14,6 +14,7 @@ import { RecoCard } from "../../src/ui/RecoCard";
 import { trialDaysLeft } from "../../src/money";
 import { MessageCard } from "../../src/ui/MessageCard";
 import { ReviewCard } from "../../src/ui/ReviewCard";
+import { CommunityCard, useLatestPost } from "../../src/ui/CommunityCard";
 import { tipOfDay } from "../../src/tips";
 import { slotForHour } from "../../src/store";
 
@@ -36,6 +37,7 @@ export default function Home() {
   const open = (c: string) => router.push({ pathname: "/product/[code]", params: { code: c } });
   const hasDay = todayMeals.length > 0 || todayGlu.length > 0;
   const fresh = state.history.length === 0 && state.meals.length === 0 && state.glucose.length === 0;
+  const latestPost = useLatestPost();
   useEffect(() => { if (!state.welcomed) router.replace("/welcome"); }, [state.welcomed]);
   // după primul verdict (scanarea vine înaintea întrebărilor, 20 nov 2026): cele două întrebări scurte, o dată pe pornire
   const askedWho = useRef(false);
@@ -111,7 +113,9 @@ export default function Home() {
 
         {!fresh && <WeightCheckin />}
         {!fresh && <RecoCard placement="home" />}
-        {!fresh && (
+        {/* un singur card „de citit”: postarea zilei din comunitate când există una proaspătă, altfel sfatul zilei (Alex, 23 nov 2026) */}
+        {!fresh && latestPost && <CommunityCard post={latestPost} />}
+        {!fresh && !latestPost && (
           <Card style={{ gap: 4, borderLeftWidth: 4, borderLeftColor: t.accent }}>
             <Label>💡 {s.tip_title}</Label>
             <Text style={{ color: t.ink, fontSize: 16 * k, lineHeight: 23 * k }}>{tipOfDay(state.lang)}</Text>

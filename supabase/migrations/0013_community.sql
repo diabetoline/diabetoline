@@ -30,7 +30,8 @@ create table if not exists public.community_posts (
   t timestamptz not null default now(),
   hidden boolean not null default false,
   likes integer not null default 0,
-  n_comments integer not null default 0
+  n_comments integer not null default 0,
+  last_push_at timestamptz
 );
 create index if not exists community_posts_country_t_idx on public.community_posts (country, t desc) where hidden = false;
 alter table public.community_posts enable row level security;
