@@ -9,6 +9,7 @@
  * - `state.entitled` e oglinda entitlement-ului `pro`; se actualizează la pornire, după cumpărare/restaurare
  *   și când RevenueCat anunță o schimbare (reînnoire, anulare, expirare).
  */
+import { track } from "./analytics";
 import { NativeModules, Platform, TurboModuleRegistry } from "react-native";
 
 export interface Plan { id: "year" | "month"; price: string; pkg: unknown }
@@ -49,12 +50,13 @@ export async function fetchPlans(): Promise<Plan[]> {
   const P = purchases(); if (!P) return [];
   try {
     const o = (await P.getOfferings()).current;
-    if (!o) return [];
+    if (!o) { track("pay_prices", { ok: false, reason: "no_offering" }); return []; }
     const out: Plan[] = [];
     if (o.annual) out.push({ id: "year", price: o.annual.product.priceString, pkg: o.annual });
     if (o.monthly) out.push({ id: "month", price: o.monthly.product.priceString, pkg: o.monthly });
+    track("pay_prices", { ok: out.length > 0, n: out.length });
     return out;
-  } catch { return []; }
+  } catch (e) { track("pay_prices", { ok: false, reason: String((e as Error)?.message ?? e).slice(0, 80) }); return []; }
 }
 
 /** Cumpără; întoarce true dacă omul e abonat după. `cancelled` = a închis fereastra magazinului. */
@@ -64,7 +66,9 @@ export async function purchase(plan: Plan): Promise<{ ok: boolean; cancelled?: b
     const { customerInfo } = await P.purchasePackage(plan.pkg as Parameters<Purchases["purchasePackage"]>[0]);
     return { ok: isPro(customerInfo) };
   } catch (e) {
-    return { ok: false, cancelled: !!(e as { userCancelled?: boolean })?.userCancelled };
+    const cancelled = !!(e as { userCancelled?: boolean })?.userCancelled;
+    track("pay_fail", { plan: plan.id, cancelled, reason: cancelled ? "cancelled" : String((e as Error)?.message ?? e).slice(0, 80) });
+    return { ok: false, cancelled };
   }
 }
 

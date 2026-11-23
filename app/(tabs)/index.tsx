@@ -14,6 +14,7 @@ import { RecoCard } from "../../src/ui/RecoCard";
 import { trialDaysLeft } from "../../src/money";
 import { MessageCard } from "../../src/ui/MessageCard";
 import { ReviewCard } from "../../src/ui/ReviewCard";
+import { NotifCard } from "../../src/ui/NotifCard";
 import { CommunityCard, useLatestPost } from "../../src/ui/CommunityCard";
 import { tipOfDay } from "../../src/tips";
 import { slotForHour } from "../../src/store";
@@ -111,6 +112,7 @@ export default function Home() {
           </Card>
         )}
 
+        {!fresh && <NotifCard />}
         {!fresh && <WeightCheckin />}
         {!fresh && <RecoCard placement="home" />}
         {/* un singur card „de citit”: postarea zilei din comunitate când există una proaspătă, altfel sfatul zilei (Alex, 23 nov 2026) */}

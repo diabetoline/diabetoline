@@ -55,7 +55,7 @@ export interface State {
   scans?: { day: string; n: number };
   /** cererea de recenzie: de câte ori am întrebat și de când putem întreba din nou */
   review?: { asked: number; next: number; done?: boolean };
-  lang: Lang; langManual?: boolean; humor: boolean; /** oferte comerciale prin push (Setări; implicit pornit, max 2/săpt.) */ offers?: boolean; /** ultima vizită în Comunitate (ISO) — bulina din meniu numără răspunsurile de după */ communitySeen?: string; /** poza de profil din comunitate (url public) */ photo?: string; welcomed?: boolean; unit: "mg" | "mmol"; name: string; bigText: boolean;
+  lang: Lang; langManual?: boolean; humor: boolean; /** oferte comerciale prin push (Setări; implicit pornit, max 2/săpt.) */ offers?: boolean; /** ultima vizită în Comunitate (ISO) — bulina din meniu numără răspunsurile de după */ communitySeen?: string; /** poza de profil din comunitate (url public) */ photo?: string; /** permisiunea de notificări a fost cerută (cu motiv, după primul verdict) sau refuzată din card */ notifAsked?: boolean; welcomed?: boolean; unit: "mg" | "mmol"; name: string; bigText: boolean;
   history: HistItem[]; glucose: GluEntry[]; meals: MealEntry[]; meds: Med[]; medLog: MedLog[]; walks: Walk[]; weights: Weight[]; list: ListItem[]; family: Family;
   /** vizitele la cumpărături (modul de scanare în lanț): ce a scanat, cu verdictele */
   trips?: Trip[];

@@ -33,8 +33,9 @@ async function planNow(s: State, t: Strings): Promise<Plan> {
   const prefs = { ...REMIND_DEFAULT, ...(s.remind ?? {}) };
   const prev: Plan = s.plan ?? { ids: [], gluIgnored: 0, medFollow: {} };
   // Android 13+: permisiunea se cere explicit (o singură dată, sistemul nu mai întreabă dacă a fost refuzată); plus canalul de notificări
-  let perm = await Notifications.getPermissionsAsync();
-  if (!perm.granted && perm.canAskAgain) perm = await Notifications.requestPermissionsAsync();
+  // 23 nov 2026 (retenție d1 13 %): nu mai cerem permisiunea orbește la pornire — o cere cardul de pe prima pagină, cu motiv,
+  // după primul verdict (`NotifCard`), sau ecranele care chiar au nevoie (medicamente, Setări). Aici doar planificăm dacă e dată.
+  const perm = await Notifications.getPermissionsAsync();
   if (!perm.granted) return prev;
   if (Platform.OS === "android") await Notifications.setNotificationChannelAsync("reminders", { name: t.rem_title, importance: Notifications.AndroidImportance.DEFAULT, sound: "default" }).catch(() => {});
   // curățăm TOT ce am programat noi înainte, după tip (nu doar id-urile din plan: două planificări în paralel lăsau
