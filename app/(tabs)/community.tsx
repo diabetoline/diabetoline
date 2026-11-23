@@ -80,7 +80,7 @@ export default function CommunityScreen() {
       {posts === null ? <Text style={{ color: t.muted, fontSize: 16 * k }}>…</Text>
         : posts.length === 0 ? <Card><Text style={{ color: t.ink, fontSize: 17 * k, lineHeight: 25 * k }}>{s.feed_empty}</Text></Card>
         : posts.map((p) => <PostCard key={p.id} post={p} onChange={(np) => setPosts(posts.map((x) => x.id === np.id ? np : x))} onRemoved={() => setPosts(posts.filter((x) => x.id !== p.id))} />)}
-      <Button title={"📷 " + s.tile_scan} kind="soft" onPress={() => router.push("/scan")} />
+      <Button title={"📷 " + s.tile_scan} kind="soft" onPress={() => router.push({ pathname: "/scan", params: { for: "community" } })} />
     </ScrollView>
     </SafeAreaView>
   );

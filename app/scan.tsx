@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, KeyboardAvoidingView, Linking, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
-import { Stack, useFocusEffect, useRouter } from "expo-router";
+import { Stack, useFocusEffect, useRouter, useLocalSearchParams } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useGate } from "../src/access";
 import { lookupProduct } from "../src/api/lookup";
@@ -31,6 +31,7 @@ function validCode(c: string, type?: string): boolean {
 
 export default function ScanScreen() {
   const t = useTheme(); const router = useRouter();
+  const { for: forWhat } = useLocalSearchParams<{ for?: string }>(); // „community”: scanarea pornită din Comunitate → „Spune comunității” direct pe panou
   const ins = useSafeAreaInsets();
   const { t: s, s: state, countScan, recordScan, addToList, addTrip } = useStore();
   const openList = (state.list ?? []).filter((x) => !x.done).length;
@@ -151,6 +152,9 @@ export default function ScanScreen() {
                 </View>
                 <Text style={{ color: t.ink, fontSize: 16, lineHeight: 22 }}>{s.summary[cur.v.level]} {s.shop_carbs(cur.v.carbs, cur.v.serving, cur.p.unit)}</Text>
                 {compare && <Text style={{ color: t.ink, fontSize: 16, fontWeight: "700" }}>{compare}</Text>}
+                {forWhat === "community" && (
+                  <Button title={"💬 " + s.share_community} onPress={() => router.replace({ pathname: "/community", params: { share: "1", code: cur.p.code, name: cur.p.name, level: cur.v.level, kind: "scan" } })} />
+                )}
                 <View style={{ flexDirection: "row", gap: 8 }}>
                   <View style={{ flex: 1 }}><Button title={onList ? "✓ " + s.list_added : "🛒 " + (cur.v.level === "red" ? s.list_add_anyway : s.list_add)} kind={onList ? "ghost" : cur.v.level === "red" ? "ghost" : undefined} onPress={() => { if (!onList) { addToList({ name: cur.p.name, code: cur.p.code, level: cur.v.level, by: "me" }); track("list_added", { from: "shop", level: cur.v.level }); } }} /></View>
                   <View style={{ flex: 1 }}><Button title={s.shop_details} kind="soft" onPress={() => router.push({ pathname: "/product/[code]", params: { code: cur.p.code, from: "scan" } })} /></View>
