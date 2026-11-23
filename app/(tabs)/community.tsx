@@ -4,11 +4,12 @@
  * Identitatea e prenumele (din Setări); poza de profil vine în treapta următoare.
  */
 import { useCallback, useEffect, useState } from "react";
-import { Image, Pressable, RefreshControl, ScrollView, Text, TextInput, View } from "react-native";
+import { Image, Modal, Pressable, RefreshControl, ScrollView, Text, TextInput, View } from "react-native";
+import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { track } from "../../src/analytics";
-import { createPost, loadFeed, loadTop, myBadges, type Post, type PostRef, type TopItem } from "../../src/community";
+import { createPost, loadFeed, loadTop, myBadges, uploadPlatePhoto, type Post, type PostRef, type TopItem } from "../../src/community";
 import { Avatar } from "../../src/ui/Avatar";
 import { useStore } from "../../src/store";
 import { useTheme } from "../../src/theme";
@@ -25,6 +26,7 @@ export default function CommunityScreen() {
   const [text, setText] = useState(""); const [name, setName] = useState(state.name ?? "");
   const [ref, setRef] = useState<PostRef>(params.share && params.name ? { code: params.code, name: params.name, level: params.level || undefined, kind: params.kind === "plate" ? "plate" : "scan", photo: params.photo } : null);
   const [busy, setBusy] = useState(false); const [note, setNote] = useState("");
+  const [pick, setPick] = useState(false); const [picking, setPicking] = useState(false);
   const load = useCallback(async () => { const [p, tp] = await Promise.all([loadFeed(undefined, state.lang), loadTop()]); if (p) { setPosts(p.posts); setAbroad(p.abroad); } else if (!posts) setPosts([]); if (tp) setTop(tp); }, [state.lang]);
   useEffect(() => { track("community_view"); void load(); set({ communitySeen: new Date().toISOString() }); }, []);
   const onRefresh = async () => { setRefreshing(true); await load(); setRefreshing(false); };
@@ -63,7 +65,10 @@ export default function CommunityScreen() {
             <Text style={{ flex: 1, color: t.ink, fontSize: 15 * k }} numberOfLines={2}>{ref.kind === "plate" ? "🍽 " : "🛒 "}{ref.name}</Text>
             <Text onPress={() => setRef(null)} style={{ color: t.muted, fontSize: 18 * k, paddingHorizontal: 6 }}>✕</Text>
           </View>
-        ) : null}
+        ) : (
+          // din jurnal: o scanare sau o farfurie deja făcută, fără să scaneze/fotografieze din nou (Alex, 23 nov 2026)
+          (state.history.length > 0 || state.meals.length > 0) ? <Button title={picking ? "…" : "📂 " + s.pick_title} kind="soft" size="sm" disabled={picking} onPress={() => setPick(true)} /> : null
+        )}
         <TextInput value={text} onChangeText={setText} placeholder={ref ? s.post_ph_ref : s.post_ph} placeholderTextColor={t.muted} maxLength={600} multiline accessibilityLabel={s.post_new}
           style={{ borderWidth: 1, borderColor: t.line, borderRadius: 12, padding: 12, fontSize: 17 * k, color: t.ink, backgroundColor: t.bg, minHeight: 72 }} />
         <Button title={busy ? "…" : s.post_send} disabled={busy || text.trim().length < 2} onPress={onSend} />
@@ -89,6 +94,42 @@ export default function CommunityScreen() {
         </View>
       ) : null}
       <WelcomePost />
+      <Modal visible={pick} animationType="slide" onRequestClose={() => setPick(false)}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }}>
+          <ScrollView contentContainerStyle={{ padding: 16, gap: 12, paddingBottom: 40 }}>
+            <Title>{s.pick_title}</Title>
+            <Hint>{s.pick_sub}</Hint>
+            {state.meals.filter((m) => m.photoUri || m.name).length > 0 ? <Label>{s.pick_plates}</Label> : null}
+            {[...state.meals].reverse().filter((m) => m.photoUri || m.name).slice(0, 10).map((m) => (
+              <Pressable key={m.id} onPress={async () => {
+                setPick(false); setPicking(true); let photo: string | undefined;
+                try { if (m.photoUri) { const small = await manipulateAsync(m.photoUri, [{ resize: { width: 900 } }], { compress: 0.7, format: SaveFormat.JPEG, base64: true }); const r = await uploadPlatePhoto(small.base64 ?? ""); if (r.ok) photo = r.url; } } catch {}
+                setPicking(false);
+                setRef({ name: m.name ?? s[`meal_${m.slot}` as `meal_${typeof m.slot}`], level: m.level, kind: "plate", photo });
+              }} style={{ flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: t.surface, borderRadius: 14, padding: 10 }}>
+                {m.photoUri ? <Image source={{ uri: m.photoUri }} style={{ width: 56, height: 56, borderRadius: 10 }} /> : <Text style={{ fontSize: 28 }}>🍽</Text>}
+                <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: m.level === "green" ? t.ok : m.level === "yellow" ? t.warn : m.level === "red" ? t.bad : t.muted }} />
+                <View style={{ flex: 1 }}>
+                  <Text style={{ color: t.ink, fontSize: 16 * k, fontWeight: "700" }} numberOfLines={2}>{m.name ?? s[`meal_${m.slot}` as `meal_${typeof m.slot}`]}</Text>
+                  <Text style={{ color: t.muted, fontSize: 13 * k }}>{new Date(m.t).toLocaleDateString()}</Text>
+                </View>
+              </Pressable>
+            ))}
+            {state.history.length > 0 ? <Label>{s.pick_scans}</Label> : null}
+            {state.history.slice(0, 15).map((h) => (
+              <Pressable key={h.code} onPress={() => { setRef({ code: h.code, name: h.name, level: h.level, kind: "scan" }); setPick(false); }}
+                style={{ flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: t.surface, borderRadius: 14, padding: 12 }}>
+                <View style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: h.level === "green" ? t.ok : h.level === "yellow" ? t.warn : t.bad }} />
+                <View style={{ flex: 1 }}>
+                  <Text style={{ color: t.ink, fontSize: 16 * k, fontWeight: "700" }} numberOfLines={2}>{h.name}</Text>
+                  <Text style={{ color: t.muted, fontSize: 13 * k }}>{new Date(h.t).toLocaleDateString()}</Text>
+                </View>
+              </Pressable>
+            ))}
+            <Button title={s.cancel} kind="ghost" onPress={() => setPick(false)} />
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
       {/* unul sub altul, aceeași mărime (Alex, 23 nov 2026) */}
       <View style={{ gap: 8 }}>
         <Button title={"📷 " + s.tile_scan} kind="soft" onPress={() => router.push({ pathname: "/scan", params: { for: "community" } })} />
