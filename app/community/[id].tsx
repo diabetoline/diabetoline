@@ -7,6 +7,8 @@ import { useStore } from "../../src/store";
 import { useTheme } from "../../src/theme";
 import { ago, PostCard } from "../../src/ui/PostCard";
 import { Button, Card, Hint, useScale } from "../../src/ui/Primitives";
+import { Avatar, Badges } from "../../src/ui/Avatar";
+import { myBadges } from "../../src/community";
 
 export default function PostScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -20,7 +22,7 @@ export default function PostScreen() {
     const nm = name.trim(); const tx = text.trim();
     if (!nm) { setNote(s.com_need_name); return; } if (tx.length < 2) return;
     setBusy(true); setNote(""); if (nm !== state.name) set({ name: nm });
-    const r = await commentPost(Number(id), nm, tx, state.lang);
+    const r = await commentPost(Number(id), nm, tx, state.lang, myBadges(state));
     setBusy(false);
     if (r.ok) { setText(""); setNote(s.com_sent); await load(); }
     else setNote(r.reason === "blocked" ? s.com_blocked : r.reason === "limit" ? s.com_limit : r.reason === "banned" ? s.com_banned : s.com_err);
@@ -42,8 +44,9 @@ export default function PostScreen() {
           <PostCard post={post} open onChange={setPost} onRemoved={() => router.back()} />
           {comments.map((c) => (
             <View key={c.id} style={{ backgroundColor: t.surface, borderRadius: 14, padding: 12, gap: 6, marginLeft: 16 }}>
-              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                <Text style={{ color: t.ink, fontWeight: "800", fontSize: 15 * k }}>{c.name}{c.mine ? ` (${s.com_you})` : ""} <Text style={{ color: t.muted, fontWeight: "400", fontSize: 13 * k }}>· {ago(c.t, s)}</Text></Text>
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+                <Avatar name={c.name} photo={c.photo} size={30 * k} />
+                <Text style={{ flex: 1, color: t.ink, fontWeight: "800", fontSize: 15 * k }}>{c.name}{c.mine ? ` (${s.com_you})` : ""} <Badges badges={c.badges} size={12 * k} /> <Text style={{ color: t.muted, fontWeight: "400", fontSize: 13 * k }}>· {ago(c.t, s)}</Text></Text>
                 <Pressable onPress={() => onMore(c)} hitSlop={10} accessibilityLabel={s.com_more}><Text style={{ color: t.muted, fontSize: 18 * k }}>···</Text></Pressable>
               </View>
               <Text style={{ color: t.ink, fontSize: 16 * k, lineHeight: 23 * k }}>{c.text}</Text>

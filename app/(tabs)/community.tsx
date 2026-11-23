@@ -4,10 +4,11 @@
  * Identitatea e prenumele (din Setări); poza de profil vine în treapta următoare.
  */
 import { useCallback, useEffect, useState } from "react";
-import { RefreshControl, ScrollView, Text, TextInput, View } from "react-native";
+import { Pressable, RefreshControl, ScrollView, Text, TextInput, View } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { track } from "../../src/analytics";
-import { createPost, loadFeed, loadTop, type Post, type PostRef, type TopItem } from "../../src/community";
+import { createPost, loadFeed, loadTop, myBadges, type Post, type PostRef, type TopItem } from "../../src/community";
+import { Avatar } from "../../src/ui/Avatar";
 import { useStore } from "../../src/store";
 import { useTheme } from "../../src/theme";
 import { PostCard } from "../../src/ui/PostCard";
@@ -30,7 +31,7 @@ export default function CommunityScreen() {
     const nm = name.trim(); const tx = text.trim();
     if (!nm) { setNote(s.com_need_name); return; } if (tx.length < 2) return;
     setBusy(true); setNote(""); if (nm !== state.name) set({ name: nm });
-    const r = await createPost(nm, tx, state.lang, ref);
+    const r = await createPost(nm, tx, state.lang, ref, myBadges(state));
     setBusy(false);
     if (r.ok) { setText(""); setRef(null); setNote(s.com_sent); await load(); }
     else setNote(r.reason === "blocked" ? s.com_blocked : r.reason === "limit" ? s.post_limit : r.reason === "banned" ? s.com_banned : s.com_err);
@@ -39,7 +40,13 @@ export default function CommunityScreen() {
   return (
     <ScrollView contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 40 }} keyboardShouldPersistTaps="handled" refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
       <Stack.Screen options={{ title: s.community }} />
-      <Title>{s.community}</Title>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+        <View style={{ flex: 1 }}><Title>{s.community}</Title></View>
+        <Pressable onPress={() => router.push("/community/photo")} accessibilityRole="button" accessibilityLabel={s.photo_title} style={{ alignItems: "center", gap: 2 }}>
+          <Avatar name={state.name || "?"} photo={state.photo} size={44 * k} />
+          <Text style={{ color: t.accent, fontSize: 12 * k, fontWeight: "700" }}>{state.photo ? s.photo_change : s.photo_add}</Text>
+        </Pressable>
+      </View>
       <Hint>{s.community_sub}</Hint>
       <Card>
         <Label>{s.post_new}</Label>

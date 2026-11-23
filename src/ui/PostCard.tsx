@@ -5,6 +5,7 @@ import { useStore } from "../store";
 import { useTheme } from "../theme";
 import { useScale } from "./Primitives";
 import { blockPostAuthor, deletePost, likePost, reportPost, type Post } from "../community";
+import { Avatar, Badges } from "./Avatar";
 
 export function ago(iso: string, s: { ago_now: string; ago_min: (n: number) => string; ago_h: (n: number) => string; ago_d: (n: number) => string }): string {
   const m = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
@@ -26,8 +27,12 @@ export function PostCard({ post, onChange, onRemoved, open }: { post: Post; onCh
   };
   const body = (
     <View style={{ gap: 8 }}>
-      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-        <Text style={{ color: t.ink, fontWeight: "800", fontSize: 16 * k }}>{post.name}{post.mine ? ` (${s.com_you})` : ""} <Text style={{ color: t.muted, fontWeight: "400", fontSize: 14 * k }}>· {ago(post.t, s)}</Text></Text>
+      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
+        <Avatar name={post.name} photo={post.photo} size={40 * k} />
+        <View style={{ flex: 1 }}>
+          <Text style={{ color: t.ink, fontWeight: "800", fontSize: 16 * k }}>{post.name}{post.mine ? ` (${s.com_you})` : ""} <Badges badges={post.badges} size={13 * k} /></Text>
+          <Text style={{ color: t.muted, fontSize: 13 * k }}>{ago(post.t, s)}</Text>
+        </View>
         <Pressable onPress={onMore} hitSlop={10} accessibilityLabel={s.com_more}><Text style={{ color: t.muted, fontSize: 20 * k }}>···</Text></Pressable>
       </View>
       <Text style={{ color: t.ink, fontSize: 17 * k, lineHeight: 25 * k }}>{post.text}</Text>

@@ -119,3 +119,19 @@ create or replace function public.bump_comment_likes(cid bigint, delta integer) 
 $$;
 revoke all on function public.bump_comment_likes(bigint, integer) from public;
 grant execute on function public.bump_comment_likes(bigint, integer) to service_role;
+
+-- profilul public (23 nov 2026): poza (făcută cu camera din aplicație; galeria vine în build-ul 1.1.3) și insignele
+create table if not exists public.community_profiles (
+  device text primary key check (char_length(device) between 8 and 64),
+  name text,
+  photo text,
+  t timestamptz not null default now()
+);
+alter table public.community_profiles enable row level security;
+grant all on public.community_profiles to service_role;
+alter table public.community_posts add column if not exists badges text[] not null default '{}';
+alter table public.product_comments add column if not exists badges text[] not null default '{}';
+-- pozele de profil: bucket public, fișiere mici (jpeg ≤ 100 KB, 256 px), numite <device>.jpg
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+  values ('avatars', 'avatars', true, 204800, array['image/jpeg'])
+  on conflict (id) do nothing;

@@ -7,7 +7,7 @@
  * POST /api/feed { action: "like_post", device, id } · { action: "delete_post", device, id }
  * Blocările/interdicțiile/raportările sunt în /api/community (aceleași tabele).
  */
-import { admin, cleanDevice, cleanName, cleanText, moderate } from "./community+api";
+import { admin, cleanBadges, cleanDevice, cleanName, cleanText, moderate, photosFor } from "./community+api";
 
 const REPLY_TITLE: Record<string, (n: string) => string> = { ro: (n) => `${n} ți-a răspuns`, en: (n) => `${n} replied to you`, de: (n) => `${n} hat dir geantwortet` };
 /** Push la autorul postării când cineva îi răspunde (23 nov 2026, aprobat de Alex): cel mult unul la 30 de minute per postare, ca să nu enerveze. */
@@ -60,33 +60,35 @@ export async function GET(request: Request): Promise<Response> {
   }
   const postId = Number(u.searchParams.get("post"));
   if (Number.isFinite(postId) && postId > 0) {
-    const { data: p } = await db.from("community_posts").select("id, device, name, text, ref, t, likes, n_comments, hidden").eq("id", postId).maybeSingle();
+    const { data: p } = await db.from("community_posts").select("id, device, name, text, ref, t, likes, n_comments, hidden, badges").eq("id", postId).maybeSingle();
     if (!p || (p.hidden && p.device !== device)) return Response.json({ ok: false, reason: "not_found" }, { status: 404 });
-    const { data: rows } = await db.from("product_comments").select("id, device, name, text, t, likes").eq("post_id", postId).eq("hidden", false).order("t", { ascending: true }).limit(200);
-    const list = ((rows ?? []) as { id: number; device: string; name: string; text: string; t: string; likes: number }[]).filter((r) => !hidden.has(r.device) || r.device === device);
+    const { data: rows } = await db.from("product_comments").select("id, device, name, text, t, likes, badges").eq("post_id", postId).eq("hidden", false).order("t", { ascending: true }).limit(200);
+    const list = ((rows ?? []) as { id: number; device: string; name: string; text: string; t: string; likes: number; badges?: string[] }[]).filter((r) => !hidden.has(r.device) || r.device === device);
+    const photos = await photosFor(db, [p.device, ...list.map((r) => r.device)]);
     let liked = new Set<number>(); let likedPost = false;
     if (device) {
       if (list.length) { const { data } = await db.from("comment_likes").select("comment_id").eq("device", device).in("comment_id", list.map((r) => r.id)); liked = new Set(((data ?? []) as { comment_id: number }[]).map((x) => x.comment_id)); }
       const { data: pl } = await db.from("post_likes").select("post_id").eq("device", device).eq("post_id", postId).maybeSingle(); likedPost = !!pl;
     }
-    return Response.json({ ok: true, post: { id: p.id, name: p.name, text: p.text, ref: p.ref, t: p.t, likes: p.likes, liked: likedPost, n_comments: p.n_comments, mine: p.device === device },
-      comments: list.map((r) => ({ id: r.id, name: r.name, text: r.text, t: r.t, likes: r.likes, liked: liked.has(r.id), mine: r.device === device })) });
+    return Response.json({ ok: true, post: { id: p.id, name: p.name, text: p.text, ref: p.ref, t: p.t, likes: p.likes, liked: likedPost, n_comments: p.n_comments, mine: p.device === device, photo: photos[p.device] ?? null, badges: p.badges ?? [] },
+      comments: list.map((r) => ({ id: r.id, name: r.name, text: r.text, t: r.t, likes: r.likes, liked: liked.has(r.id), mine: r.device === device, photo: photos[r.device] ?? null, badges: r.badges ?? [] })) });
   }
   const country = (u.searchParams.get("country") ?? "").toUpperCase().slice(0, 2);
   const before = u.searchParams.get("before");
-  let q = db.from("community_posts").select("id, device, name, text, ref, t, likes, n_comments").eq("hidden", false).order("t", { ascending: false }).limit(30);
+  let q = db.from("community_posts").select("id, device, name, text, ref, t, likes, n_comments, badges").eq("hidden", false).order("t", { ascending: false }).limit(30);
   if (country) q = q.eq("country", country);
   if (before) q = q.lt("t", before);
   const { data } = await q;
-  const posts = ((data ?? []) as { id: number; device: string; name: string; text: string; ref: Ref; t: string; likes: number; n_comments: number }[]).filter((p) => !hidden.has(p.device) || p.device === device);
+  const posts = ((data ?? []) as { id: number; device: string; name: string; text: string; ref: Ref; t: string; likes: number; n_comments: number; badges?: string[] }[]).filter((p) => !hidden.has(p.device) || p.device === device);
+  const photos = await photosFor(db, posts.map((p) => p.device));
   let liked = new Set<number>();
   if (device && posts.length) { const { data: pl } = await db.from("post_likes").select("post_id").eq("device", device).in("post_id", posts.map((p) => p.id)); liked = new Set(((pl ?? []) as { post_id: number }[]).map((x) => x.post_id)); }
-  return Response.json({ ok: true, posts: posts.map((p) => ({ id: p.id, name: p.name, text: p.text, ref: p.ref, t: p.t, likes: p.likes, liked: liked.has(p.id), n_comments: p.n_comments, mine: p.device === device })) });
+  return Response.json({ ok: true, posts: posts.map((p) => ({ id: p.id, name: p.name, text: p.text, ref: p.ref, t: p.t, likes: p.likes, liked: liked.has(p.id), n_comments: p.n_comments, mine: p.device === device, photo: photos[p.device] ?? null, badges: p.badges ?? [] })) });
 }
 
 export async function POST(request: Request): Promise<Response> {
   const db = admin(); if (!db) return Response.json({ ok: false, reason: "not_configured" }, { status: 503 });
-  let b: { action?: string; device?: string; name?: string; text?: string; ref?: unknown; lang?: string; country?: string; post?: number; id?: number };
+  let b: { action?: string; device?: string; name?: string; text?: string; ref?: unknown; lang?: string; country?: string; post?: number; id?: number; badges?: unknown };
   try { b = await request.json(); } catch { return Response.json({ ok: false }, { status: 400 }); }
   const device = cleanDevice(b.device); if (!device) return Response.json({ ok: false }, { status: 400 });
   const { data: ban } = await db.from("community_bans").select("device").eq("device", device).maybeSingle();
@@ -100,7 +102,7 @@ export async function POST(request: Request): Promise<Response> {
     if ((count ?? 0) >= 5) return Response.json({ ok: false, reason: "limit" }, { status: 429 });
     const m = await moderate(text, lang);
     if (!m.ok) return Response.json({ ok: false, reason: m.reason }, { status: m.reason === "unavailable" ? 503 : 422 });
-    const { data, error } = await db.from("community_posts").insert({ device, name, text, ref, lang, country: String(b.country ?? "").toUpperCase().slice(0, 2) || null }).select("id, t").single();
+    const { data, error } = await db.from("community_posts").insert({ device, name, text, ref, lang, country: String(b.country ?? "").toUpperCase().slice(0, 2) || null, badges: cleanBadges(b.badges) }).select("id, t").single();
     if (error) return Response.json({ ok: false, reason: error.message }, { status: 500 });
     return Response.json({ ok: true, id: data.id, t: data.t });
   }
@@ -111,7 +113,7 @@ export async function POST(request: Request): Promise<Response> {
     if ((count ?? 0) >= 20) return Response.json({ ok: false, reason: "limit" }, { status: 429 });
     const m = await moderate(text, lang);
     if (!m.ok) return Response.json({ ok: false, reason: m.reason }, { status: m.reason === "unavailable" ? 503 : 422 });
-    const { data, error } = await db.from("product_comments").insert({ post_id: post, device, name, text, lang, country: String(b.country ?? "").toUpperCase().slice(0, 2) || null }).select("id, t").single();
+    const { data, error } = await db.from("product_comments").insert({ post_id: post, device, name, text, lang, country: String(b.country ?? "").toUpperCase().slice(0, 2) || null, badges: cleanBadges(b.badges) }).select("id, t").single();
     if (error) return Response.json({ ok: false, reason: error.message }, { status: 500 });
     await db.rpc("bump_post", { pid: post, dlikes: 0, dcomments: 1 }).then(() => {}, () => {});
     await pushReply(db, post, device, name, text);

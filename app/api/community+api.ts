@@ -18,7 +18,14 @@ export const cleanDevice = (x: unknown) => { const d = String(x ?? "").slice(0, 
 export const cleanName = (x: unknown) => String(x ?? "").replace(/[\n\r\t]/g, " ").trim().slice(0, 40);
 export const cleanText = (x: unknown) => String(x ?? "").replace(/\r/g, "").replace(/[ \t]+/g, " ").trim().slice(0, 300);
 
-export type Comment = { id: number; name: string; text: string; t: string; likes: number; liked: boolean; mine: boolean };
+export type Comment = { id: number; name: string; text: string; t: string; likes: number; liked: boolean; mine: boolean; photo?: string | null; badges?: string[] };
+export const cleanBadges = (x: unknown) => Array.isArray(x) ? x.map(String).filter((b) => /^[a-z0-9_]{2,12}$/.test(b)).slice(0, 6) : [];
+/** pozele de profil pentru un set de telefoane (device → url) */
+export async function photosFor(db: DB, devices: string[]): Promise<Record<string, string>> {
+  const ids = [...new Set(devices)].filter(Boolean); if (!ids.length) return {};
+  const { data } = await db.from("community_profiles").select("device, photo").in("device", ids).not("photo", "is", null);
+  return Object.fromEntries(((data ?? []) as { device: string; photo: string }[]).map((r) => [r.device, r.photo]));
+}
 
 async function stats(db: DB, code: string, device: string) {
   const { data: scans } = await db.from("events").select("props, device").eq("name", "scan_result").eq("props->>code", code).limit(5000);
@@ -32,15 +39,16 @@ async function stats(db: DB, code: string, device: string) {
 
 async function comments(db: DB, code: string, device: string): Promise<Comment[]> {
   const [{ data: rows }, { data: blocks }, { data: bans }] = await Promise.all([
-    db.from("product_comments").select("id, device, name, text, t, likes").eq("code", code).eq("hidden", false).order("t", { ascending: false }).limit(50),
+    db.from("product_comments").select("id, device, name, text, t, likes, badges").eq("code", code).eq("hidden", false).order("t", { ascending: false }).limit(50),
     device ? db.from("community_blocks").select("blocked").eq("device", device) : Promise.resolve({ data: [] }),
     db.from("community_bans").select("device"),
   ]);
   const hidden = new Set([...((blocks ?? []) as { blocked: string }[]).map((b) => b.blocked), ...((bans ?? []) as { device: string }[]).map((b) => b.device)]);
-  const list = ((rows ?? []) as { id: number; device: string; name: string; text: string; t: string; likes: number }[]).filter((r) => !hidden.has(r.device) || r.device === device);
+  const list = ((rows ?? []) as { id: number; device: string; name: string; text: string; t: string; likes: number; badges?: string[] }[]).filter((r) => !hidden.has(r.device) || r.device === device);
+  const photos = await photosFor(db, list.map((r) => r.device));
   let liked = new Set<number>();
   if (device && list.length) { const { data } = await db.from("comment_likes").select("comment_id").eq("device", device).in("comment_id", list.map((r) => r.id)); liked = new Set(((data ?? []) as { comment_id: number }[]).map((x) => x.comment_id)); }
-  return list.map((r) => ({ id: r.id, name: r.name, text: r.text, t: r.t, likes: r.likes, liked: liked.has(r.id), mine: r.device === device }));
+  return list.map((r) => ({ id: r.id, name: r.name, text: r.text, t: r.t, likes: r.likes, liked: liked.has(r.id), mine: r.device === device, photo: photos[r.device] ?? null, badges: r.badges ?? [] }));
 }
 
 export async function GET(request: Request): Promise<Response> {
@@ -67,7 +75,7 @@ Answer ALLOW or BLOCK:`;
 
 export async function POST(request: Request): Promise<Response> {
   const db = admin(); if (!db) return Response.json({ ok: false, reason: "not_configured" }, { status: 503 });
-  let b: { action?: string; device?: string; code?: string; useful?: boolean; name?: string; text?: string; lang?: string; country?: string; id?: number; blocked?: string; reason?: string };
+  let b: { action?: string; device?: string; code?: string; useful?: boolean; name?: string; text?: string; lang?: string; country?: string; id?: number; blocked?: string; reason?: string; badges?: unknown };
   try { b = await request.json(); } catch { return Response.json({ ok: false }, { status: 400 }); }
   const device = cleanDevice(b.device); if (!device) return Response.json({ ok: false }, { status: 400 });
   const { data: ban } = await db.from("community_bans").select("device").eq("device", device).maybeSingle();
@@ -86,7 +94,7 @@ export async function POST(request: Request): Promise<Response> {
     if ((count ?? 0) >= 10) return Response.json({ ok: false, reason: "limit" }, { status: 429 });
     const m = await moderate(text, lang);
     if (!m.ok) return Response.json({ ok: false, reason: m.reason }, { status: m.reason === "unavailable" ? 503 : 422 });
-    const { data, error } = await db.from("product_comments").insert({ code, device, name, text, lang, country: String(b.country ?? "").slice(0, 2) || null }).select("id, t").single();
+    const { data, error } = await db.from("product_comments").insert({ code, device, name, text, lang, country: String(b.country ?? "").slice(0, 2) || null, badges: cleanBadges(b.badges) }).select("id, t").single();
     if (error) return Response.json({ ok: false, reason: error.message }, { status: 500 });
     return Response.json({ ok: true, id: data.id, t: data.t });
   }
