@@ -7,7 +7,7 @@ import { deviceRegion } from "./money";
 
 const API = process.env.EXPO_PUBLIC_API_URL || "https://curalife.expo.app";
 /** Comunitatea se arată abia după ce migrarea 0013 e rulată în Supabase (Alex, 22 nov 2026: „ține asta on hold”). Pe true mâine. */
-export const COMMUNITY_ON = false;
+export const COMMUNITY_ON = true;
 export type Comment = { id: number; name: string; text: string; t: string; likes: number; liked: boolean; mine: boolean; photo?: string | null; badges?: string[] };
 export type ProductCommunity = { scans: number; levels: { green: number; yellow: number; red: number }; useful: number; notUseful: number; myVote: boolean | null; comments: Comment[] };
 export type TopItem = { code: string; name: string; level: string; n: number };

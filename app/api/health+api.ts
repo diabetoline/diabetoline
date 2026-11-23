@@ -11,7 +11,7 @@ export async function GET(): Promise<Response> {
       const c = createClient(URL, key, { auth: { persistSession: false } });
       const { error } = await c.auth.admin.listUsers({ perPage: 1 });
       admin = error ? `not_admin: ${error.message}` : "admin";
-      for (const t of ["events", "products_user", "feedback", "push_tokens", "offer_sends", "orders_app"]) {
+      for (const t of ["events", "products_user", "feedback", "push_tokens", "offer_sends", "orders_app", "community_posts", "product_comments", "community_profiles"]) {
         const { count, error: e } = await c.from(t).select("*", { count: "exact", head: true });
         tables[t] = e ? `lipsă: ${e.message}` : count ?? 0;
       }
