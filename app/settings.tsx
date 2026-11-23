@@ -5,6 +5,7 @@ import * as Updates from "expo-updates";
 import Constants from "expo-constants";
 import { useEffect, useState } from "react";
 import * as Notifications from "expo-notifications";
+import { removeAvatar } from "../src/community";
 import buildInfo from "../src/build.json";
 import { deviceId } from "../src/analytics";
 import { useStore } from "../src/store";
@@ -114,7 +115,7 @@ export default function Settings() {
         </Card>
       )}
       <Button title={s.first_again} kind="soft" onPress={() => router.push("/welcome")} />
-      <Button title={s.reset} kind="danger" onPress={async () => { await resetAnalytics(); await AsyncStorage.clear(); set({ history: [], glucose: [], meals: [], meds: [], medLog: [], walks: [], weights: [], list: [], trash: [], cache: {}, name: "", profile: undefined, trialStart: undefined, welcomed: false, family: { role: null, consent: false, children: [] } }); }} />
+      <Button title={s.reset} kind="danger" onPress={async () => { await removeAvatar(); await resetAnalytics(); await AsyncStorage.clear(); set({ history: [], glucose: [], meals: [], meds: [], medLog: [], walks: [], weights: [], list: [], trash: [], cache: {}, name: "", profile: undefined, trialStart: undefined, welcomed: false, photo: undefined, communitySeen: undefined, family: { role: null, consent: false, children: [] } }); }} />
     </ScrollView>
   );
 }
