@@ -3,7 +3,15 @@
  * (`/api/community`), identitatea e doar prenumele scris de om; id-ul anonim al telefonului e cel din analytics.
  */
 import { deviceId, track } from "./analytics";
-import { deviceRegion } from "./money";
+import { getLocales } from "expo-localization";
+
+/** Țara comunității (Alex, 23 nov 2026: „fiecare țară cu comunitatea ei”): țara telefonului; fără țară, cea a limbii aplicației. */
+export function communityCountry(): string {
+  const region = getLocales().map((l) => l.regionCode).find(Boolean);
+  if (region) return region.toUpperCase();
+  const lang = (getLocales()[0]?.languageCode ?? "en").toLowerCase();
+  return lang === "ro" ? "RO" : lang === "de" ? "DE" : "GB";
+}
 
 const API = process.env.EXPO_PUBLIC_API_URL || "https://curalife.expo.app";
 /** Comunitatea se arată abia după ce migrarea 0013 e rulată în Supabase (Alex, 22 nov 2026: „ține asta on hold”). Pe true mâine. */
@@ -28,7 +36,7 @@ export async function loadProductCommunity(code: string): Promise<ProductCommuni
   } catch { return null; }
 }
 export async function vote(code: string, useful: boolean) { track("community_vote", { useful }); return post({ action: "vote", code, useful }); }
-export async function comment(code: string, name: string, text: string, lang: string, badges: string[] = []) { track("community_comment"); return post({ action: "comment", code, name, text, lang, country: deviceRegion(), badges }); }
+export async function comment(code: string, name: string, text: string, lang: string, badges: string[] = []) { track("community_comment"); return post({ action: "comment", code, name, text, lang, country: communityCountry(), badges }); }
 export async function like(id: number) { return post({ action: "like", id }); }
 export async function report(id: number, reason?: string) { track("community_report"); return post({ action: "report", id, reason }); }
 export async function blockAuthor(id: number) { return post({ action: "block_comment", id }); }
@@ -36,7 +44,7 @@ export async function remove(id: number) { return post({ action: "delete", id })
 
 export async function loadTop(): Promise<{ green: TopItem[]; red: TopItem[] } | null> {
   try {
-    const r = await fetch(`${API}/api/top?country=${encodeURIComponent(deviceRegion())}`);
+    const r = await fetch(`${API}/api/top?country=${encodeURIComponent(communityCountry())}`);
     if (!r.ok) return null; const j = (await r.json()) as { ok: boolean; green: TopItem[]; red: TopItem[] }; return j.ok ? { green: j.green, red: j.red } : null;
   } catch { return null; }
 }
@@ -55,7 +63,7 @@ async function postFeed(body: Record<string, unknown>): Promise<{ ok: boolean; r
 }
 export async function loadFeed(before?: string): Promise<Post[] | null> {
   try {
-    const r = await fetch(`${API}/api/feed?country=${encodeURIComponent(deviceRegion())}&device=${encodeURIComponent(deviceId() ?? "")}${before ? `&before=${encodeURIComponent(before)}` : ""}`);
+    const r = await fetch(`${API}/api/feed?country=${encodeURIComponent(communityCountry())}&device=${encodeURIComponent(deviceId() ?? "")}${before ? `&before=${encodeURIComponent(before)}` : ""}`);
     if (!r.ok) return null; const j = (await r.json()) as { ok: boolean; posts: Post[] }; return j.ok ? j.posts : null;
   } catch { return null; }
 }
@@ -65,8 +73,8 @@ export async function loadPost(id: number): Promise<{ post: Post; comments: Comm
     if (!r.ok) return null; const j = (await r.json()) as { ok: boolean; post: Post; comments: Comment[] }; return j.ok ? { post: j.post, comments: j.comments } : null;
   } catch { return null; }
 }
-export async function createPost(name: string, text: string, lang: string, ref?: PostRef, badges: string[] = []) { track("community_post", { ref: ref?.kind ?? "none" }); return postFeed({ action: "post", name, text, lang, ref: ref ?? null, country: deviceRegion(), badges }); }
-export async function commentPost(post: number, name: string, text: string, lang: string, badges: string[] = []) { track("community_comment", { on: "post" }); return postFeed({ action: "comment", post, name, text, lang, country: deviceRegion(), badges }); }
+export async function createPost(name: string, text: string, lang: string, ref?: PostRef, badges: string[] = []) { track("community_post", { ref: ref?.kind ?? "none" }); return postFeed({ action: "post", name, text, lang, ref: ref ?? null, country: communityCountry(), badges }); }
+export async function commentPost(post: number, name: string, text: string, lang: string, badges: string[] = []) { track("community_comment", { on: "post" }); return postFeed({ action: "comment", post, name, text, lang, country: communityCountry(), badges }); }
 export async function likePost(id: number) { return postFeed({ action: "like_post", id }); }
 export async function deletePost(id: number) { return postFeed({ action: "delete_post", id }); }
 export async function reportPost(id: number) { track("community_report", { on: "post" }); return post({ action: "report_post", id }); }
