@@ -1,0 +1,11 @@
+name: Push de comunitate
+# O dată pe zi, 16:00 ora României (iarna): încurajare de a posta, cel mult una la 7 zile per telefon (/api/community-nudge).
+on:
+  schedule:
+    - cron: "0 14 * * *"
+  workflow_dispatch:
+jobs:
+  nudge:
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -sS -X POST https://curalife.expo.app/api/community-nudge

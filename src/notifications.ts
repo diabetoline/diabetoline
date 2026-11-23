@@ -30,6 +30,7 @@ export function routeFor(data: Record<string, unknown> | null | undefined): stri
   if (kind === "message") return data?.linkId ? `/messages?link=${data.linkId}` : "/family";
   if (["alert", "high", "low", "heavy", "quiet", "noglu"].includes(kind)) return "/family/parent";
   if (kind === "meal") return "/plate";
+  if (kind === "community_feed") return "/community"; // încurajarea săptămânală de a posta
   if (kind === "community") return `/community/${encodeURIComponent(String(data?.id ?? ""))}`; // cineva ți-a răspuns la postare
   if (kind === "offer") return `/shop?offer=${encodeURIComponent(String(data?.url ?? ""))}&id=${encodeURIComponent(String(data?.id ?? ""))}`; // push comercial → comanda produsului // întrebarea zilei despre masă → poza la farfurie
   if (kind === "move") return "/move"; // întrebarea cu Da (15/30/60) / Nu — nu prima pagină (Alex, 16 nov 2026: „e confuz”)
