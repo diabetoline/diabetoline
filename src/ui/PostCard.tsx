@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import { useStore } from "../store";
 import { useTheme } from "../theme";
 import { useScale } from "./Primitives";
-import { blockPostAuthor, deletePost, likePost, reportPost, type Post } from "../community";
+import { blockPostAuthor, deletePost, flag, likePost, reportPost, type Post } from "../community";
 import { Avatar, Badges } from "./Avatar";
 
 export function ago(iso: string, s: { ago_now: string; ago_min: (n: number) => string; ago_h: (n: number) => string; ago_d: (n: number) => string }): string {
@@ -31,7 +31,7 @@ export function PostCard({ post, onChange, onRemoved, open }: { post: Post; onCh
         <Avatar name={post.name} photo={post.photo} size={40 * k} />
         <View style={{ flex: 1 }}>
           <Text style={{ color: t.ink, fontWeight: "800", fontSize: 16 * k }}>{post.name}{post.mine ? ` (${s.com_you})` : ""} <Badges badges={post.badges} size={13 * k} /></Text>
-          <Text style={{ color: t.muted, fontSize: 13 * k }}>{ago(post.t, s)}</Text>
+          <Text style={{ color: t.muted, fontSize: 13 * k }}>{ago(post.t, s)}{post.country && post.translated ? ` · ${flag(post.country)} ${s.translated}` : post.translated ? ` · ${s.translated}` : ""}</Text>
         </View>
         <Pressable onPress={onMore} hitSlop={10} accessibilityLabel={s.com_more}><Text style={{ color: t.muted, fontSize: 20 * k }}>···</Text></Pressable>
       </View>

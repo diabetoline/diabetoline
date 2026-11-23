@@ -19,13 +19,13 @@ export default function CommunityScreen() {
   const t = useTheme(); const k = useScale(); const router = useRouter();
   const { t: s, s: state, set } = useStore();
   const params = useLocalSearchParams<{ share?: string; code?: string; name?: string; level?: string; kind?: string; photo?: string }>();
-  const [posts, setPosts] = useState<Post[] | null>(null);
+  const [posts, setPosts] = useState<Post[] | null>(null); const [abroad, setAbroad] = useState<Post[]>([]);
   const [top, setTop] = useState<{ green: TopItem[]; red: TopItem[] } | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [text, setText] = useState(""); const [name, setName] = useState(state.name ?? "");
   const [ref, setRef] = useState<PostRef>(params.share && params.name ? { code: params.code, name: params.name, level: params.level || undefined, kind: params.kind === "plate" ? "plate" : "scan", photo: params.photo } : null);
   const [busy, setBusy] = useState(false); const [note, setNote] = useState("");
-  const load = useCallback(async () => { const [p, tp] = await Promise.all([loadFeed(), loadTop()]); if (p) setPosts(p); else if (!posts) setPosts([]); if (tp) setTop(tp); }, []);
+  const load = useCallback(async () => { const [p, tp] = await Promise.all([loadFeed(undefined, state.lang), loadTop()]); if (p) { setPosts(p.posts); setAbroad(p.abroad); } else if (!posts) setPosts([]); if (tp) setTop(tp); }, [state.lang]);
   useEffect(() => { track("community_view"); void load(); set({ communitySeen: new Date().toISOString() }); }, []);
   const onRefresh = async () => { setRefreshing(true); await load(); setRefreshing(false); };
   const onSend = async () => {
@@ -81,6 +81,13 @@ export default function CommunityScreen() {
       {posts === null ? <Text style={{ color: t.muted, fontSize: 16 * k }}>…</Text>
         : posts.length === 0 ? <Card><Text style={{ color: t.ink, fontSize: 17 * k, lineHeight: 25 * k }}>{s.feed_empty}</Text></Card>
         : posts.map((p) => <PostCard key={p.id} post={p} onChange={(np) => setPosts(posts.map((x) => x.id === np.id ? np : x))} onRemoved={() => setPosts(posts.filter((x) => x.id !== p.id))} />)}
+      {abroad.length > 0 ? (
+        <View style={{ gap: 10, marginTop: 6 }}>
+          <Label>{s.abroad_title}</Label>
+          <Hint>{s.abroad_sub}</Hint>
+          {abroad.map((p) => <PostCard key={`a${p.id}`} post={p} onChange={(np) => setAbroad(abroad.map((x) => x.id === np.id ? np : x))} onRemoved={() => setAbroad(abroad.filter((x) => x.id !== p.id))} />)}
+        </View>
+      ) : null}
       <WelcomePost />
       <View style={{ flexDirection: "row", gap: 8 }}>
         <View style={{ flex: 1 }}><Button title={"📷 " + s.tile_scan} kind="soft" onPress={() => router.push({ pathname: "/scan", params: { for: "community" } })} /></View>

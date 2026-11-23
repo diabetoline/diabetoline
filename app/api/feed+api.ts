@@ -8,6 +8,10 @@
  * Blocările/interdicțiile/raportările sunt în /api/community (aceleași tabele).
  */
 import { admin, cleanBadges, cleanDevice, cleanName, cleanText, moderate, photosFor } from "./community+api";
+import { lang2, translateMany } from "../../src/server/translate";
+
+/** Sub câte postări locale pe săptămână se arată „Din alte țări” (Alex, 23 nov 2026: „pe țară + din alte țări”). */
+const THIN_FEED = 10;
 
 const REPLY_TITLE: Record<string, (n: string) => string> = { ro: (n) => `${n} ți-a răspuns`, en: (n) => `${n} replied to you`, de: (n) => `${n} hat dir geantwortet` };
 /** Push la autorul postării când cineva îi răspunde (23 nov 2026, aprobat de Alex): cel mult unul la 30 de minute per postare, ca să nu enerveze. */
@@ -61,18 +65,21 @@ export async function GET(request: Request): Promise<Response> {
   }
   const postId = Number(u.searchParams.get("post"));
   if (Number.isFinite(postId) && postId > 0) {
-    const { data: p } = await db.from("community_posts").select("id, device, name, text, ref, t, likes, n_comments, hidden, badges").eq("id", postId).maybeSingle();
+    const { data: p } = await db.from("community_posts").select("id, device, name, text, ref, t, likes, n_comments, hidden, badges, lang, country").eq("id", postId).maybeSingle();
     if (!p || (p.hidden && p.device !== device)) return Response.json({ ok: false, reason: "not_found" }, { status: 404 });
-    const { data: rows } = await db.from("product_comments").select("id, device, name, text, t, likes, badges").eq("post_id", postId).eq("hidden", false).order("t", { ascending: true }).limit(200);
-    const list = ((rows ?? []) as { id: number; device: string; name: string; text: string; t: string; likes: number; badges?: string[] }[]).filter((r) => !hidden.has(r.device) || r.device === device);
+    const { data: rows } = await db.from("product_comments").select("id, device, name, text, t, likes, badges, lang").eq("post_id", postId).eq("hidden", false).order("t", { ascending: true }).limit(200);
+    const list = ((rows ?? []) as { id: number; device: string; name: string; text: string; t: string; likes: number; badges?: string[]; lang?: string | null }[]).filter((r) => !hidden.has(r.device) || r.device === device);
     const photos = await photosFor(db, [p.device, ...list.map((r) => r.device)]);
+    const lang = lang2(u.searchParams.get("lang"));
+    const tr = lang ? await translateMany(db, [{ kind: "p", id: p.id, text: p.text, lang: p.lang }, ...list.map((r) => ({ kind: "c" as const, id: r.id, text: r.text, lang: r.lang }))], lang, 12) : new Map<string, string>();
     let liked = new Set<number>(); let likedPost = false;
     if (device) {
       if (list.length) { const { data } = await db.from("comment_likes").select("comment_id").eq("device", device).in("comment_id", list.map((r) => r.id)); liked = new Set(((data ?? []) as { comment_id: number }[]).map((x) => x.comment_id)); }
       const { data: pl } = await db.from("post_likes").select("post_id").eq("device", device).eq("post_id", postId).maybeSingle(); likedPost = !!pl;
     }
-    return Response.json({ ok: true, post: { id: p.id, name: p.name, text: p.text, ref: p.ref, t: p.t, likes: p.likes, liked: likedPost, n_comments: p.n_comments, mine: p.device === device, photo: photos[p.device] ?? null, badges: p.badges ?? [] },
-      comments: list.map((r) => ({ id: r.id, name: r.name, text: r.text, t: r.t, likes: r.likes, liked: liked.has(r.id), mine: r.device === device, photo: photos[r.device] ?? null, badges: r.badges ?? [] })) });
+    const pt = tr.get(`p:${p.id}`);
+    return Response.json({ ok: true, post: { id: p.id, name: p.name, text: pt ?? p.text, translated: !!pt, country: p.country ?? null, ref: p.ref, t: p.t, likes: p.likes, liked: likedPost, n_comments: p.n_comments, mine: p.device === device, photo: photos[p.device] ?? null, badges: p.badges ?? [] },
+      comments: list.map((r) => { const ct = tr.get(`c:${r.id}`); return { id: r.id, name: r.name, text: ct ?? r.text, translated: !!ct, t: r.t, likes: r.likes, liked: liked.has(r.id), mine: r.device === device, photo: photos[r.device] ?? null, badges: r.badges ?? [] }; }) });
   }
   const country = (u.searchParams.get("country") ?? "").toUpperCase().slice(0, 2);
   const before = u.searchParams.get("before");
@@ -84,7 +91,25 @@ export async function GET(request: Request): Promise<Response> {
   const photos = await photosFor(db, posts.map((p) => p.device));
   let liked = new Set<number>();
   if (device && posts.length) { const { data: pl } = await db.from("post_likes").select("post_id").eq("device", device).in("post_id", posts.map((p) => p.id)); liked = new Set(((pl ?? []) as { post_id: number }[]).map((x) => x.post_id)); }
-  return Response.json({ ok: true, posts: posts.map((p) => ({ id: p.id, name: p.name, text: p.text, ref: p.ref, t: p.t, likes: p.likes, liked: liked.has(p.id), n_comments: p.n_comments, mine: p.device === device, photo: photos[p.device] ?? null, badges: p.badges ?? [] })) });
+  const shape = (p: typeof posts[number], extra: Record<string, unknown> = {}) => ({ id: p.id, name: p.name, text: p.text, ref: p.ref, t: p.t, likes: p.likes, liked: liked.has(p.id), n_comments: p.n_comments, mine: p.device === device, photo: photos[p.device] ?? null, badges: p.badges ?? [], ...extra });
+  // „Din alte țări”: doar la prima pagină, când țara are puține postări în ultima săptămână; textul tradus în limba telefonului
+  let abroad: ReturnType<typeof shape>[] = [];
+  const lang = lang2(u.searchParams.get("lang"));
+  if (country && lang && !before) {
+    const weekAgo = new Date(Date.now() - 7 * 864e5).toISOString();
+    const recent = posts.filter((p) => p.t >= weekAgo).length;
+    if (recent < THIN_FEED) {
+      const { data: ab } = await db.from("community_posts").select("id, device, name, text, ref, t, likes, n_comments, badges, lang, country").eq("hidden", false).neq("country", country).order("t", { ascending: false }).limit(15);
+      const list = ((ab ?? []) as (typeof posts[number] & { lang?: string | null; country?: string | null })[]).filter((p) => !hidden.has(p.device));
+      if (list.length) {
+        const [tr, ph] = await Promise.all([translateMany(db, list.map((p) => ({ kind: "p" as const, id: p.id, text: p.text, lang: p.lang })), lang), photosFor(db, list.map((p) => p.device))]);
+        Object.assign(photos, ph);
+        if (device) { const { data: pl } = await db.from("post_likes").select("post_id").eq("device", device).in("post_id", list.map((p) => p.id)); for (const x of (pl ?? []) as { post_id: number }[]) liked.add(x.post_id); }
+        abroad = list.map((p) => { const tt = tr.get(`p:${p.id}`); return shape(p, { text: tt ?? p.text, translated: !!tt, country: p.country ?? null }); });
+      }
+    }
+  }
+  return Response.json({ ok: true, posts: posts.map((p) => shape(p)), abroad });
 }
 
 export async function POST(request: Request): Promise<Response> {

@@ -14,7 +14,7 @@ export function useLatestPost(): Post | null {
   useEffect(() => {
     if (!COMMUNITY_ON) return;
     if (cache && Date.now() - cache.at < 10 * 60e3) { setPost(cache.post); return; }
-    void loadFeed().then((posts) => { const p = (posts ?? []).find((x) => Date.now() - new Date(x.t).getTime() < 48 * 3600e3) ?? null; cache = { at: Date.now(), post: p }; setPost(p); });
+    void loadFeed().then((r) => { const p = (r?.posts ?? []).find((x) => Date.now() - new Date(x.t).getTime() < 48 * 3600e3) ?? null; cache = { at: Date.now(), post: p }; setPost(p); });
   }, []);
   return post;
 }

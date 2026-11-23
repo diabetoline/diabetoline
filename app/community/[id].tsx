@@ -16,7 +16,7 @@ export default function PostScreen() {
   const { t: s, s: state, set } = useStore();
   const [post, setPost] = useState<Post | null>(null); const [comments, setComments] = useState<Comment[]>([]); const [gone, setGone] = useState(false);
   const [text, setText] = useState(""); const [name, setName] = useState(state.name ?? ""); const [busy, setBusy] = useState(false); const [note, setNote] = useState("");
-  const load = async () => { const r = await loadPost(Number(id)); if (r) { setPost(r.post); setComments(r.comments); } else setGone(true); };
+  const load = async () => { const r = await loadPost(Number(id), state.lang); if (r) { setPost(r.post); setComments(r.comments); } else setGone(true); };
   useEffect(() => { void load(); }, [id]);
   const onSend = async () => {
     const nm = name.trim(); const tx = text.trim();
@@ -46,7 +46,7 @@ export default function PostScreen() {
             <View key={c.id} style={{ backgroundColor: t.surface, borderRadius: 14, padding: 12, gap: 6, marginLeft: 16 }}>
               <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
                 <Avatar name={c.name} photo={c.photo} size={30 * k} />
-                <Text style={{ flex: 1, color: t.ink, fontWeight: "800", fontSize: 15 * k }}>{c.name}{c.mine ? ` (${s.com_you})` : ""} <Badges badges={c.badges} size={12 * k} /> <Text style={{ color: t.muted, fontWeight: "400", fontSize: 13 * k }}>· {ago(c.t, s)}</Text></Text>
+                <Text style={{ flex: 1, color: t.ink, fontWeight: "800", fontSize: 15 * k }}>{c.name}{c.mine ? ` (${s.com_you})` : ""} <Badges badges={c.badges} size={12 * k} /> <Text style={{ color: t.muted, fontWeight: "400", fontSize: 13 * k }}>· {ago(c.t, s)}{c.translated ? ` · ${s.translated}` : ""}</Text></Text>
                 <Pressable onPress={() => onMore(c)} hitSlop={10} accessibilityLabel={s.com_more}><Text style={{ color: t.muted, fontSize: 18 * k }}>···</Text></Pressable>
               </View>
               <Text style={{ color: t.ink, fontSize: 16 * k, lineHeight: 23 * k }}>{c.text}</Text>

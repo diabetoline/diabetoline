@@ -16,7 +16,7 @@ export function communityCountry(): string {
 const API = process.env.EXPO_PUBLIC_API_URL || "https://curalife.expo.app";
 /** Comunitatea se arată abia după ce migrarea 0013 e rulată în Supabase (Alex, 22 nov 2026: „ține asta on hold”). Pe true mâine. */
 export const COMMUNITY_ON = true;
-export type Comment = { id: number; name: string; text: string; t: string; likes: number; liked: boolean; mine: boolean; photo?: string | null; badges?: string[] };
+export type Comment = { id: number; name: string; text: string; t: string; likes: number; liked: boolean; mine: boolean; photo?: string | null; badges?: string[]; translated?: boolean };
 export type ProductCommunity = { scans: number; levels: { green: number; yellow: number; red: number }; useful: number; notUseful: number; myVote: boolean | null; comments: Comment[] };
 export type TopItem = { code: string; name: string; level: string; n: number };
 
@@ -51,7 +51,10 @@ export async function loadTop(): Promise<{ green: TopItem[]; red: TopItem[] } | 
 
 // ——— feed-ul comunității (postări + comentarii la postări) ———
 export type PostRef = { code?: string; name: string; level?: string; kind?: "scan" | "plate"; photo?: string } | null;
-export type Post = { id: number; name: string; text: string; ref: PostRef; t: string; likes: number; liked: boolean; n_comments: number; mine: boolean; photo?: string | null; badges?: string[] };
+export type Post = { id: number; name: string; text: string; ref: PostRef; t: string; likes: number; liked: boolean; n_comments: number; mine: boolean; photo?: string | null; badges?: string[]; translated?: boolean; country?: string | null };
+/** Steagul țării (🇷🇴) din codul de două litere. */
+export const flag = (cc?: string | null) => cc && /^[A-Z]{2}$/i.test(cc) ? String.fromCodePoint(...[...cc.toUpperCase()].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65)) : "";
+const appLang = () => (getLocales()[0]?.languageCode ?? "en").toLowerCase().slice(0, 2);
 
 async function postFeed(body: Record<string, unknown>): Promise<{ ok: boolean; reason?: string; status: number; data?: Record<string, unknown> }> {
   const device = deviceId(); if (!device) return { ok: false, status: 0, reason: "no_device" };
@@ -61,15 +64,16 @@ async function postFeed(body: Record<string, unknown>): Promise<{ ok: boolean; r
     return { ok: r.ok && j.ok !== false, status: r.status, reason: typeof j.reason === "string" ? j.reason : undefined, data: j };
   } catch { return { ok: false, status: 0, reason: "network" }; }
 }
-export async function loadFeed(before?: string): Promise<Post[] | null> {
+/** Feed-ul țării + „Din alte țări” (traduse, doar când țara are puține postări; Alex, 23 nov 2026). `lang` = limba aplicației, dacă e dată. */
+export async function loadFeed(before?: string, lang?: string): Promise<{ posts: Post[]; abroad: Post[] } | null> {
   try {
-    const r = await fetch(`${API}/api/feed?country=${encodeURIComponent(communityCountry())}&device=${encodeURIComponent(deviceId() ?? "")}${before ? `&before=${encodeURIComponent(before)}` : ""}`);
-    if (!r.ok) return null; const j = (await r.json()) as { ok: boolean; posts: Post[] }; return j.ok ? j.posts : null;
+    const r = await fetch(`${API}/api/feed?country=${encodeURIComponent(communityCountry())}&lang=${encodeURIComponent(lang ?? appLang())}&device=${encodeURIComponent(deviceId() ?? "")}${before ? `&before=${encodeURIComponent(before)}` : ""}`);
+    if (!r.ok) return null; const j = (await r.json()) as { ok: boolean; posts: Post[]; abroad?: Post[] }; return j.ok ? { posts: j.posts, abroad: j.abroad ?? [] } : null;
   } catch { return null; }
 }
-export async function loadPost(id: number): Promise<{ post: Post; comments: Comment[] } | null> {
+export async function loadPost(id: number, lang?: string): Promise<{ post: Post; comments: Comment[] } | null> {
   try {
-    const r = await fetch(`${API}/api/feed?post=${id}&device=${encodeURIComponent(deviceId() ?? "")}`);
+    const r = await fetch(`${API}/api/feed?post=${id}&lang=${encodeURIComponent(lang ?? appLang())}&device=${encodeURIComponent(deviceId() ?? "")}`);
     if (!r.ok) return null; const j = (await r.json()) as { ok: boolean; post: Post; comments: Comment[] }; return j.ok ? { post: j.post, comments: j.comments } : null;
   } catch { return null; }
 }
