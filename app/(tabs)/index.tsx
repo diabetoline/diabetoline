@@ -63,7 +63,8 @@ export default function Home() {
     <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }} edges={["top"]}>
       <ScrollView contentContainerStyle={st.wrap}>
         <DayHeader />
-        {trialDaysLeft(state.trialStart) > 0 && (
+        {/* abonatul nu mai vede numărătoarea probei (Alex, 24 nov 2026) */}
+        {!state.entitled && trialDaysLeft(state.trialStart) > 0 && (
           <Pressable onPress={() => PAYMENTS_LIVE && !state.entitled && router.push({ pathname: "/paywall", params: { from: "trial_home" } })} accessibilityRole="button">
             <Hint style={{ textAlign: "center" }}>{s.pay_left(trialDaysLeft(state.trialStart))}{PAYMENTS_LIVE && !state.entitled ? ` · ${s.pay_now_link}` : ""}</Hint>
           </Pressable>
