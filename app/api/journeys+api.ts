@@ -32,14 +32,19 @@ export async function GET(request: Request): Promise<Response> {
   const { data: inst, error } = await admin.from("events").select("device, t").eq("name", "app_install").gte("t", since).neq("device", "server-ai").order("t", { ascending: true }).limit(2000);
   if (error) return Response.json({ ok: false, reason: error.message }, { status: 500 });
   const cutoff = Date.now() - 864e5;
-  const installs = (inst ?? []).filter((r) => new Date(r.t).getTime() < cutoff) as { device: string; t: string }[];
+  // un singur app_install per telefon (până la 23 nov coada îl retrimitea → rânduri duble)
+  const seen = new Set<string>();
+  const installs = ((inst ?? []) as { device: string; t: string }[]).filter((r) => new Date(r.t).getTime() < cutoff && !seen.has(r.device) && seen.add(r.device));
   const devices = installs.map((r) => r.device);
   if (!devices.length) return Response.json({ ok: true, days, n: 0 });
-  // toate evenimentele acestor telefoane (în loturi de 200 de device-uri)
+  // toate evenimentele acestor telefoane: loturi de 50 de device-uri, paginat (un telefon activ are sute de evenimente)
   const all: Ev[] = [];
-  for (let i = 0; i < devices.length; i += 200) {
-    const { data } = await admin.from("events").select("device, name, props, country, platform, build, source, t").in("device", devices.slice(i, i + 200)).order("t", { ascending: true }).limit(20000);
-    for (const e of (data ?? []) as Ev[]) all.push(e);
+  for (let i = 0; i < devices.length; i += 50) {
+    for (let from = 0; ; from += 1000) {
+      const { data } = await admin.from("events").select("device, name, props, country, platform, build, source, t").in("device", devices.slice(i, i + 50)).order("t", { ascending: true }).range(from, from + 999);
+      for (const e of (data ?? []) as Ev[]) all.push(e);
+      if (!data || data.length < 1000) break;
+    }
   }
   const byDev = new Map<string, Ev[]>();
   for (const e of all) { const a = byDev.get(e.device); if (a) a.push(e); else byDev.set(e.device, [e]); }
