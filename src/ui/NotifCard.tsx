@@ -16,9 +16,10 @@ export function NotifCard() {
   const { t: s, s: state, set } = useStore();
   const [show, setShow] = useState(false);
   useEffect(() => {
-    if (state.notifAsked || state.history.length === 0) { setShow(false); return; }
+    // după primul verdict sau, fără verdict, de la a doua pornire (24 nov 2026: 0 din 101 instalați fuseseră întrebați)
+    if (state.notifAsked || (state.history.length === 0 && (state.opens ?? 0) < 2)) { setShow(false); return; }
     Notifications.getPermissionsAsync().then((p) => setShow(!p.granted && p.canAskAgain)).catch(() => setShow(false));
-  }, [state.notifAsked, state.history.length]);
+  }, [state.notifAsked, state.history.length, state.opens]);
   if (!show) return null;
   const allow = async () => {
     set({ notifAsked: true });

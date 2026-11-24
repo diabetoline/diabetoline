@@ -27,7 +27,7 @@ import { slotForHour } from "../../src/store";
  */
 export default function Home() {
   const t = useTheme(); const k = useScale();
-  const { t: s, s: state, markMed } = useStore();
+  const { t: s, s: state, markMed, set } = useStore();
   const router = useRouter();
   const today = dayKey(Date.now());
   const todayMeals = state.meals.filter((m) => dayKey(m.t) === today);
@@ -42,6 +42,8 @@ export default function Home() {
   const fresh = state.history.length === 0 && state.meals.length === 0 && state.glucose.length === 0;
   const latestPost = useLatestPost();
   useEffect(() => { if (!state.welcomed) router.replace("/welcome"); }, [state.welcomed]);
+  // numărul pornirilor (24 nov 2026): cardul de notificări apare și fără verdict, de la a doua pornire
+  useEffect(() => { set({ opens: (state.opens ?? 0) + 1 }); }, []);
   // după probă (24 nov 2026): paywall-ul pe tot ecranul la prima deschidere după expirare, apoi cel mult o dată la 7 zile
   const shownPaywall = useRef(false);
   useEffect(() => {

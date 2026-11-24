@@ -6,7 +6,8 @@ aplicația îl descarcă o dată la 14 zile.
 
 Sursa: exportul CSV complet al OFF (~1 GB gz), citit în flux, o singură trecere pentru toate țările.
 (API-ul de căutare nu dă mai mult de 1.000 de rezultate pe căutare și răspunde des 503 — pe 15–16 nov 2026 două rulări au picat.)
-Folosire: python3 scripts/pack.py 5000 RO DE GB US AT HU
+Folosire: python3 scripts/pack.py 5000 RO=20000 DE GB US AT HU   (ȚARĂ=N suprascrie limita pentru acea țară;
+24 nov 2026: în RO 30–50 % din scanări ieșeau „negăsit”, deci RO primește 20.000 de produse, ~9 MB)
 """
 import csv, gzip, heapq, io, json, sys, time, urllib.request
 
@@ -19,7 +20,12 @@ def num(x):
     try: return float(x)
     except (TypeError, ValueError): return None
 
-def main(limit, ccs):
+def main(limit, specs):
+    limits = {}
+    for sp in specs:
+        cc, _, n = sp.partition("=")
+        limits[cc] = int(n) if n else limit
+    ccs = list(limits)
     heaps = {cc: [] for cc in ccs}          # (unique_scans_n, idx, slim)
     tags = {cc: COUNTRY[cc] for cc in ccs}
     req = urllib.request.Request(CSV_URL, headers={"User-Agent": "Diabetoline/1.0 (contact@diabetoline.com)"})
@@ -49,7 +55,7 @@ def main(limit, ccs):
             cats = (row.get("categories_tags") or "").split(",")
             if cats and cats[0]: slim["categories_tags"] = cats[-6:]
             ing = row.get("ingredients_text")
-            if ing: slim["ingredients_text"] = ing[:400]
+            if ing: slim["ingredients_text"] = ing[:250]
             n = {}
             for k in NUTR:
                 v = num(row.get(k))
@@ -59,7 +65,7 @@ def main(limit, ccs):
             if sq is not None: slim["serving_quantity"] = sq
             for cc in mine:
                 h = heaps[cc]; item = (scans, kept, slim)
-                if len(h) < limit: heapq.heappush(h, item)
+                if len(h) < limits[cc]: heapq.heappush(h, item)
                 elif scans > h[0][0]: heapq.heapreplace(h, item)
             kept += 1
     print(rows, "rânduri citite în", int(time.time() - t0), "s", file=sys.stderr)

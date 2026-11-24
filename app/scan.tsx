@@ -42,6 +42,21 @@ export default function ScanScreen() {
   const [focused, setFocused] = useState(true);
   useFocusEffect(useCallback(() => { setFocused(true); return () => setFocused(false); }, []));
   const allowCam = () => (perm && !perm.granted && !perm.canAskAgain ? Linking.openSettings() : requestPerm());
+  // 24 nov 2026 (din evenimente: ~10 oameni au deschis scannerul și n-au citit niciun cod): cerem camera singuri la prima deschidere,
+  // numărăm refuzurile (`camera_denied`) și, după 8 s fără cod, spunem ce să facă (`scan_timeout`)
+  const asked = useRef(false); const denied = useRef(false);
+  useEffect(() => {
+    if (!perm) return;
+    if (!perm.granted && perm.canAskAgain && !asked.current) { asked.current = true; track("scan_open", { cam: "ask" }); void requestPerm(); return; }
+    if (!asked.current) { asked.current = true; track("scan_open", { cam: perm.granted ? "ok" : "denied" }); }
+    if (!perm.granted && !perm.canAskAgain && !denied.current) { denied.current = true; track("camera_denied"); }
+  }, [perm]);
+  const [slow, setSlow] = useState(false); const readAny = useRef(false);
+  useEffect(() => {
+    if (!perm?.granted) return;
+    const id = setTimeout(() => { if (!readAny.current) { setSlow(true); track("scan_timeout"); } }, 8000);
+    return () => clearTimeout(id);
+  }, [perm?.granted]);
   const [torch, setTorch] = useState(false);
   const [typing, setTyping] = useState(false);
   const [code, setCode] = useState("");
@@ -57,6 +72,7 @@ export default function ScanScreen() {
   const go = async (c: string) => {
     if (busy) return;
     if (!gate("scan")) return;
+    readAny.current = true; setSlow(false);
     setBusy(c); setErr(null);
     const r = await lookupProduct(c, state.cache, state.lang);
     setBusy(null);
@@ -120,7 +136,8 @@ export default function ScanScreen() {
       ) : null) : perm == null ? null : (
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 24, gap: 14 }}>
           <Hint style={{ textAlign: "center", color: "#fff" }}>{s.cam_denied}</Hint>
-          <Button title={s.cam_allow} onPress={allowCam} />
+          <Button title={perm.canAskAgain ? s.cam_allow : s.cam_settings} onPress={allowCam} />
+          <Button title={"🍎 " + s.basics_btn} kind="soft" onPress={() => router.push({ pathname: "/basics", params: { from: "scan" } })} />
         </View>
       )}
       <View style={[StyleSheet.absoluteFill, st.overlay, { paddingTop: ins.top, paddingBottom: ins.bottom }]} pointerEvents="box-none">
@@ -164,16 +181,15 @@ export default function ScanScreen() {
             ) : err ? (
               <View style={{ gap: 10 }}>
                 <Text style={st.hint}>{err.kind === "notfound" ? s.not_found : s.network}</Text>
-                <View style={{ flexDirection: "row", gap: 8 }}>
-                  {err.kind === "notfound" && <View style={{ flex: 1 }}><Button title={s.add_product} onPress={() => router.push({ pathname: "/product/add", params: { code: err.code, from: "scan" } })} /></View>}
-                  <View style={{ flex: 1 }}><Button title={"🍎 " + s.basics_btn} kind="soft" onPress={() => router.push({ pathname: "/basics", params: { from: "scan" } })} /></View>
-                </View>
+                {/* 24 nov 2026: poza la etichetă e butonul mare, pe toată lățimea — e calea principală la „negăsit” */}
+                {err.kind === "notfound" && <Button title={s.add_product} size="xl" onPress={() => router.push({ pathname: "/product/add", params: { code: err.code, from: "scan" } })} />}
+                <Button title={"🍎 " + s.basics_btn} kind="soft" onPress={() => router.push({ pathname: "/basics", params: { from: "scan" } })} />
                 <Text style={st.hint2}>{s.shop_next}</Text>
               </View>
             ) : (
               <>
-                <Text style={st.hint}>{s.scan_hint}</Text>
-                <Text style={st.hint2}>{s.scan_distance}</Text>
+                <Text style={st.hint}>{slow && !hits.length ? s.scan_slow : s.scan_hint}</Text>
+                {!(slow && !hits.length) && <Text style={st.hint2}>{s.scan_distance}</Text>}
                 {typing ? (
                   <View style={{ flexDirection: "row", gap: 8, marginTop: 8 }}>
                     <TextInput value={code} onChangeText={setCode} onSubmitEditing={submit} placeholder="5940000000000" placeholderTextColor="#999"

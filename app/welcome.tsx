@@ -8,6 +8,7 @@ import { useTheme } from "../src/theme";
 import { Icon, type IconName } from "../src/ui/Icon";
 import { Button, Hint, useScale } from "../src/ui/Primitives";
 import { PAYMENTS_LIVE } from "../src/access";
+import { BASICS, basicProduct } from "../src/basics";
 
 /**
  * Prima deschidere (20 nov 2026, Alex: „mai întâi scanarea, apoi chestionarul”; 3 din 4 renunțau la chestionarul de 8 pași):
@@ -33,7 +34,7 @@ const Title = ({ children, t, k }: { children: string; t: Th; k: number }) => <T
 export default function Welcome() {
   const t = useTheme(); const k = useScale(); const router = useRouter();
   const { part } = useLocalSearchParams<{ part?: string }>();
-  const { t: s, s: state, set } = useStore();
+  const { t: s, s: state, set, addUserProduct } = useStore();
   const [step, setStep] = useState<Step>(part === "who" ? "who" : "start");
   const [who, setWho] = useState<Profile["forWhom"] | null>(state.profile?.forWhom ?? null);
   const [name, setName] = useState(state.name ?? "");
@@ -45,6 +46,16 @@ export default function Welcome() {
     return state.trialStart ?? Date.now();
   };
   const scanFirst = () => { set({ welcomed: true, trialStart: trialStart() }); router.replace("/scan"); };
+  /** 24 nov 2026: 26 din 101 instalați au închis primul ecran fără să apese nimic (instalează din reclamă, fără produs în mână) —
+   *  trei exemple dau verdictul pe loc (verde / galben / roșu), iar „Caută după nume” deschide lista de alimente de bază. */
+  const DEMO: { id: string; emoji: string }[] = [{ id: "yogurt-plain", emoji: "🥛" }, { id: "apple", emoji: "🍎" }, { id: "white-bread", emoji: "🍞" }];
+  const demo = (id: string) => {
+    const b = BASICS.find((x) => x.id === id); if (!b) return;
+    const p = basicProduct(b, state.lang); addUserProduct(p); track("welcome_demo", { id });
+    set({ welcomed: true, trialStart: trialStart() });
+    router.replace({ pathname: "/product/[code]", params: { code: p.code, from: "welcome" } });
+  };
+  const searchFirst = () => { track("welcome_demo", { id: "search" }); set({ welcomed: true, trialStart: trialStart() }); router.replace({ pathname: "/basics", params: { from: "welcome" } }); };
 
   const finish = () => {
     const profile: Profile = { ...state.profile, forWhom: who ?? "me", concerns: state.profile?.concerns ?? [] };
@@ -87,6 +98,17 @@ export default function Welcome() {
           <Text style={{ color: t.muted, fontSize: 19 * k, textAlign: "center", lineHeight: 27 * k }}>{s.w_hero_text}</Text>
         </View>
         <Button title={s.w_scan_first} size="xl" onPress={scanFirst} />
+        <View style={{ gap: 10 }}>
+          <Text style={{ color: t.muted, fontSize: 16 * k, textAlign: "center" }}>{s.w_demo_title}</Text>
+          <View style={{ flexDirection: "row", gap: 8 }}>
+            {DEMO.map((d) => { const b = BASICS.find((x) => x.id === d.id); return (
+              <Pressable key={d.id} onPress={() => demo(d.id)} accessibilityRole="button" style={{ flex: 1, backgroundColor: t.surface, borderWidth: 1, borderColor: t.line, borderRadius: 14, paddingVertical: 12, paddingHorizontal: 6, alignItems: "center", gap: 4 }}>
+                <Text style={{ fontSize: 26 }}>{d.emoji}</Text>
+                <Text style={{ color: t.ink, fontSize: 14 * k, fontWeight: "700", textAlign: "center" }} numberOfLines={2}>{b?.name[state.lang].split(",")[0]}</Text>
+              </Pressable>); })}
+          </View>
+          <Pressable onPress={searchFirst} hitSlop={8} accessibilityRole="button"><Text style={{ color: t.accent, fontSize: 16 * k, textAlign: "center", fontWeight: "700" }}>{s.w_demo_search} ›</Text></Pressable>
+        </View>
         <Pressable onPress={() => setStep("who")} hitSlop={12} accessibilityRole="button">
           <Text style={{ color: t.muted, fontSize: 17 * k, textAlign: "center", textDecorationLine: "underline" }}>{s.w_later}</Text>
         </Pressable>

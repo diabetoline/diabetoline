@@ -9,7 +9,7 @@ const URL = process.env.SUPABASE_URL ?? "https://boxyorzzmvjezaspestt.supabase.c
 export const EVENT_NAMES = new Set([
   "app_install", "app_open", "welcome_step", "welcome_done", "trial_start", "paywall_view", "purchase", "restore", "stay_free",
   "scan_result", "scan_notfound", "scan_network", "glucose_logged", "plate_result", "ask_used", "ideas_used", "report_made",
-  "family_linked", "family_code", "med_added", "list_added", "reco_tap", "reco_dismiss", "feedback_sent", "data_wiped", "shop_mode", "shop_trip", "basics_pick", "basics_guess", "shop_order_tap", "offer_open", "push_registered", "purchase_product", "offer_sent", "install_referrer", "notif_test", "notif_perm", "pay_prices", "pay_fail", "community_vote", "community_comment", "community_report", "community_post", "community_view", "community_photo",
+  "family_linked", "family_code", "med_added", "list_added", "reco_tap", "reco_dismiss", "feedback_sent", "data_wiped", "shop_mode", "shop_trip", "basics_pick", "basics_guess", "shop_order_tap", "offer_open", "push_registered", "purchase_product", "offer_sent", "install_referrer", "notif_test", "notif_perm", "pay_prices", "pay_fail", "community_vote", "community_comment", "community_report", "community_post", "community_view", "community_photo", "welcome_demo", "scan_open", "camera_denied", "scan_timeout",
 ]);
 const short = (v: unknown, n: number) => (typeof v === "string" ? v.slice(0, n) : null);
 
