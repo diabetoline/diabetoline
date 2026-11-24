@@ -10,6 +10,7 @@ import { Quip } from "../../src/ui/Quip";
 import { Icon } from "../../src/ui/Icon";
 import { WeightCheckin } from "../../src/ui/Checkins";
 import { Trend } from "../../src/ui/Trend";
+import { A1cCard } from "../../src/ui/A1cCard";
 
 import type { GluEntry, MealEntry, MedLog, Walk, Weight, Trip } from "../../src/store";
 type Item = { t: number; kind: "glu"; data: GluEntry } | { t: number; kind: "meal"; data: MealEntry } | { t: number; kind: "med"; data: MedLog } | { t: number; kind: "walk"; data: Walk } | { t: number; kind: "weight"; data: Weight } | { t: number; kind: "trip"; data: Trip };
@@ -65,6 +66,7 @@ export default function Journal() {
 
         {(state.glucose.length > 0 || state.meals.length > 0) && <DaysCalendar />}
         <Trend />
+        <A1cCard />
         <WeightCheckin always />
 
         {dueMeds.length > 0 && (
