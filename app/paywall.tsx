@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Alert, Text, View } from "react-native";
+import { Alert, ScrollView, Text, View } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { trialDaysLeft } from "../src/money";
@@ -53,7 +53,8 @@ export default function Paywall() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }}>
       <Stack.Screen options={{ headerShown: false }} />
-      <View style={{ flex: 1, padding: 24, gap: 18, justifyContent: "center" }}>
+      {/* derulabil (24 nov 2026, iPhone-ul lui Alex cu text mare: titlul intra sub bara de sus și iconița ieșea din ecran) */}
+      <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 24, gap: 18, justifyContent: "center" }} showsVerticalScrollIndicator={false}>
         <View style={{ alignItems: "center" }}>
           <View style={{ width: 96, height: 96, borderRadius: 30, backgroundColor: t.accentSoft, alignItems: "center", justifyContent: "center" }}><Icon name="care" size={54} color={t.accent} strokeWidth={1.8} /></View>
         </View>
@@ -84,7 +85,7 @@ export default function Paywall() {
         )}
         {PAYMENTS_LIVE && <Button title={s.pay_restore} kind="ghost" disabled={busy} onPress={doRestore} />}
         <Hint style={{ textAlign: "center" }}>{s.pay_free_note}</Hint>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
