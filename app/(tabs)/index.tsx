@@ -12,6 +12,8 @@ import { DayHeader } from "../../src/ui/DayHeader";
 import { DayPlan } from "../../src/ui/DayPlan";
 import { RecoCard } from "../../src/ui/RecoCard";
 import { trialDaysLeft } from "../../src/money";
+import { PAYMENTS_LIVE, tier } from "../../src/access";
+import { TrialEndedCard } from "../../src/ui/TrialEndedCard";
 import { MessageCard } from "../../src/ui/MessageCard";
 import { ReviewCard } from "../../src/ui/ReviewCard";
 import { NotifCard } from "../../src/ui/NotifCard";
@@ -40,6 +42,14 @@ export default function Home() {
   const fresh = state.history.length === 0 && state.meals.length === 0 && state.glucose.length === 0;
   const latestPost = useLatestPost();
   useEffect(() => { if (!state.welcomed) router.replace("/welcome"); }, [state.welcomed]);
+  // după probă (24 nov 2026): paywall-ul pe tot ecranul la prima deschidere după expirare, apoi cel mult o dată la 7 zile
+  const shownPaywall = useRef(false);
+  useEffect(() => {
+    if (!PAYMENTS_LIVE || !state.welcomed || shownPaywall.current || tier(state) !== "free" || !state.trialStart) return;
+    if (state.paywallAt && Date.now() - state.paywallAt < 7 * 864e5) return;
+    shownPaywall.current = true;
+    setTimeout(() => router.push({ pathname: "/paywall", params: { from: "expired" } }), 600);
+  }, [state.welcomed, state.trialStart, state.entitled, state.paywallAt]);
   // după primul verdict (scanarea vine înaintea întrebărilor, 20 nov 2026): cele două întrebări scurte, o dată pe pornire
   const askedWho = useRef(false);
   useEffect(() => {
@@ -54,6 +64,7 @@ export default function Home() {
       <ScrollView contentContainerStyle={st.wrap}>
         <DayHeader />
         {trialDaysLeft(state.trialStart) > 0 && <Hint style={{ textAlign: "center" }}>{s.pay_left(trialDaysLeft(state.trialStart))}</Hint>}
+        {PAYMENTS_LIVE && !!state.trialStart && tier(state) === "free" && <View style={{ paddingHorizontal: 16 }}><TrialEndedCard /></View>}
         <View style={{ paddingHorizontal: 16, gap: 12 }}>
         {/* mesajul de la copil/părinte e cel mai important lucru de pe ecran */}
         <MessageCard />

@@ -100,6 +100,9 @@ async function planNow(s: State, t: Strings): Promise<Plan> {
   if (PAYMENTS_LIVE && s.trialStart && !s.entitled) {
     const d = at(new Date(s.trialStart + (TRIAL_DAYS - 1) * 864e5), 18);
     if (d.getTime() > Date.now()) await schedule(d, t.notif_trial_title, t.notif_trial_body, "trial");
+    // și una singură în prima zi de după probă, la 10:00 (24 nov 2026) — apoi nimic, rămâne cardul de pe prima pagină
+    const d2 = at(new Date(s.trialStart + TRIAL_DAYS * 864e5), 10);
+    if (d2.getTime() > Date.now()) await schedule(d2, t.notif_trial2_title, t.notif_trial2_body, "trial");
   }
   return { ids, gluIgnored, lastGluAt, medFollow };
 }
