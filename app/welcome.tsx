@@ -7,6 +7,7 @@ import { track } from "../src/analytics";
 import { useTheme } from "../src/theme";
 import { Icon, type IconName } from "../src/ui/Icon";
 import { Button, Hint, useScale } from "../src/ui/Primitives";
+import { PAYMENTS_LIVE } from "../src/access";
 
 /**
  * Prima deschidere (20 nov 2026, Alex: „mai întâi scanarea, apoi chestionarul”; 3 din 4 renunțau la chestionarul de 8 pași):
@@ -124,6 +125,10 @@ export default function Welcome() {
         {/* butonul e în zona derulabilă, ca tastatura să nu-l acopere (iOS, 12 nov 2026) */}
         <View style={{ marginTop: "auto", paddingTop: 20 }}>
           <Button title={step === "ready" ? s.w_start : s.w_next} size="xl" disabled={!canNext} onPress={next} />
+          {/* 24 nov 2026 (Alex): cine vrea poate plăti direct, fără să aștepte cele 5 zile */}
+          {step === "ready" && PAYMENTS_LIVE && !state.entitled && (
+            <View style={{ marginTop: 10 }}><Button title={s.pay_now_btn} kind="soft" onPress={() => { finish(); setTimeout(() => router.push({ pathname: "/paywall", params: { from: "welcome_pay" } }), 80); }} /></View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>

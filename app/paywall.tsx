@@ -57,8 +57,8 @@ export default function Paywall() {
         <View style={{ alignItems: "center" }}>
           <View style={{ width: 96, height: 96, borderRadius: 30, backgroundColor: t.accentSoft, alignItems: "center", justifyContent: "center" }}><Icon name="care" size={54} color={t.accent} strokeWidth={1.8} /></View>
         </View>
-        <Text style={{ color: t.ink, fontSize: 28 * k, fontWeight: "800", textAlign: "center", letterSpacing: -0.4 }}>{locked ? lockedTitle : s.pay_title}</Text>
-        <Text style={{ color: t.muted, fontSize: 18 * k, textAlign: "center" }}>{locked ? s.pay_locked_sub : s.pay_sub}</Text>
+        <Text style={{ color: t.ink, fontSize: 28 * k, fontWeight: "800", textAlign: "center", letterSpacing: -0.4 }}>{locked ? lockedTitle : from === "welcome_pay" || from === "trial_home" ? s.pay_direct_title : s.pay_title}</Text>
+        <Text style={{ color: t.muted, fontSize: 18 * k, textAlign: "center" }}>{locked ? s.pay_locked_sub : from === "welcome_pay" || from === "trial_home" ? s.pay_direct_sub : s.pay_sub}</Text>
         {showUsed && <Text style={{ color: t.ink, fontSize: 17 * k, textAlign: "center", fontWeight: "700" }}>{s.pay_used(used.sc, used.pl, used.gl)}</Text>}
         <View style={{ backgroundColor: t.surface, borderRadius: 20, padding: 18, gap: 10, borderWidth: 1, borderColor: t.line }}>
           {perks.map((p, j) => <Text key={j} style={{ color: t.ink, fontSize: 16 * k, lineHeight: 23 * k }}>✓ {p}</Text>)}
@@ -70,11 +70,11 @@ export default function Paywall() {
             <Text style={{ color: t.muted, fontSize: 15 * k }}>{month ? `${s.pay_month(month.price)} · ` : ""}{s.pay_family}</Text>
           </View>
         )}
-        {locked ? (
+        {locked || from === "welcome_pay" || from === "trial_home" ? (
           <>
             {year && <Button title={s.pay_buy_year} size="xl" disabled={busy} onPress={() => buy(year)} />}
             {month && <Button title={s.pay_buy_month} kind="soft" disabled={busy} onPress={() => buy(month)} />}
-            <Button title={s.pay_stay_free} kind={year ? "ghost" : undefined} size={year ? undefined : "xl"} onPress={() => { track("stay_free", { from: from ?? "" }); router.canGoBack() ? router.back() : router.replace("/"); }} />
+            <Button title={locked ? s.pay_stay_free : s.pay_later} kind={year ? "ghost" : undefined} size={year ? undefined : "xl"} onPress={() => { track("stay_free", { from: from ?? "" }); router.canGoBack() ? router.back() : router.replace("/"); }} />
           </>
         ) : (
           <>

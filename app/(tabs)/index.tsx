@@ -63,7 +63,11 @@ export default function Home() {
     <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }} edges={["top"]}>
       <ScrollView contentContainerStyle={st.wrap}>
         <DayHeader />
-        {trialDaysLeft(state.trialStart) > 0 && <Hint style={{ textAlign: "center" }}>{s.pay_left(trialDaysLeft(state.trialStart))}</Hint>}
+        {trialDaysLeft(state.trialStart) > 0 && (
+          <Pressable onPress={() => PAYMENTS_LIVE && !state.entitled && router.push({ pathname: "/paywall", params: { from: "trial_home" } })} accessibilityRole="button">
+            <Hint style={{ textAlign: "center" }}>{s.pay_left(trialDaysLeft(state.trialStart))}{PAYMENTS_LIVE && !state.entitled ? ` · ${s.pay_now_link}` : ""}</Hint>
+          </Pressable>
+        )}
         {PAYMENTS_LIVE && !!state.trialStart && tier(state) === "free" && <View style={{ paddingHorizontal: 16 }}><TrialEndedCard /></View>}
         <View style={{ paddingHorizontal: 16, gap: 12 }}>
         {/* mesajul de la copil/părinte e cel mai important lucru de pe ecran */}
