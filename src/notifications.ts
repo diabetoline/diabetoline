@@ -27,6 +27,7 @@ export function routeFor(data: Record<string, unknown> | null | undefined): stri
   if (kind === "med" || (!kind && data?.medId)) return "/meds";
   if (kind === "summary") return "/day";
   if (kind === "trial") return "/paywall?from=trial";
+  if (kind === "offer3") return "/paywall?from=offer3";
   if (kind === "message") return data?.linkId ? `/messages?link=${data.linkId}` : "/family";
   if (["alert", "high", "low", "heavy", "quiet", "noglu"].includes(kind)) return "/family/parent";
   if (kind === "meal") return "/plate";

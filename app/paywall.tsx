@@ -22,6 +22,7 @@ export default function Paywall() {
   // deschis dintr-o funcție blocată (după probă): titlu diferit și „Rămân pe gratuit” în loc de „Începe proba”
   const locked = !!from && state.trialStart != null && trialDaysLeft(state.trialStart) === 0 && !state.entitled;
   useEffect(() => { track("paywall_view", { from: from ?? "welcome", locked }); if (locked) set({ paywallAt: Date.now() }); }, []);
+  const offer = from === "offer3" || from === "verdict";
   // titlul spune ce pierde omul concret (24 nov 2026, Alex: „pagina de plată foarte eficient după probă”)
   const lockedTitle = from === "plate" ? s.pay_lock_plate : from === "ideas" ? s.pay_lock_ideas : from === "ask" ? s.pay_lock_ask : from === "report" ? s.pay_lock_report : from === "family" ? s.pay_lock_family : from === "scan" ? s.pay_lock_scan : s.pay_locked_title;
   const perMonth = (price: string) => { const n = parseFloat(price.replace(/[^\d.,]/g, "").replace(/\.(?=\d{3})/g, "").replace(",", ".")); const cur = price.replace(/[\d.,\s]/g, "").trim(); return Number.isFinite(n) && n > 0 ? `${(n / 12).toFixed(2).replace(".", ",")} ${cur}` : null; };
@@ -58,20 +59,22 @@ export default function Paywall() {
         <View style={{ alignItems: "center" }}>
           <View style={{ width: 96, height: 96, borderRadius: 30, backgroundColor: t.accentSoft, alignItems: "center", justifyContent: "center" }}><Icon name="care" size={54} color={t.accent} strokeWidth={1.8} /></View>
         </View>
-        <Text style={{ color: t.ink, fontSize: 28 * k, fontWeight: "800", textAlign: "center", letterSpacing: -0.4 }}>{locked ? lockedTitle : from === "welcome_pay" || from === "trial_home" ? s.pay_direct_title : s.pay_title}</Text>
-        <Text style={{ color: t.muted, fontSize: 18 * k, textAlign: "center" }}>{locked ? s.pay_locked_sub : from === "welcome_pay" || from === "trial_home" ? s.pay_direct_sub : s.pay_sub}</Text>
+        <Text style={{ color: t.ink, fontSize: 28 * k, fontWeight: "800", textAlign: "center", letterSpacing: -0.4 }}>{locked ? lockedTitle : offer || from === "welcome_pay" || from === "trial_home" ? s.pay_direct_title : s.pay_title}</Text>
+        <Text style={{ color: t.muted, fontSize: 18 * k, textAlign: "center" }}>{locked ? s.pay_locked_sub : offer || from === "welcome_pay" || from === "trial_home" ? s.pay_direct_sub : s.pay_sub}</Text>
         {showUsed && <Text style={{ color: t.ink, fontSize: 17 * k, textAlign: "center", fontWeight: "700" }}>{s.pay_used(used.sc, used.pl, used.gl)}</Text>}
         <View style={{ backgroundColor: t.surface, borderRadius: 20, padding: 18, gap: 10, borderWidth: 1, borderColor: t.line }}>
           {perks.map((p, j) => <Text key={j} style={{ color: t.ink, fontSize: 16 * k, lineHeight: 23 * k }}>✓ {p}</Text>)}
         </View>
         {year && (
           <View style={{ alignItems: "center", gap: 4 }}>
-            <Text style={{ color: t.ink, fontSize: 24 * k, fontWeight: "800" }}>{s.pay_year(year.price)}</Text>
+            {/* oferta de ziua 3 (25 nov 2026): prețul introductiv din magazin, dacă există și omul e eligibil */}
+            {year.intro ? <Text style={{ color: t.accent, fontSize: 24 * k, fontWeight: "800", textAlign: "center" }}>{s.pay_intro(year.intro, year.price)}</Text> : <Text style={{ color: t.ink, fontSize: 24 * k, fontWeight: "800" }}>{s.pay_year(year.price)}</Text>}
+            {year.intro ? <Hint style={{ textAlign: "center" }}>{s.pay_intro_note}</Hint> : null}
             {perMonth(year.price) ? <Text style={{ color: t.accent, fontSize: 16 * k, fontWeight: "700" }}>{s.pay_per_month(perMonth(year.price)!)}</Text> : null}
             <Text style={{ color: t.muted, fontSize: 15 * k }}>{month ? `${s.pay_month(month.price)} · ` : ""}{s.pay_family}</Text>
           </View>
         )}
-        {locked || from === "welcome_pay" || from === "trial_home" ? (
+        {locked || offer || from === "welcome_pay" || from === "trial_home" ? (
           <>
             {year && <Button title={s.pay_buy_year} size="xl" disabled={busy} onPress={() => buy(year)} />}
             {month && <Button title={s.pay_buy_month} kind="soft" disabled={busy} onPress={() => buy(month)} />}

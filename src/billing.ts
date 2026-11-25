@@ -12,7 +12,7 @@
 import { track } from "./analytics";
 import { NativeModules, Platform, TurboModuleRegistry } from "react-native";
 
-export interface Plan { id: "year" | "month"; price: string; pkg: unknown }
+export interface Plan { id: "year" | "month"; price: string; pkg: unknown; /** prețul introductiv din magazin (oferta de ziua 3, 25 nov 2026), dacă omul e eligibil */ intro?: string }
 type Purchases = typeof import("react-native-purchases").default;
 
 let mod: Purchases | null | undefined;
@@ -52,8 +52,9 @@ export async function fetchPlans(): Promise<Plan[]> {
     const o = (await P.getOfferings()).current;
     if (!o) { track("pay_prices", { ok: false, reason: "no_offering" }); return []; }
     const out: Plan[] = [];
-    if (o.annual) out.push({ id: "year", price: o.annual.product.priceString, pkg: o.annual });
-    if (o.monthly) out.push({ id: "month", price: o.monthly.product.priceString, pkg: o.monthly });
+    const intro = (pr: { introPrice?: { priceString?: string } | null }) => pr.introPrice?.priceString || undefined;
+    if (o.annual) out.push({ id: "year", price: o.annual.product.priceString, pkg: o.annual, intro: intro(o.annual.product) });
+    if (o.monthly) out.push({ id: "month", price: o.monthly.product.priceString, pkg: o.monthly, intro: intro(o.monthly.product) });
     track("pay_prices", { ok: out.length > 0, n: out.length });
     return out;
   } catch (e) { track("pay_prices", { ok: false, reason: String((e as Error)?.message ?? e).slice(0, 80) }); return []; }

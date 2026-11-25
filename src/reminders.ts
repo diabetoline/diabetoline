@@ -41,7 +41,7 @@ async function planNow(s: State, t: Strings): Promise<Plan> {
   // curățăm TOT ce am programat noi înainte, după tip (nu doar id-urile din plan: două planificări în paralel lăsau
   // notificări orfane — 4–5 „Ai făcut mișcare?” la 19:00 pe iOS, 11 nov 2026). Reamintirile fixe de medicamente
   // (fără `kind`) și cele ale copilului rămân.
-  const ours = new Set(["glucose", "meal", "move", "med", "summary", "trial"]);
+  const ours = new Set(["glucose", "meal", "move", "med", "summary", "trial", "offer3"]);
   try {
     for (const n of await Notifications.getAllScheduledNotificationsAsync()) {
       if (ours.has(String((n.content.data as { kind?: string } | null)?.kind))) { try { await Notifications.cancelScheduledNotificationAsync(n.identifier); } catch {} }
@@ -103,6 +103,9 @@ async function planNow(s: State, t: Strings): Promise<Plan> {
     // și una singură în prima zi de după probă, la 10:00 (24 nov 2026) — apoi nimic, rămâne cardul de pe prima pagină
     const d2 = at(new Date(s.trialStart + TRIAL_DAYS * 864e5), 10);
     if (d2.getTime() > Date.now()) await schedule(d2, t.notif_trial2_title, t.notif_trial2_body, "trial");
+    // oferta de ziua 3 (25 nov 2026, Alex: „să insistăm… cu un discount de moment”): o singură notificare în ziua 3 la 18:00 → paywall cu prețul introductiv
+    const d3 = at(new Date(s.trialStart + 2 * 864e5), 18);
+    if (d3.getTime() > Date.now()) await schedule(d3, t.notif_offer3_title, t.notif_offer3_body, "offer3");
   }
   return { ids, gluIgnored, lastGluAt, medFollow };
 }

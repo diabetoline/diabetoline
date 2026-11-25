@@ -14,6 +14,7 @@ import { RecoCard } from "../../src/ui/RecoCard";
 import { trialDaysLeft } from "../../src/money";
 import { PAYMENTS_LIVE, tier } from "../../src/access";
 import { TrialEndedCard } from "../../src/ui/TrialEndedCard";
+import { Offer3Card } from "../../src/ui/Offer3Card";
 import { MessageCard } from "../../src/ui/MessageCard";
 import { ReviewCard } from "../../src/ui/ReviewCard";
 import { NotifCard } from "../../src/ui/NotifCard";
@@ -72,6 +73,7 @@ export default function Home() {
           </Pressable>
         )}
         {PAYMENTS_LIVE && !!state.trialStart && tier(state) === "free" && <View style={{ paddingHorizontal: 16 }}><TrialEndedCard /></View>}
+        <View style={{ paddingHorizontal: 16 }}><Offer3Card /></View>
         <View style={{ paddingHorizontal: 16, gap: 12 }}>
         {/* mesajul de la copil/părinte e cel mai important lucru de pe ecran */}
         <MessageCard />

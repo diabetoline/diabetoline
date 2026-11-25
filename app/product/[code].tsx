@@ -18,6 +18,8 @@ import { Quip } from "../../src/ui/Quip";
 import { VerdictBadge } from "../../src/ui/VerdictBadge";
 import { findOther, findPartner, pastaAlternative, productUrl } from "../../src/partner";
 import catalog from "../../src/catalog.json";
+import { PAYMENTS_LIVE } from "../../src/access";
+import { trialDaysLeft } from "../../src/money";
 import { Linking } from "react-native";
 import { money } from "../../src/money";
 
@@ -120,6 +122,12 @@ export default function ProductScreen() {
         </View>
         {ate && v.level !== "green" && <AfterMeal level={v.level} walkMinutes={v.walkMinutes} />}
         {ate && <Button title={s.log_after} kind="ghost" onPress={() => router.push({ pathname: "/glucose/new", params: { after: p.name } })} />}
+        {/* 25 nov 2026 (Alex: „să insistăm mai mult pentru plată”, dar după ce a primit valoare): în probă, un rând discret sub verdict */}
+        {PAYMENTS_LIVE && !state.entitled && trialDaysLeft(state.trialStart) > 0 && (
+          <Pressable onPress={() => { track("paywall_link", { from: "verdict" }); router.push({ pathname: "/paywall", params: { from: "verdict" } }); }} accessibilityRole="button" hitSlop={8}>
+            <Text style={{ color: t.accent, fontSize: 15 * k, textAlign: "center", fontWeight: "700" }}>{s.pay_verdict_link} ›</Text>
+          </Pressable>
+        )}
 
         {(() => { const alt = v.level !== "green" ? pastaAlternative(p.categories, p.name) : undefined; const mine = findPartner(p.code, p.name, p.brand);
           if (mine) return (
