@@ -72,13 +72,12 @@ export default function Paywall() {
           {perks.map((p, j) => <Text key={j} style={{ color: t.ink, fontSize: 16 * k, lineHeight: 23 * k }}>✓ {p}</Text>)}
         </View>
         {year && (
-          <View style={{ alignItems: "center", gap: 4 }}>
-            {/* oferta de ziua 3 (25 nov 2026): prețul introductiv din magazin, dacă există și omul e eligibil */}
+          <View style={{ alignItems: "center", gap: 6 }}>
+            {/* un singur preț mare (25 nov 2026, Alex: „e foarte confuz” cu 29,99 · 49,99 · 4,17 · 5,99 pe același ecran) */}
             {year.intro ? <View style={{ backgroundColor: t.accent, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 4 }}><Text style={{ color: "#fff", fontSize: 14 * k, fontWeight: "800" }}>{s.pay_off30}</Text></View> : null}
-            {year.intro ? <Text style={{ color: t.accent, fontSize: 24 * k, fontWeight: "800", textAlign: "center" }}>{s.pay_intro(year.intro, year.price)}</Text> : <Text style={{ color: t.ink, fontSize: 24 * k, fontWeight: "800" }}>{s.pay_year(year.price)}</Text>}
-            {year.intro ? <Hint style={{ textAlign: "center" }}>{s.pay_intro_note}</Hint> : null}
-            {perMonth(year.price) ? <Text style={{ color: t.accent, fontSize: 16 * k, fontWeight: "700" }}>{s.pay_per_month(perMonth(year.price)!)}</Text> : null}
-            <Text style={{ color: t.muted, fontSize: 15 * k }}>{month ? `${s.pay_month(month.price)} · ` : ""}{s.pay_family}</Text>
+            <Text style={{ color: year.intro ? t.accent : t.ink, fontSize: 30 * k, fontWeight: "800", textAlign: "center" }}>{year.intro ? s.pay_first_year(year.intro) : s.pay_year(year.price)}</Text>
+            <Text style={{ color: t.muted, fontSize: 15 * k, textAlign: "center" }}>{year.intro ? s.pay_then(year.price) : `${perMonth(year.price) ? s.pay_per_month(perMonth(year.price)!) + " · " : ""}${s.pay_cancel_short}`}</Text>
+            <Text style={{ color: t.muted, fontSize: 15 * k }}>{s.pay_family}</Text>
           </View>
         )}
         {locked || offer || from === "welcome_pay" || from === "trial_home" ? (
@@ -93,9 +92,8 @@ export default function Paywall() {
             {year && <Button title={`${s.pay_buy_year} · ${year.intro ?? year.price}`} kind="ghost" disabled={busy} onPress={() => buy(year)} />}
           </>
         )}
-        {PAYMENTS_LIVE && <Button title={s.pay_restore} kind="ghost" disabled={busy} onPress={doRestore} />}
-        {PAYMENTS_LIVE && <Hint style={{ textAlign: "center" }}>{s.pay_cancel_note}</Hint>}
         <Hint style={{ textAlign: "center" }}>{s.pay_free_note}</Hint>
+        {PAYMENTS_LIVE && <Text onPress={busy ? undefined : doRestore} style={{ color: t.accent, fontSize: 15 * k, textAlign: "center", padding: 8, textDecorationLine: "underline" }}>{s.pay_restore}</Text>}
       </ScrollView>
     </SafeAreaView>
   );
