@@ -37,7 +37,9 @@ export default function Paywall() {
   // ce a folosit omul în probă (17 nov 2026): cifrele lui, nu promisiuni
   const since = state.trialStart ?? 0;
   const used = { sc: state.history.filter((h) => h.t >= since).length, pl: state.meals.filter((m) => m.t >= since).length, gl: state.glucose.filter((g) => g.t >= since).length };
-  const showUsed = locked && used.sc + used.pl + used.gl >= 3;
+  // după probă: cifrele din cele 5 zile; la oferta din ziua 3: „până acum” (25 nov 2026, ținta de conversie a lui Alex)
+  const usedN = used.sc + used.pl + used.gl;
+  const usedText = locked && usedN >= 3 ? s.pay_used(used.sc, used.pl, used.gl) : offer && usedN >= 1 ? s.pay_used_sofar(used.sc, used.pl, used.gl) : null;
   // planurile cu prețul magazinului; cumpărarea deschide fereastra Apple/Google
   const [plans, setPlans] = useState<Plan[]>([]); const [busy, setBusy] = useState(false);
   useEffect(() => { if (PAYMENTS_LIVE) fetchPlans().then(setPlans); }, []);
@@ -61,13 +63,18 @@ export default function Paywall() {
         </View>
         <Text style={{ color: t.ink, fontSize: 28 * k, fontWeight: "800", textAlign: "center", letterSpacing: -0.4 }}>{locked ? lockedTitle : offer || from === "welcome_pay" || from === "trial_home" ? s.pay_direct_title : s.pay_title}</Text>
         <Text style={{ color: t.muted, fontSize: 18 * k, textAlign: "center" }}>{locked ? s.pay_locked_sub : offer || from === "welcome_pay" || from === "trial_home" ? s.pay_direct_sub : s.pay_sub}</Text>
-        {showUsed && <Text style={{ color: t.ink, fontSize: 17 * k, textAlign: "center", fontWeight: "700" }}>{s.pay_used(used.sc, used.pl, used.gl)}</Text>}
+        {usedText && (
+          <View style={{ backgroundColor: t.accentSoft, borderRadius: 16, padding: 14 }}>
+            <Text style={{ color: t.ink, fontSize: 17 * k, lineHeight: 24 * k, textAlign: "center", fontWeight: "700" }}>{usedText}</Text>
+          </View>
+        )}
         <View style={{ backgroundColor: t.surface, borderRadius: 20, padding: 18, gap: 10, borderWidth: 1, borderColor: t.line }}>
           {perks.map((p, j) => <Text key={j} style={{ color: t.ink, fontSize: 16 * k, lineHeight: 23 * k }}>✓ {p}</Text>)}
         </View>
         {year && (
           <View style={{ alignItems: "center", gap: 4 }}>
             {/* oferta de ziua 3 (25 nov 2026): prețul introductiv din magazin, dacă există și omul e eligibil */}
+            {year.intro ? <View style={{ backgroundColor: t.accent, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 4 }}><Text style={{ color: "#fff", fontSize: 14 * k, fontWeight: "800" }}>{s.pay_off30}</Text></View> : null}
             {year.intro ? <Text style={{ color: t.accent, fontSize: 24 * k, fontWeight: "800", textAlign: "center" }}>{s.pay_intro(year.intro, year.price)}</Text> : <Text style={{ color: t.ink, fontSize: 24 * k, fontWeight: "800" }}>{s.pay_year(year.price)}</Text>}
             {year.intro ? <Hint style={{ textAlign: "center" }}>{s.pay_intro_note}</Hint> : null}
             {perMonth(year.price) ? <Text style={{ color: t.accent, fontSize: 16 * k, fontWeight: "700" }}>{s.pay_per_month(perMonth(year.price)!)}</Text> : null}
@@ -76,17 +83,18 @@ export default function Paywall() {
         )}
         {locked || offer || from === "welcome_pay" || from === "trial_home" ? (
           <>
-            {year && <Button title={s.pay_buy_year} size="xl" disabled={busy} onPress={() => buy(year)} />}
-            {month && <Button title={s.pay_buy_month} kind="soft" disabled={busy} onPress={() => buy(month)} />}
+            {year && <Button title={`${s.pay_buy_year} · ${year.intro ?? year.price}`} size="xl" disabled={busy} onPress={() => buy(year)} />}
+            {month && <Button title={`${s.pay_buy_month} · ${month.price}`} kind="soft" disabled={busy} onPress={() => buy(month)} />}
             <Button title={locked ? s.pay_stay_free : s.pay_later} kind={year ? "ghost" : undefined} size={year ? undefined : "xl"} onPress={() => { track("stay_free", { from: from ?? "" }); router.canGoBack() ? router.back() : router.replace("/"); }} />
           </>
         ) : (
           <>
             <Button title={s.pay_trial} size="xl" onPress={start} />
-            {year && <Button title={s.pay_buy_year} kind="ghost" disabled={busy} onPress={() => buy(year)} />}
+            {year && <Button title={`${s.pay_buy_year} · ${year.intro ?? year.price}`} kind="ghost" disabled={busy} onPress={() => buy(year)} />}
           </>
         )}
         {PAYMENTS_LIVE && <Button title={s.pay_restore} kind="ghost" disabled={busy} onPress={doRestore} />}
+        {PAYMENTS_LIVE && <Hint style={{ textAlign: "center" }}>{s.pay_cancel_note}</Hint>}
         <Hint style={{ textAlign: "center" }}>{s.pay_free_note}</Hint>
       </ScrollView>
     </SafeAreaView>
