@@ -94,6 +94,8 @@ export async function GET(request: Request): Promise<Response> {
   const fmt = (m: Record<string, { n: number; back: number }>) => Object.fromEntries(Object.entries(m).sort((a, b) => b[1].n - a[1].n).map(([k, v]) => [k, `${v.back}/${v.n} (${pct(v.back, v.n)}%)`]));
   const out: Record<string, unknown> = { ok: true, days, installs: agg.n, returned_after_24h: `${agg.back}/${agg.n} (${pct(agg.back, agg.n)}%)` };
   for (const [k, v] of Object.entries(agg)) if (k.startsWith("by")) out[k] = fmt(v as Record<string, { n: number; back: number }>);
+  // de ce nu merge plata (26 nov 2026): motivele din pay_fail / pay_prices eșuate, cu țara și platforma
+  out.payIssues = all.filter((e) => e.name === "pay_fail" || (e.name === "pay_prices" && e.props?.ok === false) || e.name === "purchase").map((e) => ({ t: e.t.slice(5, 16), d: e.device.slice(0, 6), c: e.country, p: e.platform, b: e.build, name: e.name, props: e.props }));
   out.legend = SHORT; out.devices = rows;
   return Response.json(out, { headers: { "cache-control": "no-store" } });
 }
