@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Alert, ScrollView, Text, View } from "react-native";
+import { Alert, Platform, ScrollView, Text, View } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { trialDaysLeft } from "../src/money";
@@ -92,6 +92,8 @@ export default function Paywall() {
             {year && <Button title={`${s.pay_buy_year} · ${year.intro ?? year.price}`} kind="ghost" disabled={busy} onPress={() => buy(year)} />}
           </>
         )}
+        {/* 26 nov 2026: 3 oameni au deschis fereastra Google Play și au închis-o — probabil fără card; spunem de factura de telefon și de copil */}
+        {PAYMENTS_LIVE && year && <Hint style={{ textAlign: "center" }}>{Platform.OS === "ios" ? s.pay_how_ios : s.pay_how_android}</Hint>}
         <Hint style={{ textAlign: "center" }}>{s.pay_free_note}</Hint>
         {PAYMENTS_LIVE && <Text onPress={busy ? undefined : doRestore} style={{ color: t.accent, fontSize: 15 * k, textAlign: "center", padding: 8, textDecorationLine: "underline" }}>{s.pay_restore}</Text>}
       </ScrollView>
