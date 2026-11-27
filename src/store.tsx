@@ -51,7 +51,7 @@ export interface State {
   trialStart?: number;
   /** abonament activ (setat de RevenueCat; până atunci nefolosit) */
   entitled?: boolean;
-  /** scanările de azi, pentru limita de 5 pe zi la gratuit */
+  /** produsele noi scanate azi, pentru limita de 3 pe zi la gratuit */
   scans?: { day: string; n: number };
   /** cererea de recenzie: de câte ori am întrebat și de când putem întreba din nou */
   review?: { asked: number; next: number; done?: boolean };

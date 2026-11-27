@@ -5,7 +5,8 @@ import type { State } from "./store";
 
 /**
  * Cine are acces la ce. Trei situații: în probă (5 zile cu tot), abonat (RevenueCat → `state.entitled`), gratuit.
- * Gratuit: 5 scanări pe zi, glicemia, medicamentele, reamintirile, calendarul. Restul cere abonament.
+ * Gratuit (27 nov 2026, Alex): 3 produse NOI pe zi (cele deja scanate și alimentele fără cod rămân libere), 1 poză la farfurie pe zi,
+ * glicemia, medicamentele, reamintirile, calendarul. Restul cere abonament. În probă totul e nelimitat.
  * ENFORCE rămâne false până pornim plățile: logica și ecranele sunt gata, dar nimeni nu e blocat încă.
  */
 import { billingAvailable } from "./billing";
@@ -16,7 +17,8 @@ import { billingAvailable } from "./billing";
  */
 export const PAYMENTS_LIVE = billingAvailable();
 export const ENFORCE = PAYMENTS_LIVE;
-export const FREE_SCANS_PER_DAY = 5;
+export const FREE_SCANS_PER_DAY = 3;
+export const FREE_PLATES_PER_DAY = 1;
 export type Tier = "trial" | "paid" | "free";
 export type Feature = "scan" | "plate" | "ideas" | "ask" | "alternatives" | "family" | "report";
 
@@ -28,12 +30,18 @@ export function tier(s: State): Tier {
 export function scansToday(s: State): number {
   return s.scans?.day === dayKeyLocal(Date.now()) ? s.scans.n : 0;
 }
+/** pozele la farfurie de azi (mesele notate azi cu analiză AI) */
+export function platesToday(s: State): number {
+  const day = dayKeyLocal(Date.now());
+  return s.meals.filter((m) => m.analysis && dayKeyLocal(m.t) === day).length;
+}
 /** true dacă funcția e permisă acum (fără să blocheze nimic cât ENFORCE e false) */
 export function allowed(s: State, f: Feature): boolean {
   if (!ENFORCE) return true;
   const t = tier(s);
   if (t !== "free") return true;
   if (f === "scan") return scansToday(s) < FREE_SCANS_PER_DAY;
+  if (f === "plate") return platesToday(s) < FREE_PLATES_PER_DAY;
   return false;
 }
 export { TRIAL_DAYS };

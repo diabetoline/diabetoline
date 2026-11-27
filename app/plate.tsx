@@ -20,7 +20,7 @@ export default function PlateScreen() {
   const close = () => { if (router.canGoBack()) router.back(); else router.replace("/"); };
   const { t: s, s: state, addMeal } = useStore();
   const gate = useGate(state);
-  useEffect(() => { gate("plate"); }, []);
+  // 27 nov 2026: pe gratuit prima poză a zilei e liberă, gate-ul se verifică la declanșare (nu la deschidere)
   const [perm, requestPerm] = useCameraPermissions();
   const cam = useRef<CameraView>(null);
   const [shot, setShot] = useState<string | null>(null);
@@ -41,6 +41,7 @@ export default function PlateScreen() {
   };
   const take = async () => {
     if (!cam.current || busy) return;
+    if (!gate("plate")) return;
     setBusy(true);
     let uri: string | undefined;
     try { uri = (await cam.current.takePictureAsync({ quality: 0.7, skipProcessing: true }))?.uri; } finally { setBusy(false); }

@@ -71,13 +71,15 @@ export default function ScanScreen() {
 
   const go = async (c: string) => {
     if (busy) return;
-    if (!gate("scan")) return;
+    // pe gratuit se numără doar produsele noi (27 nov 2026): ce e deja în cache și alimentele fără cod rămân libere
+    const known = !!state.cache[c] || c.startsWith("basic:");
+    if (!known && !gate("scan")) return;
     readAny.current = true; setSlow(false);
     setBusy(c); setErr(null);
     const r = await lookupProduct(c, state.cache, state.lang);
     setBusy(null);
     if (!r.ok) { setCur(null); setErr({ code: c, kind: r.error }); if (r.error === "notfound") track("scan_notfound", { code: c, lang: state.lang }); else track("scan_network", { code: c }); return; }
-    countScan();
+    if (!known) countScan();
     const v = analyze(r.product); recordScan(r.product, v, r.from);
     setCur({ p: r.product, v });
     setHits((h) => [...h.filter((x) => x.code !== c), { code: c, name: r.product.name, level: v.level, carbs: v.carbs, t: Date.now() }]);
